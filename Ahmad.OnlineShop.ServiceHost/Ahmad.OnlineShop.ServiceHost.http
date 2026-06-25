@@ -1,0 +1,6 @@
+@Ahmad.OnlineShop.ServiceHost_HostAddress = http://localhost:5141
+
+GET {{Ahmad.OnlineShop.ServiceHost_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
+    <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.API.Config\Ahmad.OnlineShop.Config.csproj" />
+    <ProjectReference Include="..\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AhmadBase.Application" Version="5.0.0" />
+    <PackageReference Include="AhmadBase.Helper" Version="5.0.0" />
+    <PackageReference Include="AhmadBase.Web" Version="1.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Message.Designer.cs">
+      <DependentUpon>Message.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Message.resx">
+      <LastGenOutput>Message.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

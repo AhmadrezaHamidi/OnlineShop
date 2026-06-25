@@ -1,0 +1,72 @@
+﻿using AhmadBase.Persistence.Mapping;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+
+namespace Ahmad.OnlineShop.Persistence.EF.Configurations.Products;
+
+public sealed partial class ProductConfiguration : BaseEntityMapping<Ahmad.OnlineShop.Domain.Products.Product>
+{
+    public void Configure(EntityTypeBuilder<Ahmad.OnlineShop.Domain.Products.Product> builder)
+    {
+        builder.ToTable("Products");
+
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+               .ValueGeneratedNever();
+
+        builder.Property(x => x.Name)
+               .IsRequired()
+               .HasMaxLength(200);
+
+        builder.Property(x => x.Description)
+               .HasMaxLength(1000);
+
+        builder.Property(x => x.Price)
+               .IsRequired()
+               .HasColumnType("decimal(18,2)");
+
+        builder.Property(x => x.CategoryId)
+               .IsRequired();
+
+        builder.Property(x => x.Status)
+               .IsRequired()
+               .HasConversion<string>(); // Enum را به string ذخیره می‌کند
+
+        builder.Property(x => x.CreationTime)
+               .IsRequired();
+
+        builder.Property(x => x.ModificationTime);
+
+        // Relationship with Inventory (Owned / 1:1)
+        builder.OwnsOne(p => p.Inventory, inventory =>
+        {
+            inventory.ToTable("Inventories");
+            inventory.WithOwner().HasForeignKey("ProductId");
+
+            inventory.Property(i => i.Id)
+                     .ValueGeneratedNever();
+
+            inventory.Property(i => i.Quantity)
+                     .IsRequired();
+
+            inventory.Property(i => i.ReservedQuantity)
+                     .IsRequired();
+
+            inventory.Property(i => i.UpdatedAt)
+                     .IsRequired();
+        });
+
+        // Relationship with Images (Collection)
+        builder.HasMany(p => p.Images)
+               .WithOne()
+               .HasForeignKey(i => i.ProductId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        // Indexes
+        builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => x.CategoryId);
+        builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => new { x.CategoryId, x.Status });
+    }
+}

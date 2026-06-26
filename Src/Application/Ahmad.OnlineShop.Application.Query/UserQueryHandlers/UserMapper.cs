@@ -4,7 +4,7 @@ namespace Ahmad.OnlineShop.Application.Query.UserQueryHandlers
 {
     public static class UserMapper
     {
-        public static GetProfileQueryResponse Map(Ahmad.OnlineShop.Domain.User.User user)
+        public static GetProfileQueryResponse Map(Ahmad.OnlineShop.Domain.Users.User user)
             => new GetProfileQueryResponse(
                 user.Id,
                 user.UserName,

@@ -1,6 +1,6 @@
-﻿using Ahmad.OnlineShop.Application.Exceptions;
-using Ahmad.OnlineShop.Application.Query.User;
+﻿using Ahmad.OnlineShop.Application.Query.User;
 using Ahmad.OnlineShop.Domain.Users;
+using Ahmad.OnlineShop.Domain.Users.Exceptions;
 using AhmadBase.Application.Query;
 
 namespace Ahmad.OnlineShop.Application.Query.UserQueryHandlers;

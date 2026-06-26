@@ -11,8 +11,6 @@ public sealed partial class UserConfiguration
     {
         public void Configure(EntityTypeBuilder<Session> builder)
         {
-            builder.ToTable("Sessions");
-
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id)

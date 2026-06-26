@@ -30,16 +30,16 @@ public sealed class ProductsEndpoint : IEndpoint
             ProductConstants.Docs.GetProduct.Summary,
             ProductConstants.Docs.GetProduct.Description);
 
-        group.MapPostEndpoint(           // ← Post
+        group.MapPostEndpoint(
             ProductConstants.Routes.CreateProduct,
-            PostProduct,
+            Post,
             ProductConstants.Names.CreateProduct,
             ProductConstants.Docs.CreateProduct.Summary,
             ProductConstants.Docs.CreateProduct.Description);
 
-        group.MapPutEndpoint(            // ← Put
+        group.MapPutEndpoint(
             ProductConstants.Routes.UpdateProduct,
-            PutProduct,
+            Put,
             ProductConstants.Names.UpdateProduct,
             ProductConstants.Docs.UpdateProduct.Summary,
             ProductConstants.Docs.UpdateProduct.Description);

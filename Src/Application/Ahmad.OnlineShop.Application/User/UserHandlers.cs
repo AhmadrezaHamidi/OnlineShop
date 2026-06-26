@@ -1,12 +1,11 @@
 ﻿using Ahmad.OnlineShop.Application.Contract.User;
+using Ahmad.OnlineShop.Application.Contract.Opetions;
 using Ahmad.OnlineShop.Domain.Users;
 using Ahmad.OnlineShop.Domain.Users.Args;
-using Ahmad.OnlineShop.Config;
+using Ahmad.OnlineShop.Domain.Users.Exceptions;
 using AhmadBase.Application;
 using AhmadBase.Web.Securities;
 using AhmadBase.Helper.Cryptography;
-using Ahmad.OnlineShop.Application.Exceptions;
-using Ahmad.userMa.ngemnt.Config;
 
 namespace Ahmad.OnlineShop.Application.User;
 
@@ -52,11 +51,11 @@ public class UserHandlers(
         var user = await repository.Get(command.UserId, token);
         if (user is null) throw new UserNotFoundException();
 
-        var currentHash = PasswordHasher.HashPassword(command.NewPassword, jwtOptions.Secret);
-        user.Login(currentHash);
-
         if (command.NewPassword != command.ConfirmNewPassword)
             throw new PasswordMismatchException();
+
+        var currentHash = PasswordHasher.HashPassword(command.CurrentPassword, jwtOptions.Secret);
+        user.Login(currentHash);
 
         user.ChangePassword(PasswordHasher.HashPassword(command.NewPassword, jwtOptions.Secret));
         await repository.Update(token);
@@ -114,16 +113,16 @@ public class UserHandlers(
 
         var user = await repository.Get(userName: command.UserName, token);
         if (user is not null)
-            throw new UserExistException();
+            throw new ExistingUserException();
 
 
         var id = repository.GetNextId();
-         var use = await Domain.User.User.Create(new CreateUserArg(
-             id, command.MobileNumber),userService, token);
+        var newUser = await Domain.Users.User.Create(new CreateUserArg(
+            id, command.MobileNumber), userService, token);
 
-        user.ChangePassword(PasswordHasher.HashPassword(command.Password, null));
+        newUser.ChangePassword(PasswordHasher.HashPassword(command.Password, null));
 
-        await repository.Add(user, token);
+        await repository.Add(newUser, token);
 
         return new { };
     }

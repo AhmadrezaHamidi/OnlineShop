@@ -54,19 +54,19 @@ public sealed class AccountEndpoints : IEndpoint
             AccountConstants.Docs.GetProfile.Summary,
             AccountConstants.Docs.GetProfile.Description);
 
-        //group.MapPostEndpoint(
-        //    AccountConstants.Routes.UpdateProfile,
-        //    UpdateAccountProfile,
-        //    AccountConstants.Names.UpdateProfile,
-        //    AccountConstants.Docs.UpdateProfile.Summary,
-        //    AccountConstants.Docs.UpdateProfile.Description);
+        group.MapPatchEndpoint(
+            AccountConstants.Routes.UpdateProfile,
+            UpdateAccountProfile,
+            AccountConstants.Names.UpdateProfile,
+            AccountConstants.Docs.UpdateProfile.Summary,
+            AccountConstants.Docs.UpdateProfile.Description);
 
-        //group.MapPostEndpoint(
-        //    AccountConstants.Routes.ChangePassword,
-        //    ChangeAccountPassword,
-        //    AccountConstants.Names.ChangePassword,
-        //    AccountConstants.Docs.ChangePassword.Summary,
-        //    AccountConstants.Docs.ChangePassword.Description);
+        group.MapPatchEndpoint(
+            AccountConstants.Routes.ChangePassword,
+            ChangeAccountPassword,
+            AccountConstants.Names.ChangePassword,
+            AccountConstants.Docs.ChangePassword.Summary,
+            AccountConstants.Docs.ChangePassword.Description);
 
         //group.MapGetEndpoint(
         //    AccountConstants.Routes.GetAccounts,
@@ -116,17 +116,17 @@ public sealed class AccountEndpoints : IEndpoint
         return await queryBus.DispatchAsync(new GetProfileQuery(userId), cancellation);
     }
 
-    //private static async Task<IResult> UpdateAccountProfile(
-    //    UpdateProfileCommand command,
-    //    ICommandBus sender,
-    //    CancellationToken cancellation)
-    //    => (await sender.Dispatch<IResult>(command, cancellation)).ToHttpResult();
+    private static async Task<long> UpdateAccountProfile(
+        UpdateProfileCommand command,
+        ICommandBus sender,
+        CancellationToken cancellation)
+        => await sender.Dispatch<long>(command, cancellation);
 
-    //private static async Task<IResult> ChangeAccountPassword(
-    //    ChangePasswordCommand command,
-    //    ICommandBus sender,
-    //    CancellationToken cancellation)
-    //    => (await sender.Dispatch<IResult>(command, cancellation)).ToHttpResult();
+    private static async Task<long> ChangeAccountPassword(
+        ChangePasswordCommand command,
+        ICommandBus sender,
+        CancellationToken cancellation)
+        => await sender.Dispatch<long>(command, cancellation);
 
     //private static async Task<IResult> GetAccounts(
     //    IQueryBus queryBus,

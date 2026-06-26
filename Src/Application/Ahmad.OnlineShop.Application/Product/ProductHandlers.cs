@@ -7,12 +7,6 @@ using Ahmad.OnlineShop.Domain.Products.Events;
 using Ahmad.OnlineShop.Domain.Products.Exceptions;
 using AhmadBase.Application;
 using AhmadBase.Application.Query;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ahmad.OnlineShop.Application.Product;
 
@@ -150,21 +144,9 @@ public class ProductHandlers(
         var product = await productRepository.Get(command.ProductId, token);
         if (product is null) throw new ProductNotFoundException();
 
-        public ProductImage AddImage(CreateProductImageArg arg)
-    {
-        GuardMaxImagesNotExceeded();
-        if (arg.Type == ImageType.Primary)
-            GuardPrimaryImageNotExists();
-
-        var image = ProductImage.Create(arg);
-        _images.Add(image);
-
-        RaiseDomainEvent(new ProductImageAddedEvent(Id, image.Id, arg.Url, arg.Type));
-        return image;
-    }
-    var imageId = product.AddImage(command.ImageUrl, command.AltText, command.DisplayOrder);
+        var image = product.AddImage(command.ImageUrl, command.BucketKey, command.Type);
         await productRepository.Update(product, token);
-        return imageId;
+        return image.Id;
     }
 
     public async Task<Guid> Handle(RemoveProductImageCommand command, CancellationToken token)
@@ -218,7 +200,7 @@ public class ProductHandlers(
         if (product is null) throw new ProductNotFoundException();
 
         return ProductMapper.MapToDetail(product);
-    }
+    } 
 
     public async Task<GetInventoryQueryResponse> HandleAsync(GetInventoryQuery query, CancellationToken token)
     {

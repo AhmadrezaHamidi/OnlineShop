@@ -5,67 +5,67 @@ namespace Ahmad.OnlineShop.Domain.Bnpl.Exceptions;
 // Credit
 public sealed class CreditLimitNotFoundException : BusinessException
 {
-    public CreditLimitNotFoundException() : base("سقف اعتبار کاربر یافت نشد.") { }
+    public CreditLimitNotFoundException() : base(Resources.Message.CreditLimitNotFoundException) { }
 }
 
 public sealed class InsufficientCreditException : BusinessException
 {
-    public InsufficientCreditException() : base("سقف اعتبار کافی نیست.") { }
+    public InsufficientCreditException() : base(Resources.Message.InsufficientCreditException) { }
 }
 
 public sealed class InvalidCreditLimitAmountException : BusinessException
 {
-    public InvalidCreditLimitAmountException() : base("مقدار اعتبار باید بزرگتر از صفر باشد.") { }
+    public InvalidCreditLimitAmountException() : base(Resources.Message.InvalidCreditLimitAmountException) { }
 }
 
 public sealed class NegativeCreditException : BusinessException
 {
-    public NegativeCreditException() : base("اعتبار استفاده‌شده نمی‌تواند منفی شود.") { }
+    public NegativeCreditException() : base(Resources.Message.NegativeCreditException) { }
 }
 
 // Contract
 public sealed class BnplContractNotFoundException : BusinessException
 {
-    public BnplContractNotFoundException() : base("قرارداد BNPL یافت نشد.") { }
+    public BnplContractNotFoundException() : base(Resources.Message.BnplContractNotFoundException) { }
 }
 
 public sealed class BnplContractAlreadyCancelledException : BusinessException
 {
-    public BnplContractAlreadyCancelledException() : base("قرارداد قبلاً لغو شده است.") { }
+    public BnplContractAlreadyCancelledException() : base(Resources.Message.BnplContractAlreadyCancelledException) { }
 }
 
 public sealed class BnplContractAlreadyCompletedException : BusinessException
 {
-    public BnplContractAlreadyCompletedException() : base("قرارداد قبلاً تکمیل شده است.") { }
+    public BnplContractAlreadyCompletedException() : base(Resources.Message.BnplContractAlreadyCompletedException) { }
 }
 
 public sealed class BnplContractNotActiveException : BusinessException
 {
-    public BnplContractNotActiveException() : base("قرارداد در وضعیت فعال نیست.") { }
+    public BnplContractNotActiveException() : base(Resources.Message.BnplContractNotActiveException) { }
 }
 
 public sealed class InvalidInstallmentCountException : BusinessException
 {
-    public InvalidInstallmentCountException() : base("تعداد اقساط باید بین ۱ تا ۴۸ باشد.") { }
+    public InvalidInstallmentCountException() : base(Resources.Message.InvalidInstallmentCountException) { }
 }
 
 public sealed class InvalidTotalAmountException : BusinessException
 {
-    public InvalidTotalAmountException() : base("مبلغ کل قرارداد باید بزرگتر از صفر باشد.") { }
+    public InvalidTotalAmountException() : base(Resources.Message.InvalidTotalAmountException) { }
 }
 
 // Installment
 public sealed class InstallmentNotFoundException : BusinessException
 {
-    public InstallmentNotFoundException() : base("قسط مورد نظر یافت نشد.") { }
+    public InstallmentNotFoundException() : base(Resources.Message.InstallmentNotFoundException) { }
 }
 
 public sealed class InstallmentAlreadyPaidException : BusinessException
 {
-    public InstallmentAlreadyPaidException() : base("این قسط قبلاً پرداخت شده است.") { }
+    public InstallmentAlreadyPaidException() : base(Resources.Message.InstallmentAlreadyPaidException) { }
 }
 
 public sealed class InstallmentInvalidAmountException : BusinessException
 {
-    public InstallmentInvalidAmountException() : base("مبلغ قسط باید بزرگتر از صفر باشد.") { }
+    public InstallmentInvalidAmountException() : base(Resources.Message.InstallmentInvalidAmountException) { }
 }

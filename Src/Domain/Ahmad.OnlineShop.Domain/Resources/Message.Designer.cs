@@ -329,5 +329,160 @@ namespace Ahmad.OnlineShop.Domain.Resources {
                 return ResourceManager.GetString("UserNotFoundException", resourceCulture);
             }
         }
+
+        internal static string AdminNotFoundException {
+            get {
+                return ResourceManager.GetString("AdminNotFoundException", resourceCulture);
+            }
+        }
+
+        internal static string AdminEmailAlreadyExistsException {
+            get {
+                return ResourceManager.GetString("AdminEmailAlreadyExistsException", resourceCulture);
+            }
+        }
+
+        internal static string AdminInvalidEmailException {
+            get {
+                return ResourceManager.GetString("AdminInvalidEmailException", resourceCulture);
+            }
+        }
+
+        internal static string AdminInvalidNameException {
+            get {
+                return ResourceManager.GetString("AdminInvalidNameException", resourceCulture);
+            }
+        }
+
+        internal static string AdminAlreadyActiveException {
+            get {
+                return ResourceManager.GetString("AdminAlreadyActiveException", resourceCulture);
+            }
+        }
+
+        internal static string AdminAlreadyInactiveException {
+            get {
+                return ResourceManager.GetString("AdminAlreadyInactiveException", resourceCulture);
+            }
+        }
+
+        internal static string ReportNotFoundException {
+            get {
+                return ResourceManager.GetString("ReportNotFoundException", resourceCulture);
+            }
+        }
+
+        internal static string ReportAlreadyCompletedException {
+            get {
+                return ResourceManager.GetString("ReportAlreadyCompletedException", resourceCulture);
+            }
+        }
+
+        internal static string AuditInvalidActionException {
+            get {
+                return ResourceManager.GetString("AuditInvalidActionException", resourceCulture);
+            }
+        }
+
+        internal static string AuditInvalidEntityException {
+            get {
+                return ResourceManager.GetString("AuditInvalidEntityException", resourceCulture);
+            }
+        }
+
+        internal static string CreditLimitNotFoundException {
+            get { return ResourceManager.GetString("CreditLimitNotFoundException", resourceCulture); }
+        }
+
+        internal static string InsufficientCreditException {
+            get { return ResourceManager.GetString("InsufficientCreditException", resourceCulture); }
+        }
+
+        internal static string InvalidCreditLimitAmountException {
+            get { return ResourceManager.GetString("InvalidCreditLimitAmountException", resourceCulture); }
+        }
+
+        internal static string NegativeCreditException {
+            get { return ResourceManager.GetString("NegativeCreditException", resourceCulture); }
+        }
+
+        internal static string BnplContractNotFoundException {
+            get { return ResourceManager.GetString("BnplContractNotFoundException", resourceCulture); }
+        }
+
+        internal static string BnplContractAlreadyCancelledException {
+            get { return ResourceManager.GetString("BnplContractAlreadyCancelledException", resourceCulture); }
+        }
+
+        internal static string BnplContractAlreadyCompletedException {
+            get { return ResourceManager.GetString("BnplContractAlreadyCompletedException", resourceCulture); }
+        }
+
+        internal static string BnplContractNotActiveException {
+            get { return ResourceManager.GetString("BnplContractNotActiveException", resourceCulture); }
+        }
+
+        internal static string InvalidInstallmentCountException {
+            get { return ResourceManager.GetString("InvalidInstallmentCountException", resourceCulture); }
+        }
+
+        internal static string InvalidTotalAmountException {
+            get { return ResourceManager.GetString("InvalidTotalAmountException", resourceCulture); }
+        }
+
+        internal static string InstallmentNotFoundException {
+            get { return ResourceManager.GetString("InstallmentNotFoundException", resourceCulture); }
+        }
+
+        internal static string InstallmentAlreadyPaidException {
+            get { return ResourceManager.GetString("InstallmentAlreadyPaidException", resourceCulture); }
+        }
+
+        internal static string InstallmentInvalidAmountException {
+            get { return ResourceManager.GetString("InstallmentInvalidAmountException", resourceCulture); }
+        }
+
+        internal static string OrderNotFoundException {
+            get { return ResourceManager.GetString("OrderNotFoundException", resourceCulture); }
+        }
+        internal static string OrderNoItemsException {
+            get { return ResourceManager.GetString("OrderNoItemsException", resourceCulture); }
+        }
+        internal static string OrderAlreadyCancelledException {
+            get { return ResourceManager.GetString("OrderAlreadyCancelledException", resourceCulture); }
+        }
+        internal static string OrderAlreadyDeliveredException {
+            get { return ResourceManager.GetString("OrderAlreadyDeliveredException", resourceCulture); }
+        }
+        internal static string OrderInvalidStatusTransitionException {
+            get { return ResourceManager.GetString("OrderInvalidStatusTransitionException", resourceCulture); }
+        }
+        internal static string OrderItemNotFoundException {
+            get { return ResourceManager.GetString("OrderItemNotFoundException", resourceCulture); }
+        }
+        internal static string OrderItemInvalidQuantityException {
+            get { return ResourceManager.GetString("OrderItemInvalidQuantityException", resourceCulture); }
+        }
+        internal static string OrderItemInvalidUnitPriceException {
+            get { return ResourceManager.GetString("OrderItemInvalidUnitPriceException", resourceCulture); }
+        }
+        internal static string PaymentNotFoundException {
+            get { return ResourceManager.GetString("PaymentNotFoundException", resourceCulture); }
+        }
+        internal static string PaymentAmountMismatchException {
+            get { return ResourceManager.GetString("PaymentAmountMismatchException", resourceCulture); }
+        }
+        internal static string PaymentInvalidAmountException {
+            get { return ResourceManager.GetString("PaymentInvalidAmountException", resourceCulture); }
+        }
+        internal static string OrderCannotConfirmWithoutPaymentException {
+            get { return ResourceManager.GetString("OrderCannotConfirmWithoutPaymentException", resourceCulture); }
+        }
+        internal static string RoleNotFoundException {
+            get { return ResourceManager.GetString("RoleNotFoundException", resourceCulture); }
+        }
+        internal static string InvalidRefreshTokenException {
+            get { return ResourceManager.GetString("InvalidRefreshTokenException", resourceCulture); }
+        }
     }
 }

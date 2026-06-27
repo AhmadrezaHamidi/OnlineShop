@@ -1,4 +1,4 @@
-﻿using Ahmad.OnlineShop.Application.Commands;
+using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Rest.EndPoints.Order;
 using AhmadBase.Application;
 using AhmadBase.Web;
@@ -20,25 +20,22 @@ public sealed class OrderPaymentEndpoints : IEndpoint
             .WithName(OrderConstants.Names.RecordPayment)
             .WithSummary(OrderConstants.Docs.RecordPayment.Summary);
 
-        group.MapPatch(OrderConstants.Routes.CompletePayment, ["PATCH"], CompletePayment)
+        group.MapPatch(OrderConstants.Routes.CompletePayment, CompletePayment)
             .WithName(OrderConstants.Names.CompletePayment)
             .WithSummary(OrderConstants.Docs.CompletePayment.Summary);
 
-        group.MapMethods(OrderConstants.Routes.FailPayment, ["PATCH"], FailPayment)
+        group.MapPatch(OrderConstants.Routes.FailPayment, FailPayment)
             .WithName(OrderConstants.Names.FailPayment)
             .WithSummary(OrderConstants.Docs.FailPayment.Summary);
     }
 
-    // ── Handlers ─────────────────────────────────────────────────────
-
     private static async Task<IResult> RecordPayment(
         long id,
-        RecordPaymentRequest body,
+        RecordPaymentCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {
-        var result = await bus.Dispatch<long>(
-            new RecordPaymentCommand(id, body.PaymentId, body.Amount, body.Provider), ct);
+        var result = await bus.Dispatch<long>(command with { OrderId = id }, ct);
         return Results.Ok(ApiResponse<long>.Ok(result));
     }
 
@@ -62,9 +59,3 @@ public sealed class OrderPaymentEndpoints : IEndpoint
         return Results.Ok(ApiResponse<long>.Ok(result));
     }
 }
-
-public sealed record RecordPaymentRequest(
-    long PaymentId,
-    decimal Amount,
-    string? Provider = null
-);

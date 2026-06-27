@@ -6,12 +6,12 @@ namespace Ahmad.OnlineShop.Domain.Bnpl.Entities;
 
 public sealed class Installment : TEntity<long>
 {
-    public long              ContractId    { get; private set; }
-    public int               InstallmentNo { get; private set; }
-    public decimal           Amount        { get; private set; }
-    public DateTime          DueDate       { get; private set; }
-    public DateTime?         PaidAt        { get; private set; }
-    public InstallmentStatus Status        { get; private set; }
+    public long ContractId { get; private set; }
+    public int InstallmentNo { get; private set; }
+    public decimal Amount { get; private set; }
+    public DateTime DueDate { get; private set; }
+    public DateTime? PaidAt { get; private set; }
+    public InstallmentStatus Status { get; private set; }
 
     public bool IsOverdue => Status == InstallmentStatus.Pending && DateTime.UtcNow > DueDate;
 
@@ -21,12 +21,12 @@ public sealed class Installment : TEntity<long>
     {
         GuardAmount(amount);
 
-        Id            = id;
-        ContractId    = contractId;
+        Id = id;
+        ContractId = contractId;
         InstallmentNo = installmentNo;
-        Amount        = amount;
-        DueDate       = dueDate;
-        Status        = InstallmentStatus.Pending;
+        Amount = amount;
+        DueDate = dueDate;
+        Status = InstallmentStatus.Pending;
     }
 
     internal void MarkPaid()

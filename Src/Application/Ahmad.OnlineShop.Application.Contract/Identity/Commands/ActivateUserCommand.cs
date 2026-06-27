@@ -1,5 +1,8 @@
-﻿using AhmadBase.Application;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Identity.Application.Commands;
 
-public record ActivateUserCommand(long UserId) : ICommand<bool>;
+public record ActivateUserCommand(
+    [property: JsonIgnore] long UserId
+) : ICommand<bool>;

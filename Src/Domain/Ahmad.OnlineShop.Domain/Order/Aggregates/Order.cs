@@ -3,7 +3,6 @@ using Ahmad.OnlineShop.Domain.Order.Entities;
 using Ahmad.OnlineShop.Domain.Order.Enums;
 using Ahmad.OnlineShop.Domain.Order.Events;
 using Ahmad.OnlineShop.Domain.Order.Exceptions;
-using AhmadBase.Doamin;
 
 namespace Ahmad.OnlineShop.Domain.Order.Aggregates;
 

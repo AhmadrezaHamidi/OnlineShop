@@ -1,7 +1,8 @@
 ﻿using Ahmad.OnlineShop.Domain.Products;
 using AhmadBase.Persistence.NHiLoHelper;
-using AhmadBase.Doamin;
+using Ahmad.OnlineShop.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Ahmad.OnlineShop.Domain.Products.Enums;
 
 
 namespace Ahmad.OnlineShop.Persistence.EF.Repositories;
@@ -23,17 +24,29 @@ public class ProductRepository : IProductRepository
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id, token);
 
-    public async Task<(List<Product> Items, int TotalCount)> GetListAsync(
-        int page = 1,
-        int pageSize = 20,
-        string? search = null,
-        long? categoryId = null,
-        CancellationToken token = default)
+    public async Task AddAsync(Product product, CancellationToken token)
+    {
+        await _context.Products.AddAsync(product, token);
+        await _context.SaveChangesAsync(token);
+    }
+
+    public Task UpdateAsync(Product product, CancellationToken token)
+    {
+        _context.Products.Update(product);
+        return _context.SaveChangesAsync(token);
+    }
+
+    public long GetNextId()
+        => _hiLoGenerator.GetNextId<Product>();
+
+
+    public async Task<(List<Product> Items, int Total)> GetListAsync(int page, int pageSize,
+        string? search, long? categoryId, ProductStatus? status, CancellationToken token = default)
     {
         var query = _context.Products
-            .Include(p => p.Inventory)
-            .Include(p => p.Images)
-            .AsQueryable();
+           .Include(p => p.Inventory)
+           .Include(p => p.Images)
+           .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -56,19 +69,4 @@ public class ProductRepository : IProductRepository
 
         return (items, totalCount);
     }
-
-    public async Task Add(Product product, CancellationToken token)
-    {
-        await _context.Products.AddAsync(product, token);
-        await _context.SaveChangesAsync(token);
-    }
-
-    public Task Update(Product product, CancellationToken token)
-    {
-        _context.Products.Update(product);
-        return _context.SaveChangesAsync(token);
-    }
-
-    public long GetNextId()
-        => _hiLoGenerator.GetNextId<Product>();
 }

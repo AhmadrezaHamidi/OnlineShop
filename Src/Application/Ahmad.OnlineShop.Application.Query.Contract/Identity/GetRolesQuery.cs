@@ -1,6 +1,9 @@
-﻿using AhmadBase.Application.Query;
-using Identity.Application.Dtos;
+using AhmadBase.Application.Query;
 
 namespace Identity.Application.Query.Queries;
 
-public record GetRolesQuery() : IQuery<IReadOnlyList<RoleDto>>;
+public record GetRolesQuery() : IQuery<IReadOnlyList<GetRoleQueryResponse>>;
+
+public sealed record GetRoleQueryResponse(
+    long   Id,
+    string Name);

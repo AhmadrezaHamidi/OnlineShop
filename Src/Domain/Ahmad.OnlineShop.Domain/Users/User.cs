@@ -9,6 +9,8 @@ namespace Ahmad.OnlineShop.Domain.User;
 
 public class User : IdentityUser<long>, IAggregateRoot
 {
+    public IReadOnlyCollection<IEvent> DomainEvents => Array.Empty<IEvent>();
+    public void ClearDomainEvents() { }
     public string? Name { get; private set; }
     public string? Family { get; private set; }
     public string? DisplayName { get; private set; }

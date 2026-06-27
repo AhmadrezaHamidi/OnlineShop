@@ -1,9 +1,17 @@
-﻿using AhmadBase.Application;
-using Identity.Application.Dtos;
+using AhmadBase.Application;
 
 namespace Identity.Application.Commands;
 
 public record LoginCommand(
     string Email,
     string Password
-) : ICommand<TokenResponseDto>;
+) : ICommand<LoginCommandResponse>;
+
+public sealed record LoginCommandResponse(
+    string   AccessToken,
+    string   RefreshToken,
+    DateTime AccessTokenExpiresAt,
+    DateTime RefreshTokenExpiresAt,
+    long     UserId,
+    string   FullName,
+    string   Email);

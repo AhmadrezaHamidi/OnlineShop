@@ -3,7 +3,6 @@ using AhmadBase.Application.Query;
 using AhmadBase.Web;
 using AhmadBase.Web.Models;
 using Ahmad.OnlineShop.Application.Commands;
-using Ahmad.OnlineShop.Application.Dtos;
 using Ahmad.OnlineShop.Application.Query.Queries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +50,7 @@ public sealed class BnplCreditEndpoints : IEndpoint
         CancellationToken cancellation)
     {
         var result = await queryBus.DispatchAsync(new GetCreditLimitQuery(userId), cancellation);
-        return Results.Ok(ApiResponse<CreditLimitDto>.Ok(result));
+        return Results.Ok(ApiResponse<GetCreditLimitQueryResponse>.Ok(result));
     }
 
     private static async Task<IResult> IncreaseCredit(

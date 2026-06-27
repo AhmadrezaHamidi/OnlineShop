@@ -1,12 +1,5 @@
-﻿using AhmadBase.Application;
-using AhmadBase.Web;
-using AhmadBase.Web.Models;
+using Ahmad.OnlineShop.Rest.EndPoints.Identity;
 using Identity.Application.Commands;
-using Identity.Application.Dtos;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace Identity.Rest.Endpoints;
 
@@ -14,49 +7,77 @@ public class AuthEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/auth").WithTags("Auth");
+        var group = app.MapGroup(IdentityConstants.Routes.BaseRoute)
+            .WithApiVersionSet()
+            .WithTags("Auth");
 
-        group.MapPost("/register",
-            async ([FromBody] RegisterCommand cmd, ICommandBus bus, CancellationToken ct) =>
-                Results.Ok(ApiResponse<long>.Ok(await bus.Dispatch<long>(cmd, ct))))
-            .WithName("Auth.Register")
-            .WithSummary("Register a new user")
-            .Produces<ApiResponse<long>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.Register,
+            Register,
+            IdentityConstants.Names.Register,
+            IdentityConstants.Docs.Register.Summary,
+            IdentityConstants.Docs.Register.Description);
 
-        group.MapPost("/login",
-            async ([FromBody] LoginCommand cmd, ICommandBus bus, CancellationToken ct) =>
-                Results.Ok(ApiResponse<TokenResponseDto>.Ok(
-                    await bus.Dispatch<TokenResponseDto>((ICommand<TokenResponseDto>)cmd, ct))))
-            .WithName("Auth.Login")
-            .WithSummary("Login and receive JWT tokens")
-            .Produces<ApiResponse<TokenResponseDto>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPostEndpoint<LoginCommandResponse>(
+            IdentityConstants.Routes.Login,
+            Login,
+            IdentityConstants.Names.Login,
+            IdentityConstants.Docs.Login.Summary,
+            IdentityConstants.Docs.Login.Description);
 
-        group.MapPost("/refresh",
-            async ([FromBody] RefreshTokenCommand cmd, ICommandBus bus, CancellationToken ct) =>
-                Results.Ok(ApiResponse<TokenResponseDto>.Ok(
-                    await bus.Dispatch<TokenResponseDto>((ICommand<TokenResponseDto>)cmd, ct))))
-            .WithName("Auth.RefreshToken")
-            .WithSummary("Exchange a refresh token for new tokens")
-            .Produces<ApiResponse<TokenResponseDto>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPostEndpoint<LoginCommandResponse>(
+            IdentityConstants.Routes.RefreshToken,
+            RefreshToken,
+            IdentityConstants.Names.RefreshToken,
+            IdentityConstants.Docs.RefreshToken.Summary,
+            IdentityConstants.Docs.RefreshToken.Description);
 
-        group.MapPost("/logout",
-            async ([FromBody] LogoutCommand cmd, ICommandBus bus, CancellationToken ct) =>
-                Results.Ok(ApiResponse<bool>.Ok(await bus.Dispatch<bool>((ICommand<bool>)cmd, ct))))
-            .WithName("Auth.Logout")
-            .WithSummary("Revoke the current refresh token")
-            .RequireAuthorization()
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.Logout,
+            Logout,
+            IdentityConstants.Names.Logout,
+            IdentityConstants.Docs.Logout.Summary,
+            IdentityConstants.Docs.Logout.Description)
+            .RequireAuthorization();
 
-        group.MapPost("/change-password",
-            async ([FromBody] ChangePasswordCommand cmd, ICommandBus bus, CancellationToken ct) =>
-                Results.Ok(ApiResponse<bool>.Ok(await bus.Dispatch<bool>((ICommand<bool>)cmd, ct))))
-            .WithName("Auth.ChangePassword")
-            .WithSummary("Change the authenticated user's password")
-            .RequireAuthorization()
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.ChangePassword,
+            ChangePassword,
+            IdentityConstants.Names.ChangePassword,
+            IdentityConstants.Docs.ChangePassword.Summary,
+            IdentityConstants.Docs.ChangePassword.Description)
+            .RequireAuthorization();
     }
+
+    // ── Handlers ──────────────────────────────────────────────────────────────
+
+    private static async Task<long> Register(
+        RegisterCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<long>(command, ct);
+
+    private static async Task<LoginCommandResponse> Login(
+        LoginCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
+
+    private static async Task<LoginCommandResponse> RefreshToken(
+        RefreshTokenCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
+
+    private static async Task<bool> Logout(
+        LogoutCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)command, ct);
+
+    private static async Task<bool> ChangePassword(
+        ChangePasswordCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)command, ct);
 }

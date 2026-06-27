@@ -2,9 +2,9 @@
 using Ahmad.OnlineShop.Domain.Order.Args;
 using Ahmad.OnlineShop.Domain.Order.Entities;
 using Ahmad.OnlineShop.Domain.Order.Enums;
+using Ahmad.OnlineShop.Domain.Order.Events;
 using Ahmad.OnlineShop.Domain.Order.Exceptions;
 using OrderAgg = Ahmad.OnlineShop.Domain.Order.Aggregates;
-using Xunit;
 
 
 
@@ -171,20 +171,20 @@ public class OrderTests
 
     // ── Helper Methods ─────────────────────────────────────
 
-    private Order CreatePendingOrder()
+    private OrderAgg.Order CreatePendingOrder()
     {
         var arg = new CreateOrderArg(_orderId, _userId, PaymentMethod.Online);
-        return Order.Create(arg);
+        return OrderAgg.Order.Create(arg);
     }
 
-    private Order CreateOrderWithItems()
+    private OrderAgg.Order CreateOrderWithItems()
     {
         var order = CreatePendingOrder();
         order.AddItem(new AddOrderItemArg(1, 101, 2, 150_000m));
         return order;
     }
 
-    private Order CreateConfirmedOrder()
+    private OrderAgg.Order CreateConfirmedOrder()
     {
         var order = CreateOrderWithItems();
         order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, "ZarinPal"));
@@ -192,11 +192,10 @@ public class OrderTests
         return order;
     }
 
-    private Order CreateShippedOrder()
+    private OrderAgg.Order CreateShippedOrder()
     {
         var order = CreateConfirmedOrder();
         order.Ship();
         return order;
     }
-}
 }

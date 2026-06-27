@@ -3,7 +3,6 @@ using AhmadBase.Application.Query;
 using AhmadBase.Web;
 using AhmadBase.Web.Models;
 using Ahmad.OnlineShop.Application.Commands;
-using Ahmad.OnlineShop.Application.Dtos;
 using Ahmad.OnlineShop.Application.Query.Queries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -109,7 +108,7 @@ public sealed class BnplContractEndpoints : IEndpoint
         CancellationToken cancellation)
     {
         var result = await queryBus.DispatchAsync(new GetContractQuery(id), cancellation);
-        return Results.Ok(ApiResponse<ContractDto>.Ok(result));
+        return Results.Ok(ApiResponse<GetContractQueryResponse>.Ok(result));
     }
 
     private static async Task<IResult> GetUserContracts(
@@ -121,7 +120,7 @@ public sealed class BnplContractEndpoints : IEndpoint
     {
         var result = await queryBus.DispatchAsync(
             new GetUserContractsQuery(userId, page, pageSize), cancellation);
-        return Results.Ok(ApiResponse<PagedResult<ContractDto>>.Ok(result));
+        return Results.Ok(ApiResponse<QueryPagedResult<GetContractQueryResponse>>.Ok(result));
     }
 
     private static async Task<IResult> GetInstallments(
@@ -130,6 +129,6 @@ public sealed class BnplContractEndpoints : IEndpoint
         CancellationToken cancellation)
     {
         var result = await queryBus.DispatchAsync(new GetInstallmentsQuery(id), cancellation);
-        return Results.Ok(ApiResponse<List<InstallmentDto>>.Ok(result));
+        return Results.Ok(ApiResponse<List<GetInstallmentResponse>>.Ok(result));
     }
 }

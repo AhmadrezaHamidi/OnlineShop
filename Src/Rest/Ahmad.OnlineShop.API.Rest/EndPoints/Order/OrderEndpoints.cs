@@ -1,5 +1,5 @@
 ﻿using Ahmad.OnlineShop.Application.Commands;
-using Ahmad.OnlineShop.Application.Dtos;
+using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Application.Query.Queries;
 using Ahmad.OnlineShop.Domain.Order.Enums;
 using Ahmad.OnlineShop.Rest.EndPoints.Order;
@@ -131,11 +131,11 @@ public sealed class OrderEndpoints : IEndpoint
 
     private static async Task<IResult> CancelOrder(
         long id,
-        CancelOrderRequest body,
+        CancelOrderCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {
-        var result = await bus.Dispatch<long>(new CancelOrderCommand(id, body.Reason), ct);
+        var result = await bus.Dispatch<long>(command with { OrderId = id }, ct);
         return Results.Ok(ApiResponse<long>.Ok(result));
     }
 
@@ -148,9 +148,9 @@ public sealed class OrderEndpoints : IEndpoint
         long? userId = null,
         OrderStatus? status = null)
     {
-        var result = await queryBus.DispatchAsync<PagedResult<OrderDto>>(
+        var result = await queryBus.DispatchAsync<QueryPagedResult<GetOrderQueryResponse>>(
             new GetOrdersQuery(page, pageSize, userId, status), ct);
-        return Results.Ok(ApiResponse<PagedResult<OrderDto>>.Ok(result));
+        return Results.Ok(ApiResponse<QueryPagedResult<GetOrderQueryResponse>>.Ok(result));
     }
 
     private static async Task<IResult> GetOrder(
@@ -158,7 +158,7 @@ public sealed class OrderEndpoints : IEndpoint
         IQueryBus queryBus,
         CancellationToken ct)
     {
-        var result = await queryBus.DispatchAsync<OrderDto>(new GetOrderQuery(id), ct);
-        return Results.Ok(ApiResponse<OrderDto>.Ok(result));
+        var result = await queryBus.DispatchAsync<GetOrderQueryResponse>(new GetOrderQuery(id), ct);
+        return Results.Ok(ApiResponse<GetOrderQueryResponse>.Ok(result));
     }
 }

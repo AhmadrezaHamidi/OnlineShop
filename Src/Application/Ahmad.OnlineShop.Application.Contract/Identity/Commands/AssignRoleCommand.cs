@@ -1,8 +1,9 @@
-﻿using AhmadBase.Application;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Identity.Application.Commands;
 
 public record AssignRoleCommand(
-    long UserId,
-    long RoleId
+    [property: JsonIgnore] long UserId,
+    [property: JsonIgnore] long RoleId
 ) : ICommand<bool>;

@@ -1,14 +1,6 @@
-﻿using AhmadBase.Application;
-using AhmadBase.Application.Query;
-using AhmadBase.Web;
-using AhmadBase.Web.Models;
+using Ahmad.OnlineShop.Rest.EndPoints.Identity;
 using Identity.Application.Commands;
-using Identity.Application.Dtos;
 using Identity.Application.Query.Queries;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace Identity.Rest.Endpoints;
 
@@ -16,120 +8,136 @@ public class UserEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/users")
+        var group = app.MapGroup(IdentityConstants.Routes.BaseRoute)
+            .WithApiVersionSet()
             .WithTags("Users")
             .RequireAuthorization();
 
         // ── Queries ───────────────────────────────────────────────────────────
 
-        group.MapGet("/{userId:long}",
-            async (long userId, IQueryBus queryBus, CancellationToken ct) =>
-            {
-                var result = await queryBus.DispatchAsync(new GetUserQuery(userId), ct);
-                return Results.Ok(ApiResponse<UserDto>.Ok(result));
-            })
-            .WithName("Users.GetById")
-            .WithSummary("Get a user by ID")
-            .Produces<ApiResponse<UserDto>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapGetEndpoint<GetUserQueryResponse>(
+            IdentityConstants.Routes.GetUser,
+            GetUser,
+            IdentityConstants.Names.GetUser,
+            IdentityConstants.Docs.GetUser.Summary,
+            IdentityConstants.Docs.GetUser.Description);
 
-        group.MapGet("/",
-            async ([AsParameters] GetUsersQuery query, IQueryBus queryBus, CancellationToken ct) =>
-            {
-                var result = await queryBus.DispatchAsync(query, ct);
-                return Results.Ok(ApiResponse<PagedResult<UserDto>>.Ok(result));
-            })
-            .WithName("Users.GetList")
-            .WithSummary("Get a paged list of users")
-            .Produces<ApiResponse<PagedResult<UserDto>>>(StatusCodes.Status200OK);
+        group.MapGetEndpoint<IdentityPagedResult<GetUserQueryResponse>>(
+            IdentityConstants.Routes.GetUsers,
+            GetUsers,
+            IdentityConstants.Names.GetUsers,
+            IdentityConstants.Docs.GetUsers.Summary,
+            IdentityConstants.Docs.GetUsers.Description);
 
-        group.MapGet("/roles",
-            async (IQueryBus queryBus, CancellationToken ct) =>
-            {
-                var result = await queryBus.DispatchAsync(new GetRolesQuery(), ct);
-                return Results.Ok(ApiResponse<IReadOnlyList<RoleDto>>.Ok(result));
-            })
-            .WithName("Users.GetRoles")
-            .WithSummary("Get all available roles")
-            .Produces<ApiResponse<IReadOnlyList<RoleDto>>>(StatusCodes.Status200OK);
+        group.MapGetEndpoint<IReadOnlyList<GetRoleQueryResponse>>(
+            IdentityConstants.Routes.GetRoles,
+            GetRoles,
+            IdentityConstants.Names.GetRoles,
+            IdentityConstants.Docs.GetRoles.Summary,
+            IdentityConstants.Docs.GetRoles.Description);
 
         // ── Commands ──────────────────────────────────────────────────────────
 
-        group.MapPut("/{userId:long}/profile",
-            async (long userId, [FromBody] UpdateProfileRequest req, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new UpdateProfileCommand(userId, req.FullName, req.PhoneNumber);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.UpdateProfile")
-            .WithSummary("Update user profile")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapPutEndpoint(
+            IdentityConstants.Routes.UpdateProfile,
+            UpdateProfile,
+            IdentityConstants.Names.UpdateProfile,
+            IdentityConstants.Docs.UpdateProfile.Summary,
+            IdentityConstants.Docs.UpdateProfile.Description);
 
-        group.MapPost("/{userId:long}/roles/{roleId:long}",
-            async (long userId, long roleId, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new AssignRoleCommand(userId, roleId);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.AssignRole")
-            .WithSummary("Assign a role to a user")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.AssignRole,
+            AssignRole,
+            IdentityConstants.Names.AssignRole,
+            IdentityConstants.Docs.AssignRole.Summary,
+            IdentityConstants.Docs.AssignRole.Description);
 
-        group.MapDelete("/{userId:long}/roles/{roleId:long}",
-            async (long userId, long roleId, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new RemoveRoleCommand(userId, roleId);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.RemoveRole")
-            .WithSummary("Remove a role from a user")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapDeleteEndpoint(
+            IdentityConstants.Routes.RemoveRole,
+            RemoveRole,
+            IdentityConstants.Names.RemoveRole,
+            IdentityConstants.Docs.RemoveRole.Summary,
+            IdentityConstants.Docs.RemoveRole.Description);
 
-        group.MapPost("/{userId:long}/activate",
-            async (long userId, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new ActivateUserCommand(userId);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.Activate")
-            .WithSummary("Activate a user account")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.ActivateUser,
+            ActivateUser,
+            IdentityConstants.Names.ActivateUser,
+            IdentityConstants.Docs.ActivateUser.Summary,
+            IdentityConstants.Docs.ActivateUser.Description);
 
-        group.MapPost("/{userId:long}/deactivate",
-            async (long userId, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new DeactivateUserCommand(userId);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.Deactivate")
-            .WithSummary("Deactivate a user account")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.DeactivateUser,
+            DeactivateUser,
+            IdentityConstants.Names.DeactivateUser,
+            IdentityConstants.Docs.DeactivateUser.Summary,
+            IdentityConstants.Docs.DeactivateUser.Description);
 
-        group.MapPost("/{userId:long}/suspend",
-            async (long userId, ICommandBus bus, CancellationToken ct) =>
-            {
-                var cmd    = new SuspendUserCommand(userId);
-                var result = await bus.Dispatch<bool>((ICommand<bool>)cmd, ct);
-                return Results.Ok(ApiResponse<bool>.Ok(result));
-            })
-            .WithName("Users.Suspend")
-            .WithSummary("Suspend a user account")
-            .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+        group.MapPostEndpoint(
+            IdentityConstants.Routes.SuspendUser,
+            SuspendUser,
+            IdentityConstants.Names.SuspendUser,
+            IdentityConstants.Docs.SuspendUser.Summary,
+            IdentityConstants.Docs.SuspendUser.Description);
     }
+
+    // ── Query Handlers ────────────────────────────────────────────────────────
+
+    private static async Task<GetUserQueryResponse> GetUser(
+        long id,
+        IQueryBus queryBus,
+        CancellationToken ct)
+        => await queryBus.DispatchAsync<GetUserQueryResponse>(new GetUserQuery(id), ct);
+
+    private static async Task<IdentityPagedResult<GetUserQueryResponse>> GetUsers(
+        [AsParameters] GetUsersQuery query,
+        IQueryBus queryBus,
+        CancellationToken ct)
+        => await queryBus.DispatchAsync<IdentityPagedResult<GetUserQueryResponse>>(query, ct);
+
+    private static async Task<IReadOnlyList<GetRoleQueryResponse>> GetRoles(
+        IQueryBus queryBus,
+        CancellationToken ct)
+        => await queryBus.DispatchAsync<IReadOnlyList<GetRoleQueryResponse>>(new GetRolesQuery(), ct);
+
+    // ── Command Handlers ──────────────────────────────────────────────────────
+
+    private static async Task<bool> UpdateProfile(
+        long id,
+        UpdateProfileCommand command,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)(command with { UserId = id }), ct);
+
+    private static async Task<bool> AssignRole(
+        long id,
+        long roleId,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)new AssignRoleCommand(id, roleId), ct);
+
+    private static async Task<bool> RemoveRole(
+        long id,
+        long roleId,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)new RemoveRoleCommand(id, roleId), ct);
+
+    private static async Task<bool> ActivateUser(
+        long id,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)new ActivateUserCommand(id), ct);
+
+    private static async Task<bool> DeactivateUser(
+        long id,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)new DeactivateUserCommand(id), ct);
+
+    private static async Task<bool> SuspendUser(
+        long id,
+        ICommandBus bus,
+        CancellationToken ct)
+        => await bus.Dispatch<bool>((ICommand<bool>)new SuspendUserCommand(id), ct);
 }
-
-// ── Request models ─────────────────────────────────────────────────────────────
-
-/// <summary>Body payload for the update-profile endpoint.</summary>
-public record UpdateProfileRequest(string FullName, string? PhoneNumber);

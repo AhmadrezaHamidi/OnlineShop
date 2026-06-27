@@ -1,5 +1,4 @@
-﻿using AhmadBase.Application.Query;
-using Ahmad.OnlineShop.Application.Dtos;
+using AhmadBase.Application.Query;
 
 namespace Ahmad.OnlineShop.Application.Query.Queries;
 
@@ -7,4 +6,4 @@ public record GetUserContractsQuery(
     long UserId,
     int  Page,
     int  PageSize
-) : IQuery<PagedResult<ContractDto>>;
+) : IQuery<QueryPagedResult<GetContractQueryResponse>>;

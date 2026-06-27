@@ -1,5 +1,4 @@
-﻿using AhmadBase.Application.Query;
-using Identity.Application.Dtos;
+using AhmadBase.Application.Query;
 using Identity.Domain.Enums;
 
 namespace Identity.Application.Query.Queries;
@@ -9,4 +8,15 @@ public record GetUsersQuery(
     int         PageSize = 20,
     string?     Search   = null,
     UserStatus? Status   = null
-) : IQuery<PagedResult<UserDto>>;
+) : IQuery<IdentityPagedResult<GetUserQueryResponse>>;
+
+public record IdentityPagedResult<T>(
+    IReadOnlyList<T> Items,
+    int              TotalCount,
+    int              Page,
+    int              PageSize)
+{
+    public int  TotalPages      => PageSize > 0 ? (int)Math.Ceiling((double)TotalCount / PageSize) : 0;
+    public bool HasNextPage     => Page < TotalPages;
+    public bool HasPreviousPage => Page > 1;
+}

@@ -30,10 +30,16 @@ public static class ProductConstants
         public const string ConfirmStock = "/{id}/Inventory/Confirm";
 
         // Image
-        public const string AddImage = "/{id}/Images";
-        public const string RemoveImage = "/{id}/Images/{imageId}";
+        public const string GetImages       = "/{id}/Images";
+        public const string AddImage        = "/{id}/Images";
+        public const string RemoveImage     = "/{id}/Images/{imageId}";
         public const string SetPrimaryImage = "/{id}/Images/{imageId}/Primary";
-        public const string ReorderImage = "/{id}/Images/{imageId}/Reorder";
+        public const string ReorderImage    = "/{id}/Images/{imageId}/Reorder";
+
+        // Category
+        public const string GetCategories  = "/Categories";
+        public const string CreateCategory = "/Categories";
+        public const string UpdateCategory = "/Categories/{id}";
     }
 
     public static class Names
@@ -53,10 +59,15 @@ public static class ProductConstants
         public const string ReleaseStock = "ReleaseStock";
         public const string ConfirmStock = "ConfirmStock";
 
-        public const string AddImage = "AddProductImage";
-        public const string RemoveImage = "RemoveProductImage";
+        public const string GetImages       = "GetProductImages";
+        public const string AddImage        = "AddProductImage";
+        public const string RemoveImage     = "RemoveProductImage";
         public const string SetPrimaryImage = "SetPrimaryImage";
-        public const string ReorderImage = "ReorderImage";
+        public const string ReorderImage    = "ReorderImage";
+
+        public const string GetCategories  = "GetCategories";
+        public const string CreateCategory = "CreateCategory";
+        public const string UpdateCategory = "UpdateCategory";
     }
 
     public static class Docs
@@ -159,10 +170,34 @@ public static class ProductConstants
             public const string Description = "این سرویس یک تصویر را به عنوان تصویر اصلی محصول تنظیم می‌کند";
         }
 
+        public static class GetImages
+        {
+            public const string Summary     = "دریافت تصاویر محصول";
+            public const string Description = "این سرویس تمام تصاویر یک محصول را برمی‌گرداند";
+        }
+
         public static class ReorderImage
         {
-            public const string Summary = "تغییر ترتیب تصاویر";
+            public const string Summary     = "تغییر ترتیب تصاویر";
             public const string Description = "این سرویس ترتیب نمایش تصاویر محصول را تغییر می‌دهد";
+        }
+
+        public static class GetCategories
+        {
+            public const string Summary     = "لیست دسته‌بندی‌ها";
+            public const string Description = "این سرویس تمام دسته‌بندی‌های موجود را برمی‌گرداند";
+        }
+
+        public static class CreateCategory
+        {
+            public const string Summary     = "ایجاد دسته‌بندی";
+            public const string Description = "این سرویس یک دسته‌بندی جدید ایجاد می‌کند";
+        }
+
+        public static class UpdateCategory
+        {
+            public const string Summary     = "ویرایش دسته‌بندی";
+            public const string Description = "این سرویس اطلاعات یک دسته‌بندی را ویرایش می‌کند";
         }
     }
 }

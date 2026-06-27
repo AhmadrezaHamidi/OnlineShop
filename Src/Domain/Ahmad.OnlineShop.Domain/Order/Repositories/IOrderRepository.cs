@@ -1,4 +1,6 @@
-﻿using OrderAgg = Ahmad.OnlineShop.Domain.Order.Aggregates;
+﻿using Ahmad.OnlineShop.Domain.Order.Enums;
+using OrderAgg = Ahmad.OnlineShop.Domain.Order.Aggregates;
+
 namespace Ahmad.OnlineShop.Domain.Repositories;
 
 public interface IOrderRepository

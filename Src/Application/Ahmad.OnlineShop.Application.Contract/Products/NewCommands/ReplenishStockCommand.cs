@@ -1,8 +1,9 @@
-﻿using AhmadBase.Application;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Ahmad.OnlineShop.Application.Commands;
 
 public record ReplenishStockCommand(
-    long ProductId,
-    int  Quantity
+    [property: JsonIgnore] long ProductId,
+    int Quantity
 ) : ICommand<long>;

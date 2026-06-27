@@ -1,12 +1,8 @@
-﻿using Identity.Application.Dtos;
+using Identity.Application.Query.Queries;
 
 namespace Identity.Application.Query.Contracts;
 
-/// <summary>
-/// Read-side (query) repository for roles.
-/// Implemented in the Infrastructure/Read layer (e.g. Dapper).
-/// </summary>
 public interface IRoleReadRepository
 {
-    Task<IReadOnlyList<RoleDto>> GetAllAsync(CancellationToken token = default);
+    Task<IReadOnlyList<GetRoleQueryResponse>> GetAllAsync(CancellationToken token = default);
 }

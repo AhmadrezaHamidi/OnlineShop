@@ -1,9 +1,10 @@
-﻿using AhmadBase.Application;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Ahmad.OnlineShop.Application.Commands;
 
 public record ReorderProductImageCommand(
-    long ProductId,
-    Guid ImageId,
-    int  NewSortOrder
+    [property: JsonIgnore] long ProductId,
+    [property: JsonIgnore] Guid ImageId,
+    int NewSortOrder
 ) : ICommand<Guid>;

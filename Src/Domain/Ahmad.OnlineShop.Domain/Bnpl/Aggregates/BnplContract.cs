@@ -11,28 +11,28 @@ public sealed class BnplContract : AggregateRoot<long>
 {
     private readonly List<Installment> _installments = [];
 
-    public long           OrderId          { get; private set; }
-    public long           UserId           { get; private set; }
-    public decimal        TotalAmount      { get; private set; }
-    public int            InstallmentCount { get; private set; }
-    public ContractStatus Status           { get; private set; }
-    public DateTime       CreatedAt        { get; private set; }
+    public long OrderId { get; private set; }
+    public long UserId { get; private set; }
+    public decimal TotalAmount { get; private set; }
+    public int InstallmentCount { get; private set; }
+    public ContractStatus Status { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyCollection<Installment> Installments => _installments.AsReadOnly();
 
-    public int  PaidCount    => _installments.Count(i => i.Status == InstallmentStatus.Paid);
-    public bool IsCompleted  => PaidCount == InstallmentCount;
+    public int PaidCount => _installments.Count(i => i.Status == InstallmentStatus.Paid);
+    public bool IsCompleted => PaidCount == InstallmentCount;
 
     private BnplContract() { }
 
     private BnplContract(CreateBnplContractArg arg) : base(arg.Id)
     {
-        OrderId          = arg.OrderId;
-        UserId           = arg.UserId;
-        TotalAmount      = arg.TotalAmount;
+        OrderId = arg.OrderId;
+        UserId = arg.UserId;
+        TotalAmount = arg.TotalAmount;
         InstallmentCount = arg.InstallmentCount;
-        Status           = ContractStatus.Active;
-        CreatedAt        = DateTime.UtcNow;
+        Status = ContractStatus.Active;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public static BnplContract Create(CreateBnplContractArg arg)
@@ -92,14 +92,14 @@ public sealed class BnplContract : AggregateRoot<long>
     }
 
     private void GenerateInstallments(DateTime firstDueDate, int intervalDays)
-    {
-        var amount    = Math.Round(TotalAmount / InstallmentCount, 2);
+    {A
+        var amount = Math.Round(TotalAmount / InstallmentCount, 2);
         var remainder = TotalAmount - amount * InstallmentCount;
 
         for (var i = 1; i <= InstallmentCount; i++)
         {
             var installmentAmount = i == InstallmentCount ? amount + remainder : amount;
-            var dueDate           = firstDueDate.AddDays(intervalDays * (i - 1));
+            var dueDate = firstDueDate.AddDays(intervalDays * (i - 1));
             _installments.Add(new Installment(0, Id, i, installmentAmount, dueDate));
         }
     }

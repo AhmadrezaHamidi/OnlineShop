@@ -1,5 +1,4 @@
-﻿// Products/ProductImage.cs
-using Ahmad.OnlineShop.Domain.Products.Args;
+﻿using Ahmad.OnlineShop.Domain.Products.Args;
 using Ahmad.OnlineShop.Domain.Products.Enums;
 using Ahmad.OnlineShop.Domain.Products.Exceptions;
 using AhmadBase.Doamin;

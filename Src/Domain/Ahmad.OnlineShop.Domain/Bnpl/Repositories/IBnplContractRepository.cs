@@ -1,5 +1,5 @@
-﻿using Ahmad.OnlineShop.Domain.Aggregates;
-using Ahmad.OnlineShop.Domain.Enums;
+﻿
+using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
 
 namespace Ahmad.OnlineShop.Domain.Repositories;
 

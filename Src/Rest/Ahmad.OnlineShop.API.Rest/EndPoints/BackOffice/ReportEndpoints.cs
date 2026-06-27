@@ -1,10 +1,9 @@
-﻿using Ahmad.OnlineShop.Rest.EndPoints.BackOffice;
+using Ahmad.OnlineShop.Rest.EndPoints.BackOffice;
 using AhmadBase.Application;
 using AhmadBase.Application.Query;
 using AhmadBase.Web;
 using AhmadBase.Web.Models;
 using BackOffice.Application.Commands;
-using BackOffice.Application.Dtos;
 using BackOffice.Application.Query.Queries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -21,20 +20,18 @@ public class ReportEndpoints : IEndpoint
             .WithTags("BackOffice - Reports")
             .RequireAuthorization();
 
-        // ── Queries ───────────────────────────────────────────────────────────
         group.MapGet(BackOfficeConstants.Routes.GetReports,
             async ([FromQuery] long adminId, [FromQuery] int page, [FromQuery] int pageSize,
                    IQueryBus queryBus, CancellationToken ct) =>
             {
                 var result = await queryBus.DispatchAsync(new GetReportsQuery(adminId, page, pageSize), ct);
-                return Results.Ok(ApiResponse<List<ReportDto>>.Ok(result));
+                return Results.Ok(ApiResponse<List<GetReportQueryResponse>>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.GetReports)
             .WithSummary(BackOfficeConstants.Docs.GetReports.Summary)
-            .Produces<ApiResponse<List<ReportDto>>>(StatusCodes.Status200OK)
+            .Produces<ApiResponse<List<GetReportQueryResponse>>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
-        // ── Commands ──────────────────────────────────────────────────────────
         group.MapPost(BackOfficeConstants.Routes.RequestReport,
             async ([FromBody] RequestReportCommand command, ICommandBus bus, CancellationToken ct) =>
             {
@@ -47,10 +44,9 @@ public class ReportEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPatch(BackOfficeConstants.Routes.CompleteReport,
-            async (long id, [FromBody] CompleteReportRequest req, ICommandBus bus, CancellationToken ct) =>
+            async (long id, [FromBody] CompleteReportCommand command, ICommandBus bus, CancellationToken ct) =>
             {
-                var cmd = new CompleteReportCommand(req.AdminId, id, req.FilePath);
-                var result = await bus.Dispatch<long>((ICommand<long>)cmd, ct);
+                var result = await bus.Dispatch<long>((ICommand<long>)(command with { ReportId = id }), ct);
                 return Results.Ok(ApiResponse<long>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.CompleteReport)
@@ -59,10 +55,9 @@ public class ReportEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPatch(BackOfficeConstants.Routes.FailReport,
-            async (long id, [FromBody] FailReportRequest req, ICommandBus bus, CancellationToken ct) =>
+            async (long id, [FromBody] FailReportCommand command, ICommandBus bus, CancellationToken ct) =>
             {
-                var cmd = new FailReportCommand(req.AdminId, id, req.Reason);
-                var result = await bus.Dispatch<long>((ICommand<long>)cmd, ct);
+                var result = await bus.Dispatch<long>((ICommand<long>)(command with { ReportId = id }), ct);
                 return Results.Ok(ApiResponse<long>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.FailReport)
@@ -71,7 +66,3 @@ public class ReportEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
     }
 }
-
-// ── Request models ─────────────────────────────────────────────────────────────
-public record CompleteReportRequest(long AdminId, string FilePath);
-public record FailReportRequest(long AdminId, string Reason);

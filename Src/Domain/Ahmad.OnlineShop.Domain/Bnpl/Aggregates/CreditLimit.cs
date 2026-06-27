@@ -7,20 +7,20 @@ namespace Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
 
 public sealed class CreditLimit : AggregateRoot<long>
 {
-    public long     UserId         { get; private set; }
-    public decimal  TotalLimit     { get; private set; }
-    public decimal  UsedLimit      { get; private set; }
-    public decimal  AvailableLimit => TotalLimit - UsedLimit;
-    public DateTime UpdatedAt      { get; private set; }
+    public long UserId { get; private set; }
+    public decimal TotalLimit { get; private set; }
+    public decimal UsedLimit { get; private set; }
+    public decimal AvailableLimit => TotalLimit - UsedLimit;
+    public DateTime UpdatedAt { get; private set; }
 
     private CreditLimit() { }
 
     private CreditLimit(CreateCreditLimitArg arg) : base(arg.Id)
     {
-        UserId     = arg.UserId;
+        UserId = arg.UserId;
         TotalLimit = arg.TotalLimit;
-        UsedLimit  = 0;
-        UpdatedAt  = DateTime.UtcNow;
+        UsedLimit = 0;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public static CreditLimit Create(CreateCreditLimitArg arg)
@@ -34,9 +34,9 @@ public sealed class CreditLimit : AggregateRoot<long>
         GuardPositiveAmount(amount);
         GuardSufficientCredit(amount);
 
-        var old    = UsedLimit;
+        var old = UsedLimit;
         UsedLimit += amount;
-        UpdatedAt  = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
 
         RaiseDomainEvent(new CreditChangedEvent(UserId, old, UsedLimit, TotalLimit, AvailableLimit));
     }
@@ -46,9 +46,9 @@ public sealed class CreditLimit : AggregateRoot<long>
         GuardPositiveAmount(amount);
         GuardEnoughUsedCredit(amount);
 
-        var old    = UsedLimit;
+        var old = UsedLimit;
         UsedLimit -= amount;
-        UpdatedAt  = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
 
         RaiseDomainEvent(new CreditChangedEvent(UserId, old, UsedLimit, TotalLimit, AvailableLimit));
     }
@@ -57,7 +57,7 @@ public sealed class CreditLimit : AggregateRoot<long>
     {
         GuardNewLimitHigherThanCurrent(newLimit);
         TotalLimit = newLimit;
-        UpdatedAt  = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     private static void GuardLimitAmount(decimal limit)

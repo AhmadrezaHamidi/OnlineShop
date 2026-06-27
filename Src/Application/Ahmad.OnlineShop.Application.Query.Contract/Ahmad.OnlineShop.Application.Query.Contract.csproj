@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
-    <ProjectReference Include="..\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />
   </ItemGroup>
 
 </Project>

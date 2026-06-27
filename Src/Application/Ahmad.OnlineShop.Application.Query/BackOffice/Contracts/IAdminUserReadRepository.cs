@@ -1,30 +1,26 @@
-﻿using BackOffice.Application.Dtos;
-using BackOffice.Domain.Enums;
+using Ahmad.OnlineShop.Domain.BackOffice.Enums;
+using BackOffice.Application.Query.Queries;
 
 namespace BackOffice.Application.Query.Contracts;
 
-/// <summary>
-/// Read-side (query) repository for admin users.
-/// Implemented in the Infrastructure/Read layer (e.g. Dapper).
-/// </summary>
 public interface IAdminUserReadRepository
 {
-    Task<AdminUserDto?> GetByIdAsync(long adminId, CancellationToken token = default);
+    Task<GetAdminUserQueryResponse?> GetByIdAsync(long adminId, CancellationToken token = default);
 
-    Task<(List<AdminUserDto> Items, int Total)> GetListAsync(
+    Task<(List<GetAdminUserQueryResponse> Items, int Total)> GetListAsync(
         int          page,
         int          pageSize,
         AdminStatus? status,
         AdminRole?   role,
         CancellationToken token = default);
 
-    Task<List<ReportDto>> GetReportsAsync(
+    Task<List<GetReportQueryResponse>> GetReportsAsync(
         long adminId,
         int  page,
         int  pageSize,
         CancellationToken token = default);
 
-    Task<List<AuditLogDto>> GetAuditLogsAsync(
+    Task<List<GetAuditLogQueryResponse>> GetAuditLogsAsync(
         long adminId,
         int  page,
         int  pageSize,

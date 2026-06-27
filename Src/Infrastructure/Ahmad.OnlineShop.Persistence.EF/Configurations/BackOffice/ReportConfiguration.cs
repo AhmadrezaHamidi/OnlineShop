@@ -1,5 +1,5 @@
-﻿using AhmadBase.Persistence.Mapping;
-using BackOffice.Domain.Entities;
+﻿using Ahmad.OnlineShop.Domain.BackOffice.Entities;
+using AhmadBase.Persistence.Mapping;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ahmad.OnlineShop.Persistence.EF.Configurations.BackOffice;

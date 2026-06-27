@@ -1,4 +1,4 @@
-﻿using Identity.Domain.Aggregates;
+using Identity.Domain.Aggregates;
 
 namespace Identity.Domain.Repositories;
 

@@ -1,10 +1,11 @@
-﻿using AhmadBase.Application;
-using Ahmad.OnlineShop.Domain.Enums;
+using Ahmad.OnlineShop.Domain.Products.Enums;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Ahmad.OnlineShop.Application.Commands;
 
 public record AddProductImageCommand(
-    long      ProductId,
+    [property: JsonIgnore] long ProductId,
     string    Url,
     string    BucketKey,
     ImageType Type

@@ -1,5 +1,7 @@
 ﻿using Ahmad.OnlineShop.Domain.BackOffice.Aggregates;
 using Ahmad.OnlineShop.Domain.BackOffice.Entities;
+using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
+using Ahmad.OnlineShop.Domain.Bnpl.Entities;
 using Ahmad.OnlineShop.Domain.Products;
 using Ahmad.OnlineShop.Domain.User;
 using AhmadBase.Doamin;
@@ -26,11 +28,15 @@ public sealed class ApplicationDbContext
 
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<Product> Products => Set<Product>();
-    //public DbSet<ProductImage> ProductImages => Set<ProductImage>();
-    //public DbSet<Inventory> Inventories => Set<Inventory>();
-    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
-    //public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-    //public DbSet<Report> Reports => Set<Report>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<AdminUser>    AdminUsers    => Set<AdminUser>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    
+    public DbSet<Report> Reports => Set<Report>();
+    public DbSet<BnplContract> BnplContracts => Set<BnplContract>();
+    public DbSet<CreditLimit>  CreditLimits  => Set<CreditLimit>();
+    public DbSet<Installment>  Installments  => Set<Installment>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

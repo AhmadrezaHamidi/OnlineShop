@@ -207,4 +207,115 @@
   <data name="UserNotFoundException" xml:space="preserve">
     <value>کاربر یافت نشد .</value>
   </data>
+  <data name="AdminNotFoundException" xml:space="preserve">
+    <value>ادمین مورد نظر یافت نشد.</value>
+  </data>
+  <data name="AdminEmailAlreadyExistsException" xml:space="preserve">
+    <value>ادمین با این ایمیل از قبل وجود دارد.</value>
+  </data>
+  <data name="AdminInvalidEmailException" xml:space="preserve">
+    <value>ایمیل ادمین نامعتبر است.</value>
+  </data>
+  <data name="AdminInvalidNameException" xml:space="preserve">
+    <value>نام کامل ادمین الزامی است.</value>
+  </data>
+  <data name="AdminAlreadyActiveException" xml:space="preserve">
+    <value>ادمین قبلاً فعال است.</value>
+  </data>
+  <data name="AdminAlreadyInactiveException" xml:space="preserve">
+    <value>ادمین قبلاً غیرفعال است.</value>
+  </data>
+  <data name="ReportNotFoundException" xml:space="preserve">
+    <value>گزارش مورد نظر یافت نشد.</value>
+  </data>
+  <data name="ReportAlreadyCompletedException" xml:space="preserve">
+    <value>گزارش قبلاً تکمیل شده است.</value>
+  </data>
+  <data name="AuditInvalidActionException" xml:space="preserve">
+    <value>عملیات لاگ الزامی است.</value>
+  </data>
+  <data name="AuditInvalidEntityException" xml:space="preserve">
+    <value>نوع موجودیت لاگ الزامی است.</value>
+  </data>
+  <data name="CreditLimitNotFoundException" xml:space="preserve">
+    <value>سقف اعتبار کاربر یافت نشد.</value>
+  </data>
+  <data name="InsufficientCreditException" xml:space="preserve">
+    <value>سقف اعتبار کافی نیست.</value>
+  </data>
+  <data name="InvalidCreditLimitAmountException" xml:space="preserve">
+    <value>مقدار اعتبار باید بزرگتر از صفر باشد.</value>
+  </data>
+  <data name="NegativeCreditException" xml:space="preserve">
+    <value>اعتبار استفاده‌شده نمی‌تواند منفی شود.</value>
+  </data>
+  <data name="BnplContractNotFoundException" xml:space="preserve">
+    <value>قرارداد BNPL یافت نشد.</value>
+  </data>
+  <data name="BnplContractAlreadyCancelledException" xml:space="preserve">
+    <value>قرارداد قبلاً لغو شده است.</value>
+  </data>
+  <data name="BnplContractAlreadyCompletedException" xml:space="preserve">
+    <value>قرارداد قبلاً تکمیل شده است.</value>
+  </data>
+  <data name="BnplContractNotActiveException" xml:space="preserve">
+    <value>قرارداد در وضعیت فعال نیست.</value>
+  </data>
+  <data name="InvalidInstallmentCountException" xml:space="preserve">
+    <value>تعداد اقساط باید بین ۱ تا ۴۸ باشد.</value>
+  </data>
+  <data name="InvalidTotalAmountException" xml:space="preserve">
+    <value>مبلغ کل قرارداد باید بزرگتر از صفر باشد.</value>
+  </data>
+  <data name="InstallmentNotFoundException" xml:space="preserve">
+    <value>قسط مورد نظر یافت نشد.</value>
+  </data>
+  <data name="InstallmentAlreadyPaidException" xml:space="preserve">
+    <value>این قسط قبلاً پرداخت شده است.</value>
+  </data>
+  <data name="InstallmentInvalidAmountException" xml:space="preserve">
+    <value>مبلغ قسط باید بزرگتر از صفر باشد.</value>
+  </data>
+  <data name="OrderNotFoundException" xml:space="preserve">
+    <value>سفارش مورد نظر یافت نشد.</value>
+  </data>
+  <data name="OrderNoItemsException" xml:space="preserve">
+    <value>سفارش باید حداقل یک آیتم داشته باشد.</value>
+  </data>
+  <data name="OrderAlreadyCancelledException" xml:space="preserve">
+    <value>سفارش قبلاً لغو شده است.</value>
+  </data>
+  <data name="OrderAlreadyDeliveredException" xml:space="preserve">
+    <value>سفارش قبلاً تحویل داده شده است.</value>
+  </data>
+  <data name="OrderInvalidStatusTransitionException" xml:space="preserve">
+    <value>تغییر وضعیت سفارش در حالت فعلی مجاز نیست.</value>
+  </data>
+  <data name="OrderItemNotFoundException" xml:space="preserve">
+    <value>آیتم سفارش یافت نشد.</value>
+  </data>
+  <data name="OrderItemInvalidQuantityException" xml:space="preserve">
+    <value>تعداد آیتم باید بزرگتر از صفر باشد.</value>
+  </data>
+  <data name="OrderItemInvalidUnitPriceException" xml:space="preserve">
+    <value>قیمت واحد باید بزرگتر از صفر باشد.</value>
+  </data>
+  <data name="PaymentNotFoundException" xml:space="preserve">
+    <value>پرداخت مورد نظر یافت نشد.</value>
+  </data>
+  <data name="PaymentAmountMismatchException" xml:space="preserve">
+    <value>مبلغ پرداخت با مجموع سفارش مطابقت ندارد.</value>
+  </data>
+  <data name="PaymentInvalidAmountException" xml:space="preserve">
+    <value>مبلغ پرداخت نامعتبر است.</value>
+  </data>
+  <data name="OrderCannotConfirmWithoutPaymentException" xml:space="preserve">
+    <value>سفارش بدون پرداخت موفق قابل تأیید نیست.</value>
+  </data>
+  <data name="RoleNotFoundException" xml:space="preserve">
+    <value>نقش مورد نظر یافت نشد.</value>
+  </data>
+  <data name="InvalidRefreshTokenException" xml:space="preserve">
+    <value>توکن نامعتبر یا منقضی شده است.</value>
+  </data>
 </root>

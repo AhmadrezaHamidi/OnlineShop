@@ -1,9 +1,10 @@
-﻿using AhmadBase.Application;
+using AhmadBase.Application;
+using System.Text.Json.Serialization;
 
 namespace Ahmad.OnlineShop.Application.Contract.Order.Commands;
 
 public record RecordPaymentCommand(
-    long    OrderId,
+    [property: JsonIgnore] long OrderId,
     long    PaymentId,
     decimal Amount,
     string? Provider = null

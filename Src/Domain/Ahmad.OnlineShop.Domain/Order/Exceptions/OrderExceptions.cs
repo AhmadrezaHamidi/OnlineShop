@@ -5,62 +5,62 @@ namespace Ahmad.OnlineShop.Domain.Order.Exceptions;
 // Order
 public sealed class OrderNotFoundException : BusinessException
 {
-    public OrderNotFoundException() : base("سفارش مورد نظر یافت نشد.") { }
+    public OrderNotFoundException() : base(Resources.Message.OrderNotFoundException) { }
 }
 
 public sealed class OrderNoItemsException : BusinessException
 {
-    public OrderNoItemsException() : base("سفارش باید حداقل یک آیتم داشته باشد.") { }
+    public OrderNoItemsException() : base(Resources.Message.OrderNoItemsException) { }
 }
 
 public sealed class OrderAlreadyCancelledException : BusinessException
 {
-    public OrderAlreadyCancelledException() : base("سفارش قبلاً لغو شده است.") { }
+    public OrderAlreadyCancelledException() : base(Resources.Message.OrderAlreadyCancelledException) { }
 }
 
 public sealed class OrderAlreadyDeliveredException : BusinessException
 {
-    public OrderAlreadyDeliveredException() : base("سفارش قبلاً تحویل داده شده است.") { }
+    public OrderAlreadyDeliveredException() : base(Resources.Message.OrderAlreadyDeliveredException) { }
 }
 
 public sealed class OrderInvalidStatusTransitionException : BusinessException
 {
-    public OrderInvalidStatusTransitionException() : base("تغییر وضعیت سفارش در حالت فعلی مجاز نیست.") { }
+    public OrderInvalidStatusTransitionException() : base(Resources.Message.OrderInvalidStatusTransitionException) { }
 }
 
 // OrderItem
 public sealed class OrderItemNotFoundException : BusinessException
 {
-    public OrderItemNotFoundException() : base("آیتم سفارش یافت نشد.") { }
+    public OrderItemNotFoundException() : base(Resources.Message.OrderItemNotFoundException) { }
 }
 
 public sealed class OrderItemInvalidQuantityException : BusinessException
 {
-    public OrderItemInvalidQuantityException() : base("تعداد آیتم باید بزرگتر از صفر باشد.") { }
+    public OrderItemInvalidQuantityException() : base(Resources.Message.OrderItemInvalidQuantityException) { }
 }
 
 public sealed class OrderItemInvalidUnitPriceException : BusinessException
 {
-    public OrderItemInvalidUnitPriceException() : base("قیمت واحد باید بزرگتر از صفر باشد.") { }
+    public OrderItemInvalidUnitPriceException() : base(Resources.Message.OrderItemInvalidUnitPriceException) { }
 }
 
 // Payment
 public sealed class PaymentNotFoundException : BusinessException
 {
-    public PaymentNotFoundException() : base("پرداخت مورد نظر یافت نشد.") { }
+    public PaymentNotFoundException() : base(Resources.Message.PaymentNotFoundException) { }
 }
 
 public sealed class PaymentAmountMismatchException : BusinessException
 {
-    public PaymentAmountMismatchException() : base("مبلغ پرداخت با مجموع سفارش مطابقت ندارد.") { }
+    public PaymentAmountMismatchException() : base(Resources.Message.PaymentAmountMismatchException) { }
 }
 
 public sealed class PaymentInvalidAmountException : BusinessException
 {
-    public PaymentInvalidAmountException() : base("مبلغ پرداخت نامعتبر است.") { }
+    public PaymentInvalidAmountException() : base(Resources.Message.PaymentInvalidAmountException) { }
 }
 
 public sealed class OrderCannotConfirmWithoutPaymentException : BusinessException
 {
-    public OrderCannotConfirmWithoutPaymentException() : base("سفارش بدون پرداخت موفق قابل تأیید نیست.") { }
+    public OrderCannotConfirmWithoutPaymentException() : base(Resources.Message.OrderCannotConfirmWithoutPaymentException) { }
 }

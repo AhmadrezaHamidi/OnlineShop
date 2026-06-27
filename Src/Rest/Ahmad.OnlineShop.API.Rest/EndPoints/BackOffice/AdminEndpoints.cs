@@ -5,9 +5,7 @@ using AhmadBase.Application.Query;
 using AhmadBase.Web;
 using AhmadBase.Web.Models;
 using BackOffice.Application.Commands;
-using BackOffice.Application.Dtos;
 using BackOffice.Application.Query.Queries;
-using BackOffice.Domain.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,33 +26,33 @@ public class AdminEndpoints : IEndpoint
             async (long id, IQueryBus queryBus, CancellationToken ct) =>
             {
                 var result = await queryBus.DispatchAsync(new GetAdminUserQuery(id), ct);
-                return Results.Ok(ApiResponse<AdminUserDto>.Ok(result));
+                return Results.Ok(ApiResponse<GetAdminUserQueryResponse>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.GetAdmin)
             .WithSummary(BackOfficeConstants.Docs.GetAdmin.Summary)
-            .Produces<ApiResponse<AdminUserDto>>(StatusCodes.Status200OK)
+            .Produces<ApiResponse<GetAdminUserQueryResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapGet(BackOfficeConstants.Routes.GetAdmins,
             async ([AsParameters] GetAdminUsersQuery query, IQueryBus queryBus, CancellationToken ct) =>
             {
                 var result = await queryBus.DispatchAsync(query, ct);
-                return Results.Ok(ApiResponse<PagedResult<AdminUserDto>>.Ok(result));
+                return Results.Ok(ApiResponse<BackOfficePagedResult<GetAdminUserQueryResponse>>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.GetAdmins)
             .WithSummary(BackOfficeConstants.Docs.GetAdmins.Summary)
-            .Produces<ApiResponse<PagedResult<AdminUserDto>>>(StatusCodes.Status200OK);
+            .Produces<ApiResponse<BackOfficePagedResult<GetAdminUserQueryResponse>>>(StatusCodes.Status200OK);
 
         group.MapGet(BackOfficeConstants.Routes.GetAuditLogs,
             async (long id, [FromQuery] int page, [FromQuery] int pageSize,
                    IQueryBus queryBus, CancellationToken ct) =>
             {
                 var result = await queryBus.DispatchAsync(new GetAuditLogsQuery(id, page, pageSize), ct);
-                return Results.Ok(ApiResponse<List<AuditLogDto>>.Ok(result));
+                return Results.Ok(ApiResponse<List<GetAuditLogQueryResponse>>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.GetAuditLogs)
             .WithSummary(BackOfficeConstants.Docs.GetAuditLogs.Summary)
-            .Produces<ApiResponse<List<AuditLogDto>>>(StatusCodes.Status200OK)
+            .Produces<ApiResponse<List<GetAuditLogQueryResponse>>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         // ── Commands ──────────────────────────────────────────────────────────
@@ -105,10 +103,9 @@ public class AdminEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPatch(BackOfficeConstants.Routes.ChangeAdminRole,
-            async (long id, [FromBody] ChangeAdminRoleRequest req, ICommandBus bus, CancellationToken ct) =>
+            async (long id, [FromBody] ChangeAdminRoleCommand command, ICommandBus bus, CancellationToken ct) =>
             {
-                var cmd = new ChangeAdminRoleCommand(id, req.NewRole);
-                var result = await bus.Dispatch<long>((ICommand<long>)cmd, ct);
+                var result = await bus.Dispatch<long>((ICommand<long>)(command with { AdminId = id }), ct);
                 return Results.Ok(ApiResponse<long>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.ChangeAdminRole)
@@ -117,6 +114,3 @@ public class AdminEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
     }
 }
-
-// ── Request models ─────────────────────────────────────────────────────────────
-public record ChangeAdminRoleRequest(AdminRole NewRole);

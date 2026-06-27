@@ -1,8 +1,10 @@
 ﻿using Ahmad.OnlineShop.Application.Contract.User;
 using Ahmad.OnlineShop.Application.Contract.Opetions;
+using Ahmad.OnlineShop.Application.Exceptions;
 using Ahmad.OnlineShop.Domain.Users;
 using Ahmad.OnlineShop.Domain.Users.Args;
 using Ahmad.OnlineShop.Domain.Users.Exceptions;
+using UserAgg = Ahmad.OnlineShop.Domain.User.User;
 using AhmadBase.Application;
 using AhmadBase.Web.Securities;
 using AhmadBase.Helper.Cryptography;
@@ -117,7 +119,7 @@ public class UserHandlers(
 
 
         var id = repository.GetNextId();
-        var newUser = await Domain.Users.User.Create(new CreateUserArg(
+        var newUser = await UserAgg.Create(new CreateUserArg(
             id, command.MobileNumber), userService, token);
 
         newUser.ChangePassword(PasswordHasher.HashPassword(command.Password, null));

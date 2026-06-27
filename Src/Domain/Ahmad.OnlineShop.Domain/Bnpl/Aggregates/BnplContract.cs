@@ -92,7 +92,7 @@ public sealed class BnplContract : AggregateRoot<long>
     }
 
     private void GenerateInstallments(DateTime firstDueDate, int intervalDays)
-    {A
+    {
         var amount = Math.Round(TotalAmount / InstallmentCount, 2);
         var remainder = TotalAmount - amount * InstallmentCount;
 

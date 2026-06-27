@@ -2,81 +2,78 @@ using Identity.Application.Commands;
 using Identity.Application.Services;
 using Identity.Domain.Aggregates;
 using Identity.Domain.Entities;
+using Identity.Domain.Enums;
 using Identity.Domain.Exceptions;
 using Identity.Domain.Repositories;
 
 namespace Identity.Application.Handlers;
 
+/// <summary>
+/// Handler های Identity با احراز هویت OTP
+/// - RequestOtp: تولید کد 6 رقمی و ارسال SMS
+/// - VerifyOtp:  تأیید کد و صدور JWT (اگر کاربر جدید باشد، خودکار ثبت می‌شود)
+/// - RefreshToken: تجدید توکن
+/// - Logout: باطل کردن refresh token
+/// - مدیریت پروفایل و نقش‌ها
+/// </summary>
 public sealed class IdentityHandlers(
-    IUserRepository userRepo,
+    IUserRepository         userRepo,
     IRefreshTokenRepository refreshTokenRepo,
-    IRoleRepository roleRepo,
-    IPasswordHasher passwordHasher,
-    IJwtService jwtService) :
-    ICommandHandler<RegisterCommand, long>,
-    ICommandHandler<LoginCommand, LoginCommandResponse>,
-    ICommandHandler<LogoutCommand, bool>,
-    ICommandHandler<RefreshTokenCommand, LoginCommandResponse>,
-    ICommandHandler<ChangePasswordCommand, bool>,
-    ICommandHandler<UpdateProfileCommand, bool>,
-    ICommandHandler<ActivateUserCommand, bool>,
+    IRoleRepository         roleRepo,
+    IOtpRepository          otpRepo,
+    ISmsService             smsService,
+    IJwtService             jwtService) :
+    ICommandHandler<RequestOtpCommand,     bool>,
+    ICommandHandler<VerifyOtpCommand,      LoginCommandResponse>,
+    ICommandHandler<RefreshTokenCommand,   LoginCommandResponse>,
+    ICommandHandler<LogoutCommand,         bool>,
+    ICommandHandler<UpdateProfileCommand,  bool>,
+    ICommandHandler<ActivateUserCommand,   bool>,
     ICommandHandler<DeactivateUserCommand, bool>,
-    ICommandHandler<SuspendUserCommand, bool>,
-    ICommandHandler<AssignRoleCommand, bool>,
-    ICommandHandler<RemoveRoleCommand, bool>
+    ICommandHandler<SuspendUserCommand,    bool>,
+    ICommandHandler<AssignRoleCommand,     bool>,
+    ICommandHandler<RemoveRoleCommand,     bool>
 {
-    #region Auth Commands
+    #region OTP Auth
 
-    public async Task<long> Handle(RegisterCommand command, CancellationToken token)
+    /// <summary>تولید OTP 6 رقمی و ارسال از طریق SMS</summary>
+    public async Task<bool> Handle(RequestOtpCommand command, CancellationToken token)
     {
-        var exists = await userRepo.ExistsByEmailAsync(command.Email, token);
-        if (exists)
-            throw new UserAlreadyExistsException();
+        var code  = GenerateOtpCode();
+        var id    = await otpRepo.GetNextIdAsync();
+        var otp   = new OtpRequest(id, command.PhoneNumber, code);
 
-        var id = await userRepo.GetNextIdAsync();
-        var passwordHash = passwordHasher.Hash(command.Password);
-        var user = User.Register(id, command.FullName, command.Email, passwordHash, command.PhoneNumber);
+        await otpRepo.AddAsync(otp, token);
 
-        await userRepo.AddAsync(user, token);
-
-        return user.Id;
+        var sent = await smsService.SendOtpAsync(command.PhoneNumber, code, token);
+        return sent;
     }
 
-    public async Task<LoginCommandResponse> Handle(LoginCommand command, CancellationToken token)
+    /// <summary>تأیید OTP و صدور JWT — اگر کاربر جدید باشد خودکار ثبت می‌شود</summary>
+    public async Task<LoginCommandResponse> Handle(VerifyOtpCommand command, CancellationToken token)
     {
-        var user = await userRepo.GetByEmailAsync(command.Email, token)
-            ?? throw new UserNotFoundException();
+        var otp = await otpRepo.GetLatestByPhoneAsync(command.PhoneNumber, token)
+            ?? throw new OtpNotRequestedException();
 
-        if (!passwordHasher.Verify(command.Password, user.PasswordHash))
-            throw new IncorrectPasswordException();
+        otp.Verify(command.Code);
+        await otpRepo.UpdateAsync(otp, token);
 
-        var (accessToken, accessExpiry) = jwtService.GenerateAccessToken(user);
-        var rawRefreshToken = jwtService.GenerateRefreshToken();
-        var refreshExpiry = DateTime.UtcNow.AddDays(30);
+        var user = await userRepo.GetByPhoneAsync(command.PhoneNumber, token);
+        if (user is null)
+        {
+            var id = await userRepo.GetNextIdAsync();
+            user   = User.Create(id, command.PhoneNumber);
+            await userRepo.AddAsync(user, token);
+        }
 
-        var refreshTokenId = await refreshTokenRepo.GetNextIdAsync();
-        var refreshTokenEntity = new RefreshToken(refreshTokenId, user.Id, rawRefreshToken, refreshExpiry);
-        await refreshTokenRepo.AddAsync(refreshTokenEntity, token);
-
-        return new LoginCommandResponse(
-            AccessToken: accessToken,
-            RefreshToken: rawRefreshToken,
-            AccessTokenExpiresAt: accessExpiry,
-            RefreshTokenExpiresAt: refreshExpiry,
-            UserId: user.Id,
-            FullName: user.FullName,
-            Email: user.Email);
+        return await IssueTokens(user, token);
     }
 
-    public async Task<bool> Handle(LogoutCommand command, CancellationToken token)
-    {
-        var refreshToken = await refreshTokenRepo.GetByTokenAsync(command.RefreshToken, token)
-            ?? throw new InvalidRefreshTokenException();
+    #endregion
 
-        await refreshTokenRepo.DeleteAsync(refreshToken, token);
-        return true;
-    }
+    #region Token Management
 
+    /// <summary>تجدید access token با استفاده از refresh token</summary>
     public async Task<LoginCommandResponse> Handle(RefreshTokenCommand command, CancellationToken token)
     {
         var storedToken = await refreshTokenRepo.GetByTokenAsync(command.RefreshToken, token)
@@ -89,64 +86,43 @@ public sealed class IdentityHandlers(
 
         await refreshTokenRepo.DeleteAsync(storedToken, token);
 
-        var (accessToken, accessExpiry) = jwtService.GenerateAccessToken(user);
-        var rawRefreshToken = jwtService.GenerateRefreshToken();
-        var refreshExpiry = DateTime.UtcNow.AddDays(30);
+        return await IssueTokens(user, token);
+    }
 
-        var newId = await refreshTokenRepo.GetNextIdAsync();
-        var newRefreshToken = new RefreshToken(newId, user.Id, rawRefreshToken, refreshExpiry);
-        await refreshTokenRepo.AddAsync(newRefreshToken, token);
+    /// <summary>خروج از سیستم و باطل کردن refresh token</summary>
+    public async Task<bool> Handle(LogoutCommand command, CancellationToken token)
+    {
+        var refreshToken = await refreshTokenRepo.GetByTokenAsync(command.RefreshToken, token)
+            ?? throw new InvalidRefreshTokenException();
 
-        return new LoginCommandResponse(
-            AccessToken: accessToken,
-            RefreshToken: rawRefreshToken,
-            AccessTokenExpiresAt: accessExpiry,
-            RefreshTokenExpiresAt: refreshExpiry,
-            UserId: user.Id,
-            FullName: user.FullName,
-            Email: user.Email);
+        await refreshTokenRepo.DeleteAsync(refreshToken, token);
+        return true;
     }
 
     #endregion
 
-    #region User Profile Commands
+    #region Profile
 
-    public async Task<bool> Handle(ChangePasswordCommand command, CancellationToken token)
-    {
-        var user = await userRepo.GetByIdAsync(command.UserId, token)
-            ?? throw new UserNotFoundException();
-
-        if (!passwordHasher.Verify(command.CurrentPassword, user.PasswordHash))
-            throw new IncorrectPasswordException();
-
-        user.ChangePassword(passwordHasher.Hash(command.NewPassword));
-
-        await userRepo.UpdateAsync(user, token);
-        return true;
-    }
-
+    /// <summary>بروزرسانی نام کامل کاربر</summary>
     public async Task<bool> Handle(UpdateProfileCommand command, CancellationToken token)
     {
         var user = await userRepo.GetByIdAsync(command.UserId, token)
             ?? throw new UserNotFoundException();
 
-        user.UpdateProfile(command.FullName, command.PhoneNumber);
-
+        user.UpdateProfile(command.FullName);
         await userRepo.UpdateAsync(user, token);
         return true;
     }
 
     #endregion
 
-    #region User Status Commands
+    #region User Status
 
     public async Task<bool> Handle(ActivateUserCommand command, CancellationToken token)
     {
         var user = await userRepo.GetByIdAsync(command.UserId, token)
             ?? throw new UserNotFoundException();
-
         user.Activate();
-
         await userRepo.UpdateAsync(user, token);
         return true;
     }
@@ -155,9 +131,7 @@ public sealed class IdentityHandlers(
     {
         var user = await userRepo.GetByIdAsync(command.UserId, token)
             ?? throw new UserNotFoundException();
-
         user.Deactivate();
-
         await userRepo.UpdateAsync(user, token);
         return true;
     }
@@ -166,16 +140,14 @@ public sealed class IdentityHandlers(
     {
         var user = await userRepo.GetByIdAsync(command.UserId, token)
             ?? throw new UserNotFoundException();
-
         user.Suspend();
-
         await userRepo.UpdateAsync(user, token);
         return true;
     }
 
     #endregion
 
-    #region Role Commands
+    #region Roles
 
     public async Task<bool> Handle(AssignRoleCommand command, CancellationToken token)
     {
@@ -186,7 +158,6 @@ public sealed class IdentityHandlers(
             ?? throw new RoleNotFoundException();
 
         user.AssignRole(command.RoleId);
-
         await userRepo.UpdateAsync(user, token);
         return true;
     }
@@ -200,9 +171,37 @@ public sealed class IdentityHandlers(
             ?? throw new RoleNotFoundException();
 
         user.RemoveRole(command.RoleId);
-
         await userRepo.UpdateAsync(user, token);
         return true;
+    }
+
+    #endregion
+
+    #region Helpers
+
+    private static string GenerateOtpCode()
+        => Random.Shared.Next(100_000, 999_999).ToString();
+
+    private async Task<LoginCommandResponse> IssueTokens(User user, CancellationToken token)
+    {
+        var jwtResult    = jwtService.GenerateAccessToken(user);
+        var accessToken  = jwtResult.Token;
+        var accessExpiry = jwtResult.ExpiresAt;
+        var rawRefreshToken             = jwtService.GenerateRefreshToken();
+        var refreshExpiry               = DateTime.UtcNow.AddDays(30);
+
+        var newId           = await refreshTokenRepo.GetNextIdAsync();
+        var newRefreshToken = new RefreshToken(newId, user.Id, rawRefreshToken, refreshExpiry);
+        await refreshTokenRepo.AddAsync(newRefreshToken, token);
+
+        return new LoginCommandResponse(
+            AccessToken:           accessToken,
+            RefreshToken:          rawRefreshToken,
+            AccessTokenExpiresAt:  accessExpiry,
+            RefreshTokenExpiresAt: refreshExpiry,
+            UserId:                user.Id,
+            FullName:              user.FullName ?? string.Empty,
+            Email:                 user.PhoneNumber);
     }
 
     #endregion

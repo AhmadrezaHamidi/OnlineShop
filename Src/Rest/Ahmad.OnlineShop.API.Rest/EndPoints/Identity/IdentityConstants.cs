@@ -16,11 +16,10 @@ public static class IdentityConstants
         public const string SuspendUser    = "/Users/{id}/Suspend";
         public const string UpdateProfile  = "/Users/{id}/Profile";
 
-        public const string Register       = "/Auth/Register";
-        public const string Login          = "/Auth/Login";
-        public const string Logout         = "/Auth/Logout";
-        public const string RefreshToken   = "/Auth/RefreshToken";
-        public const string ChangePassword = "/Auth/ChangePassword";
+        public const string RequestOtp   = "/Auth/RequestOtp";
+        public const string VerifyOtp    = "/Auth/VerifyOtp";
+        public const string Logout       = "/Auth/Logout";
+        public const string RefreshToken = "/Auth/RefreshToken";
     }
 
     public static class Names
@@ -34,11 +33,10 @@ public static class IdentityConstants
         public const string DeactivateUser = "DeactivateUser";
         public const string SuspendUser    = "SuspendUser";
         public const string UpdateProfile  = "UpdateProfile";
-        public const string Register       = "Register";
-        public const string Login          = "Login";
-        public const string Logout         = "Logout";
-        public const string RefreshToken   = "RefreshToken";
-        public const string ChangePassword = "ChangePassword";
+        public const string RequestOtp   = "RequestOtp";
+        public const string VerifyOtp    = "VerifyOtp";
+        public const string Logout       = "Logout";
+        public const string RefreshToken = "RefreshToken";
     }
 
     public static class Docs
@@ -88,30 +86,25 @@ public static class IdentityConstants
             public const string Summary     = "ویرایش پروفایل";
             public const string Description = "این سرویس اطلاعات پروفایل کاربر را بروزرسانی می‌کند";
         }
-        public static class Register
+        public static class RequestOtp
         {
-            public const string Summary     = "ثبت‌نام";
-            public const string Description = "این سرویس برای ثبت‌نام کاربر جدید استفاده می‌شود";
+            public const string Summary     = "درخواست کد تأیید";
+            public const string Description = "کد OTP 6 رقمی به شماره موبایل ارسال می‌شود";
         }
-        public static class Login
+        public static class VerifyOtp
         {
-            public const string Summary     = "ورود";
-            public const string Description = "این سرویس برای احراز هویت و دریافت توکن استفاده می‌شود";
+            public const string Summary     = "تأیید کد و ورود به سیستم";
+            public const string Description = "پس از تأیید OTP، JWT و Refresh Token صادر می‌شود";
         }
         public static class Logout
         {
-            public const string Summary     = "خروج";
-            public const string Description = "این سرویس برای خروج از سیستم و باطل کردن Session استفاده می‌شود";
+            public const string Summary     = "خروج از سیستم";
+            public const string Description = "Refresh Token باطل می‌شود";
         }
         public static class RefreshToken
         {
             public const string Summary     = "تمدید توکن";
             public const string Description = "این سرویس توکن جدید با استفاده از Refresh Token صادر می‌کند";
-        }
-        public static class ChangePassword
-        {
-            public const string Summary     = "تغییر رمز عبور";
-            public const string Description = "این سرویس رمز عبور کاربر جاری را تغییر می‌دهد";
         }
     }
 }

@@ -1,20 +1,20 @@
 /// <summary>
 /// تست‌های Application Handler محصول (ProductHandlers)
 /// پوشش‌دهنده: ایجاد/آپدیت محصول، وضعیت، دسته‌بندی، موجودی، تصویر
-/// تکنولوژی Mock: NSubstitute — IProductRepository, ICategoryRepository
-/// خطاهای تست‌شده: ProductNotFoundException | CategoryNotFoundException
-///                  EmptyCategoryNameException
+/// تکنولوژی: Fake Repository (بدون نیاز به mocking library)
+/// خطاهای تست‌شده: ProductNotFoundException | CategoryNotFoundException | EmptyCategoryNameException
 /// </summary>
-using Ahmad.OnlineShop.Application.BackOffice;
+using Ahmad.OnlineShop.Application.Tests.Fakes;
+using Ahmad.OnlineShop.Application.Handlers;
 
-namespace Ahmad.OnlineShop.Application.Handlers.Tests;
+namespace Ahmad.OnlineShop.Application.Tests.Commands;
 
 public class ProductHandlersTests
 {
-    private readonly IProductRepository  _productRepo  = Substitute.For<IProductRepository>();
-    private readonly ICategoryRepository _categoryRepo = Substitute.For<ICategoryRepository>();
-    private readonly ProductHandlers     _sut;
-    private readonly CancellationToken   _ct = CancellationToken.None;
+    private readonly FakeProductRepository  _productRepo  = new();
+    private readonly FakeCategoryRepository _categoryRepo = new();
+    private readonly ProductHandlers        _sut;
+    private readonly CancellationToken      _ct = CancellationToken.None;
 
     public ProductHandlersTests()
     {
@@ -23,8 +23,8 @@ public class ProductHandlersTests
 
     // ─── Helpers ────────────────────────────────────────────────────────────
 
-    private static Category  MakeCategory() => new(10, "Electronics");
-    private static Product   MakeProduct()  => Product.Create(
+    private static CategoryAgg MakeCategory() => new(10, "Electronics");
+    private static ProductAgg  MakeProduct()  => ProductAgg.Create(
         new CreateProductArg(1, 10, "Laptop", null, 50_000_000m, 1));
 
     // ─── CreateProductCommand ─────────────────────────────────────────────────
@@ -33,25 +33,22 @@ public class ProductHandlersTests
     [Fact]
     public async Task Create_When_CategoryExists_Should_AddProduct()
     {
-        _categoryRepo.Get(10, _ct).Returns(MakeCategory());
-        _productRepo.GetNextId().Returns(1L);
+        _categoryRepo.Seed(MakeCategory());
 
-        var result = await _sut.Handle(
-            new CreateProductCommand(10, "Laptop", null, 50_000_000m), _ct);
+        await _sut.Handle(new CreateProductCommand(10, "Laptop", null, 50_000_000m), _ct);
 
-        await _productRepo.Received(1).AddAsync(Arg.Any<Product>(), _ct);
+        Assert.NotNull(_productRepo.Added);
+        Assert.Equal("Laptop", _productRepo.Added!.Name);
     }
 
     /// <summary>خطا: دسته‌بندی پیدا نشد → CategoryNotFoundException</summary>
     [Fact]
     public async Task Create_When_CategoryNotFound_Should_Throw_CategoryNotFoundException()
     {
-        _categoryRepo.Get(10, _ct).ReturnsNull();
-
         await Assert.ThrowsAsync<CategoryNotFoundException>(
             () => _sut.Handle(new CreateProductCommand(10, "Laptop", null, 50_000_000m), _ct));
 
-        await _productRepo.DidNotReceive().AddAsync(Arg.Any<Product>(), _ct);
+        Assert.Null(_productRepo.Added);
     }
 
     // ─── UpdateProductCommand ─────────────────────────────────────────────────
@@ -61,25 +58,22 @@ public class ProductHandlersTests
     public async Task Update_When_ProductAndCategoryExist_Should_UpdateAndSave()
     {
         var product = MakeProduct();
-        _productRepo.Get(1, _ct).Returns(product);
-        _categoryRepo.Get(20, _ct).Returns(new Category(20, "Phones"));
+        _productRepo.Seed(product);
+        _categoryRepo.Seed(new CategoryAgg(20, "Phones"));
 
-        await _sut.Handle(new UpdateProductCommand(1, "New Name", "New Desc", 20), _ct);
+        await _sut.Handle(new UpdateProductCommand(product.Id, "New Name", "New Desc", 20), _ct);
 
         Assert.Equal("New Name", product.Name);
         Assert.Equal("New Desc", product.Description);
         Assert.Equal(20,          product.CategoryId);
-        await _productRepo.Received(1).UpdateAsync(product, _ct);
     }
 
     /// <summary>خطا: محصول پیدا نشد → ProductNotFoundException</summary>
     [Fact]
     public async Task Update_When_ProductNotFound_Should_Throw_ProductNotFoundException()
     {
-        _productRepo.Get(99, _ct).ReturnsNull();
-
         await Assert.ThrowsAsync<ProductNotFoundException>(
-            () => _sut.Handle(new UpdateProductCommand(99, "Name", null, 10), _ct));
+            () => _sut.Handle(new UpdateProductCommand(9999, "Name", null, 10), _ct));
     }
 
     // ─── ActivateProductCommand ───────────────────────────────────────────────
@@ -90,48 +84,45 @@ public class ProductHandlersTests
     {
         var product = MakeProduct();
         product.Deactivate();
-        _productRepo.Get(1, _ct).Returns(product);
+        _productRepo.Seed(product);
 
-        await _sut.Handle(new ActivateProductCommand(1), _ct);
+        await _sut.Handle(new ActivateProductCommand(product.Id), _ct);
 
         Assert.Equal(ProductStatus.Active, product.Status);
-        await _productRepo.Received(1).UpdateAsync(product, _ct);
     }
 
-    /// <summary>خطا: محصول پیدا نشد برای فعال‌سازی → ProductNotFoundException</summary>
+    /// <summary>خطا: محصول پیدا نشد → ProductNotFoundException</summary>
     [Fact]
     public async Task Activate_When_ProductNotFound_Should_Throw_ProductNotFoundException()
     {
-        _productRepo.Get(99, _ct).ReturnsNull();
-
         await Assert.ThrowsAsync<ProductNotFoundException>(
-            () => _sut.Handle(new ActivateProductCommand(99), _ct));
+            () => _sut.Handle(new ActivateProductCommand(9999), _ct));
     }
 
     // ─── DeactivateProductCommand ─────────────────────────────────────────────
 
-    /// <summary>غیرفعال‌سازی محصول باید وضعیت را Inactive کند</summary>
+    /// <summary>غیرفعال‌سازی محصول Active باید وضعیت را Inactive کند</summary>
     [Fact]
     public async Task Deactivate_When_ProductActive_Should_DeactivateProduct()
     {
         var product = MakeProduct();
-        _productRepo.Get(1, _ct).Returns(product);
+        _productRepo.Seed(product);
 
-        await _sut.Handle(new DeactivateProductCommand(1), _ct);
+        await _sut.Handle(new DeactivateProductCommand(product.Id), _ct);
 
         Assert.Equal(ProductStatus.Inactive, product.Status);
     }
 
     // ─── ArchiveProductCommand ────────────────────────────────────────────────
 
-    /// <summary>بایگانی محصول باید وضعیت را Archived کند</summary>
+    /// <summary>بایگانی محصول Active باید وضعیت را Archived کند</summary>
     [Fact]
     public async Task Archive_When_ProductActive_Should_ArchiveProduct()
     {
         var product = MakeProduct();
-        _productRepo.Get(1, _ct).Returns(product);
+        _productRepo.Seed(product);
 
-        await _sut.Handle(new ArchiveProductCommand(1), _ct);
+        await _sut.Handle(new ArchiveProductCommand(product.Id), _ct);
 
         Assert.Equal(ProductStatus.Archived, product.Status);
     }
@@ -144,12 +135,11 @@ public class ProductHandlersTests
     {
         var product = MakeProduct();
         product.ReplenishStock(100);
-        _productRepo.Get(1, _ct).Returns(product);
+        _productRepo.Seed(product);
 
-        await _sut.Handle(new ReserveStockCommand(1, 30), _ct);
+        await _sut.Handle(new ReserveStockCommand(product.Id, 30), _ct);
 
         Assert.Equal(30, product.Inventory.ReservedQuantity);
-        await _productRepo.Received(1).UpdateAsync(product, _ct);
     }
 
     // ─── AddProductImageCommand ───────────────────────────────────────────────
@@ -159,13 +149,12 @@ public class ProductHandlersTests
     public async Task AddImage_When_ProductExists_Should_AddImageToProduct()
     {
         var product = MakeProduct();
-        _productRepo.Get(1, _ct).Returns(product);
+        _productRepo.Seed(product);
 
-        var cmd = new AddProductImageCommand(1, "https://img.com/1.jpg", "bucket/key", ImageType.Gallery);
-        await _sut.Handle(cmd, _ct);
+        await _sut.Handle(
+            new AddProductImageCommand(product.Id, "https://img.com/1.jpg", "bucket/key", ImageType.Gallery), _ct);
 
         Assert.Single(product.Images);
-        await _productRepo.Received(1).UpdateAsync(product, _ct);
     }
 
     // ─── CreateCategoryCommand ────────────────────────────────────────────────
@@ -174,19 +163,19 @@ public class ProductHandlersTests
     [Fact]
     public async Task CreateCategory_When_NameNotExists_Should_AddCategory()
     {
-        _categoryRepo.ExistsByName("Electronics", _ct).Returns(false);
-        _categoryRepo.GetNextId().Returns(1L);
+        _categoryRepo.NameExists = false;
 
-        var result = await _sut.Handle(new CreateCategoryCommand("Electronics", null), _ct);
+        await _sut.Handle(new CreateCategoryCommand("Electronics", null), _ct);
 
-        await _categoryRepo.Received(1).Add(Arg.Any<Category>(), _ct);
+        Assert.NotNull(_categoryRepo.Added);
+        Assert.Equal("Electronics", _categoryRepo.Added!.Name);
     }
 
     /// <summary>خطا: نام دسته‌بندی تکراری → EmptyCategoryNameException</summary>
     [Fact]
     public async Task CreateCategory_When_NameExists_Should_Throw_EmptyCategoryNameException()
     {
-        _categoryRepo.ExistsByName("Electronics", _ct).Returns(true);
+        _categoryRepo.NameExists = true;
 
         await Assert.ThrowsAsync<EmptyCategoryNameException>(
             () => _sut.Handle(new CreateCategoryCommand("Electronics", null), _ct));

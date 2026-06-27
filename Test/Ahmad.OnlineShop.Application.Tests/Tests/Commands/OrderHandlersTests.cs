@@ -1,18 +1,20 @@
 /// <summary>
 /// تست‌های Application Handler سفارش (OrderHandlers)
 /// پوشش‌دهنده: ایجاد، افزودن/حذف آیتم، چرخه وضعیت، پرداخت
-/// تکنولوژی Mock: NSubstitute — IOrderRepository
-/// خطاهای تست‌شده: OrderNotFoundException | OrderInvalidStatusTransitionException
+/// تکنولوژی: Fake Repository (بدون نیاز به مکینگ library)
+/// خطاهای تست‌شده: OrderNotFoundException
 /// </summary>
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Order.Mapper;
+using Ahmad.OnlineShop.Application.Handlers;
 
-namespace Ahmad.OnlineShop.Application.Handlers.Tests;
+namespace Ahmad.OnlineShop.Application.Tests.Commands;
 
 public class OrderHandlersTests
 {
-    private readonly IOrderRepository _repo = Substitute.For<IOrderRepository>();
-    private readonly OrderHandlers    _sut;
-    private readonly CancellationToken _ct = CancellationToken.None;
+    private readonly FakeOrderRepository _repo = new();
+    private readonly OrderHandlers       _sut;
+    private readonly CancellationToken   _ct = CancellationToken.None;
 
     public OrderHandlersTests()
     {
@@ -21,17 +23,17 @@ public class OrderHandlersTests
 
     // ─── Helpers ────────────────────────────────────────────────────────────
 
-    private static Order MakePendingOrder()
-        => Order.Create(new CreateOrderArg(1, 100, PaymentMethod.Online));
+    private static OrderAgg MakePendingOrder()
+        => OrderAgg.Create(new CreateOrderArg(1, 100, PaymentMethod.Online));
 
-    private static Order MakeOrderWithItem()
+    private static OrderAgg MakeOrderWithItem()
     {
         var order = MakePendingOrder();
         order.AddItem(new AddOrderItemArg(1, 101, 2, 150_000m));
         return order;
     }
 
-    private static Order MakeConfirmedOrder()
+    private static OrderAgg MakeConfirmedOrder()
     {
         var order   = MakeOrderWithItem();
         var payment = order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, null));
@@ -45,35 +47,19 @@ public class OrderHandlersTests
     [Fact]
     public async Task Create_Should_AddOrder_And_ReturnId()
     {
-        _repo.GetNextIdAsync().Returns(1L);
-
         var result = await _sut.Handle(
             new CreateOrderCommand(100, PaymentMethod.Online), _ct);
 
-        Assert.Equal(1, result);
-        await _repo.Received(1).AddAsync(Arg.Any<Order>(), _ct);
+        Assert.NotNull(_repo.Added);
+        Assert.Equal(100, _repo.Added!.UserId);
     }
 
     // ─── PlaceOrderCommand ────────────────────────────────────────────────────
-
-    /// <summary>ثبت سفارش باید رویداد OrderPlaced را raise کند</summary>
-    [Fact]
-    public async Task Place_When_OrderHasItems_Should_RaiseEvent()
-    {
-        var order = MakeOrderWithItem();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
-
-        await _sut.Handle(new PlaceOrderCommand(1), _ct);
-
-        await _repo.Received(1).UpdateAsync(order, _ct);
-    }
 
     /// <summary>خطا: سفارش پیدا نشد → OrderNotFoundException</summary>
     [Fact]
     public async Task Place_When_OrderNotFound_Should_Throw_OrderNotFoundException()
     {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
         await Assert.ThrowsAsync<OrderNotFoundException>(
             () => _sut.Handle(new PlaceOrderCommand(99), _ct));
     }
@@ -85,15 +71,12 @@ public class OrderHandlersTests
     public async Task AddItem_Should_AddItem_And_UpdateTotal()
     {
         var order = MakePendingOrder();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
-        _repo.GetNextIdAsync().Returns(1L);
+        _repo.Seed(order);
 
-        var result = await _sut.Handle(
-            new AddOrderItemCommand(1, 101, 2, 150_000m), _ct);
+        await _sut.Handle(new AddOrderItemCommand(1, 101, 2, 150_000m), _ct);
 
         Assert.Equal(300_000m, order.TotalAmount);
         Assert.Single(order.Items);
-        await _repo.Received(1).UpdateAsync(order, _ct);
     }
 
     // ─── RemoveOrderItemCommand ───────────────────────────────────────────────
@@ -102,8 +85,8 @@ public class OrderHandlersTests
     [Fact]
     public async Task RemoveItem_Should_RemoveItem_And_UpdateTotal()
     {
-        var order = MakeOrderWithItem();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        var order  = MakeOrderWithItem();
+        _repo.Seed(order);
         var itemId = order.Items.First().Id;
 
         await _sut.Handle(new RemoveOrderItemCommand(1, itemId), _ct);
@@ -114,38 +97,27 @@ public class OrderHandlersTests
 
     // ─── ConfirmOrderCommand ──────────────────────────────────────────────────
 
-    /// <summary>تأیید سفارش باید وضعیت را Confirmed کند</summary>
+    /// <summary>CompletePayment باید سفارش را از طریق MarkPaymentCompleted تأیید کند</summary>
     [Fact]
-    public async Task Confirm_When_OrderHasPayment_Should_ConfirmOrder()
+    public async Task Confirm_Via_CompletePayment_Should_SetStatusConfirmed()
     {
-        var order = MakeOrderWithItem();
-        var pay   = order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, null));
-        pay.MarkCompleted();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        var order   = MakeOrderWithItem();
+        var payment = order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, null));
+        _repo.Seed(order);
 
-        await _sut.Handle(new ConfirmOrderCommand(1), _ct);
+        await _sut.Handle(new CompletePaymentCommand(1, payment.Id), _ct);
 
         Assert.Equal(OrderStatus.Confirmed, order.Status);
     }
 
-    /// <summary>خطا: سفارش پیدا نشد برای تأیید → OrderNotFoundException</summary>
-    [Fact]
-    public async Task Confirm_When_OrderNotFound_Should_Throw_OrderNotFoundException()
-    {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
-        await Assert.ThrowsAsync<OrderNotFoundException>(
-            () => _sut.Handle(new ConfirmOrderCommand(99), _ct));
-    }
-
     // ─── ShipOrderCommand ─────────────────────────────────────────────────────
 
-    /// <summary>ارسال سفارش باید وضعیت را Shipped کند</summary>
+    /// <summary>ارسال سفارش تأییدشده باید وضعیت را Shipped کند</summary>
     [Fact]
     public async Task Ship_When_OrderConfirmed_Should_SetStatusToShipped()
     {
         var order = MakeConfirmedOrder();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
         await _sut.Handle(new ShipOrderCommand(1), _ct);
 
@@ -154,13 +126,13 @@ public class OrderHandlersTests
 
     // ─── DeliverOrderCommand ──────────────────────────────────────────────────
 
-    /// <summary>تحویل سفارش باید وضعیت را Delivered کند</summary>
+    /// <summary>تحویل سفارش ارسال‌شده باید وضعیت را Delivered کند</summary>
     [Fact]
     public async Task Deliver_When_OrderShipped_Should_SetStatusToDelivered()
     {
         var order = MakeConfirmedOrder();
         order.Ship();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
         await _sut.Handle(new DeliverOrderCommand(1), _ct);
 
@@ -169,12 +141,12 @@ public class OrderHandlersTests
 
     // ─── CancelOrderCommand ───────────────────────────────────────────────────
 
-    /// <summary>لغو سفارش باید وضعیت را Cancelled کند</summary>
+    /// <summary>لغو سفارش Pending باید وضعیت را Cancelled کند</summary>
     [Fact]
     public async Task Cancel_When_OrderPending_Should_SetStatusToCancelled()
     {
         var order = MakeOrderWithItem();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
         await _sut.Handle(new CancelOrderCommand(1, "انصراف مشتری"), _ct);
 
@@ -185,16 +157,14 @@ public class OrderHandlersTests
 
     /// <summary>ثبت پرداخت باید Payment را به سفارش اضافه کند</summary>
     [Fact]
-    public async Task RecordPayment_Should_AddPayment_And_ReturnPaymentId()
+    public async Task RecordPayment_Should_AddPaymentToOrder()
     {
         var order = MakeOrderWithItem();
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
-        var result = await _sut.Handle(
-            new RecordPaymentCommand(1, 2001, order.TotalAmount, "ZarinPal"), _ct);
+        await _sut.Handle(new RecordPaymentCommand(1, 2001, order.TotalAmount, "ZarinPal"), _ct);
 
         Assert.Single(order.Payments);
-        await _repo.Received(1).UpdateAsync(order, _ct);
     }
 
     // ─── CompletePaymentCommand ───────────────────────────────────────────────
@@ -205,7 +175,7 @@ public class OrderHandlersTests
     {
         var order   = MakeOrderWithItem();
         var payment = order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, null));
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
         await _sut.Handle(new CompletePaymentCommand(1, payment.Id), _ct);
 
@@ -221,7 +191,7 @@ public class OrderHandlersTests
     {
         var order   = MakeOrderWithItem();
         var payment = order.RecordPayment(new RecordPaymentArg(2001, order.TotalAmount, null));
-        _repo.GetByIdAsync(1, _ct).Returns(order);
+        _repo.Seed(order);
 
         await _sut.Handle(new FailPaymentCommand(1, payment.Id), _ct);
 

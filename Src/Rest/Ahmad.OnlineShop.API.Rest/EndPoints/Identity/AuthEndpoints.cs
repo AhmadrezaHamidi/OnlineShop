@@ -3,6 +3,10 @@ using Identity.Application.Commands;
 
 namespace Identity.Rest.Endpoints;
 
+/// <summary>
+/// Endpoints احراز هویت با OTP
+/// جریان: RequestOtp ← دریافت SMS ← VerifyOtp ← JWT
+/// </summary>
 public class AuthEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -12,18 +16,18 @@ public class AuthEndpoints : IEndpoint
             .WithTags("Auth");
 
         group.MapPostEndpoint(
-            IdentityConstants.Routes.Register,
-            Register,
-            IdentityConstants.Names.Register,
-            IdentityConstants.Docs.Register.Summary,
-            IdentityConstants.Docs.Register.Description);
+            IdentityConstants.Routes.RequestOtp,
+            RequestOtp,
+            IdentityConstants.Names.RequestOtp,
+            IdentityConstants.Docs.RequestOtp.Summary,
+            IdentityConstants.Docs.RequestOtp.Description);
 
         group.MapPostEndpoint<LoginCommandResponse>(
-            IdentityConstants.Routes.Login,
-            Login,
-            IdentityConstants.Names.Login,
-            IdentityConstants.Docs.Login.Summary,
-            IdentityConstants.Docs.Login.Description);
+            IdentityConstants.Routes.VerifyOtp,
+            VerifyOtp,
+            IdentityConstants.Names.VerifyOtp,
+            IdentityConstants.Docs.VerifyOtp.Summary,
+            IdentityConstants.Docs.VerifyOtp.Description);
 
         group.MapPostEndpoint<LoginCommandResponse>(
             IdentityConstants.Routes.RefreshToken,
@@ -39,44 +43,34 @@ public class AuthEndpoints : IEndpoint
             IdentityConstants.Docs.Logout.Summary,
             IdentityConstants.Docs.Logout.Description)
             .RequireAuthorization();
-
-        group.MapPostEndpoint(
-            IdentityConstants.Routes.ChangePassword,
-            ChangePassword,
-            IdentityConstants.Names.ChangePassword,
-            IdentityConstants.Docs.ChangePassword.Summary,
-            IdentityConstants.Docs.ChangePassword.Description)
-            .RequireAuthorization();
     }
 
     // ── Handlers ──────────────────────────────────────────────────────────────
 
-    private static async Task<long> Register(
-        RegisterCommand command,
+    /// <summary>ارسال OTP به شماره موبایل</summary>
+    private static async Task<bool> RequestOtp(
+        RequestOtpCommand command,
         ICommandBus bus,
         CancellationToken ct)
-        => await bus.Dispatch<long>(command, ct);
+        => await bus.Dispatch<bool>(command, ct);
 
-    private static async Task<LoginCommandResponse> Login(
-        LoginCommand command,
+    /// <summary>تأیید OTP و صدور JWT</summary>
+    private static async Task<LoginCommandResponse> VerifyOtp(
+        VerifyOtpCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
 
+    /// <summary>تجدید توکن</summary>
     private static async Task<LoginCommandResponse> RefreshToken(
         RefreshTokenCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
 
+    /// <summary>خروج از سیستم</summary>
     private static async Task<bool> Logout(
         LogoutCommand command,
-        ICommandBus bus,
-        CancellationToken ct)
-        => await bus.Dispatch<bool>((ICommand<bool>)command, ct);
-
-    private static async Task<bool> ChangePassword(
-        ChangePasswordCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<bool>((ICommand<bool>)command, ct);

@@ -4,42 +4,38 @@ using Identity.Domain.Exceptions;
 
 namespace Identity.Domain.Aggregates;
 
+/// <summary>
+/// Aggregate Root کاربر سیستم (مشتری یا فروشنده)
+/// ادمین‌ها به صورت دستی در دیتابیس ثبت می‌شوند و از این aggregate استفاده نمی‌کنند
+/// </summary>
 public sealed class User : AggregateRoot<long>
 {
-    public string FullName { get; private set; } = string.Empty;
-    public string Email { get; private set; } = string.Empty;
-    public string PasswordHash { get; private set; } = string.Empty;
-    public string? PhoneNumber { get; private set; }
-    public UserStatus Status { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public string   PhoneNumber { get; private set; } = string.Empty;
+    public string?  FullName    { get; private set; }
+    public UserType UserType    { get; private set; }
+    public UserStatus Status    { get; private set; }
+    public DateTime CreatedAt   { get; private set; }
 
     private readonly List<long> _roleIds = [];
     public IReadOnlyCollection<long> RoleIds => _roleIds.AsReadOnly();
 
     private User() { }
 
-    private User(long id, string fullName, string email, string passwordHash, string? phoneNumber)
-        : base(id)
+    private User(long id, string phoneNumber, UserType userType) : base(id)
     {
-        FullName = fullName;
-        Email = email.ToLowerInvariant();
-        PasswordHash = passwordHash;
         PhoneNumber = phoneNumber;
-        Status = UserStatus.Active;
-        CreatedAt = DateTime.UtcNow;
+        UserType    = userType;
+        Status      = UserStatus.Active;
+        CreatedAt   = DateTime.UtcNow;
     }
 
-    public static User Register(long id, string fullName, string email, string passwordHash, string? phoneNumber = null)
-        => new(id, fullName, email, passwordHash, phoneNumber);
+    /// <summary>ایجاد کاربر جدید (اولین ورود با OTP)</summary>
+    public static User Create(long id, string phoneNumber, UserType userType = UserType.Customer)
+        => new(id, phoneNumber, userType);
 
-    public void ChangePassword(string newHash)
-        => PasswordHash = newHash;
-
-    public void UpdateProfile(string fullName, string? phoneNumber)
-    {
-        FullName = fullName;
-        PhoneNumber = phoneNumber;
-    }
+    /// <summary>ثبت/بروزرسانی اطلاعات پروفایل</summary>
+    public void UpdateProfile(string fullName)
+        => FullName = fullName;
 
     public void Activate()
     {
@@ -48,15 +44,8 @@ public sealed class User : AggregateRoot<long>
         Status = UserStatus.Active;
     }
 
-    public void Deactivate()
-    {
-        Status = UserStatus.Inactive;
-    }
-
-    public void Suspend()
-    {
-        Status = UserStatus.Suspended;
-    }
+    public void Deactivate()  => Status = UserStatus.Inactive;
+    public void Suspend()     => Status = UserStatus.Suspended;
 
     public void AssignRole(long roleId)
     {
@@ -64,6 +53,5 @@ public sealed class User : AggregateRoot<long>
             _roleIds.Add(roleId);
     }
 
-    public void RemoveRole(long roleId)
-        => _roleIds.Remove(roleId);
+    public void RemoveRole(long roleId) => _roleIds.Remove(roleId);
 }

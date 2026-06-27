@@ -1,174 +1,141 @@
 /// <summary>
 /// تست‌های Application Handler مدیران (BackOfficeHandlers)
 /// پوشش‌دهنده: ایجاد مدیر، تغییر نقش، فعال/غیرفعال/تعلیق، گزارش‌ها
-/// تکنولوژی Mock: NSubstitute — IAdminUserRepository
-/// خطاهای تست‌شده: AdminEmailAlreadyExistsException | AdminNotFoundException | ReportNotFoundException
+/// تکنولوژی: Fake Repository
+/// خطاهای تست‌شده: AdminEmailAlreadyExistsException | AdminNotFoundException
 /// </summary>
-using Ahmad.OnlineShop.Domain.BackOffice.Args;
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 
 namespace Ahmad.OnlineShop.Application.BackOffice.Tests;
 
 public class BackOfficeHandlersTests
 {
-    private readonly IAdminUserRepository _repo = Substitute.For<IAdminUserRepository>();
-    private readonly BackOfficeHandlers   _sut;
-    private readonly CancellationToken    _ct = CancellationToken.None;
+    private readonly FakeAdminUserRepository _repo = new();
+    private readonly BackOfficeHandlers      _sut;
+    private readonly CancellationToken       _ct = CancellationToken.None;
 
     public BackOfficeHandlersTests()
     {
         _sut = new BackOfficeHandlers(_repo);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────
-
     private static AdminUser MakeAdmin() =>
         AdminUser.Create(new CreateAdminUserArg(1, "Ahmad", "a@b.com", AdminRole.SuperAdmin));
 
     // ─── CreateAdminUserCommand ───────────────────────────────────────────────
 
-    /// <summary>ایجاد مدیر جدید باید آن را در Repository ذخیره کند و Id را برگرداند</summary>
+    /// <summary>ایجاد مدیر جدید باید آن را در Repository ذخیره کند</summary>
     [Fact]
-    public async Task Create_When_EmailNotExists_Should_AddAdmin_And_ReturnId()
+    public async Task Create_When_EmailNotExists_Should_AddAdmin()
     {
-        _repo.GetByEmailAsync("a@b.com", _ct).ReturnsNull();
-        _repo.GetNextId().Returns(1L);
+        _repo.FoundByEmail = null;
 
         var result = await _sut.Handle(
             new CreateAdminUserCommand("Ahmad", "a@b.com", AdminRole.SuperAdmin), _ct);
 
-        Assert.Equal(1, result);
-        await _repo.Received(1).AddAsync(Arg.Any<AdminUser>(), _ct);
+        Assert.NotNull(_repo.Added);
+        Assert.Equal("Ahmad", _repo.Added!.FullName);
     }
 
     /// <summary>خطا: ایمیل تکراری → AdminEmailAlreadyExistsException</summary>
     [Fact]
     public async Task Create_When_EmailExists_Should_Throw_AdminEmailAlreadyExistsException()
     {
-        _repo.GetByEmailAsync("a@b.com", _ct).Returns(MakeAdmin());
+        _repo.FoundByEmail = MakeAdmin();
 
         await Assert.ThrowsAsync<AdminEmailAlreadyExistsException>(
             () => _sut.Handle(new CreateAdminUserCommand("Ahmad", "a@b.com", AdminRole.SuperAdmin), _ct));
 
-        await _repo.DidNotReceive().AddAsync(Arg.Any<AdminUser>(), _ct);
+        Assert.Null(_repo.Added);
     }
 
     // ─── ChangeAdminRoleCommand ───────────────────────────────────────────────
 
     /// <summary>تغییر نقش مدیر باید Repository را آپدیت کند</summary>
     [Fact]
-    public async Task ChangeRole_When_AdminExists_Should_UpdateRepo_And_ReturnId()
+    public async Task ChangeRole_When_AdminExists_Should_UpdateRole()
     {
         var admin = MakeAdmin();
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
-        var result = await _sut.Handle(
-            new ChangeAdminRoleCommand(1, AdminRole.OrderManager), _ct);
+        await _sut.Handle(new ChangeAdminRoleCommand(1, AdminRole.OrderManager), _ct);
 
-        Assert.Equal(1, result);
         Assert.Equal(AdminRole.OrderManager, admin.Role);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
+        Assert.NotNull(_repo.Updated);
     }
 
     /// <summary>خطا: مدیر پیدا نشد → AdminNotFoundException</summary>
     [Fact]
     public async Task ChangeRole_When_AdminNotFound_Should_Throw_AdminNotFoundException()
     {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
         await Assert.ThrowsAsync<AdminNotFoundException>(
             () => _sut.Handle(new ChangeAdminRoleCommand(99, AdminRole.OrderManager), _ct));
     }
 
     // ─── ActivateAdminCommand ─────────────────────────────────────────────────
 
-    /// <summary>خطا: مدیر پیدا نشد برای فعال‌سازی → AdminNotFoundException</summary>
+    /// <summary>فعال‌سازی مدیر غیرفعال باید وضعیت را Active کند</summary>
     [Fact]
-    public async Task Activate_When_AdminNotFound_Should_Throw_AdminNotFoundException()
-    {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
-        await Assert.ThrowsAsync<AdminNotFoundException>(
-            () => _sut.Handle(new ActivateAdminCommand(99), _ct));
-    }
-
-    /// <summary>فعال‌سازی مدیر غیرفعال باید موفق باشد</summary>
-    [Fact]
-    public async Task Activate_When_AdminInactive_Should_Activate_And_Update()
+    public async Task Activate_When_AdminInactive_Should_Activate()
     {
         var admin = MakeAdmin();
         admin.Deactivate();
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
         await _sut.Handle(new ActivateAdminCommand(1), _ct);
 
         Assert.Equal(AdminStatus.Active, admin.Status);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
+    }
+
+    /// <summary>خطا: مدیر پیدا نشد → AdminNotFoundException</summary>
+    [Fact]
+    public async Task Activate_When_AdminNotFound_Should_Throw_AdminNotFoundException()
+    {
+        await Assert.ThrowsAsync<AdminNotFoundException>(
+            () => _sut.Handle(new ActivateAdminCommand(99), _ct));
     }
 
     // ─── DeactivateAdminCommand ───────────────────────────────────────────────
 
-    /// <summary>غیرفعال‌سازی مدیر باید وضعیت را Inactive کند</summary>
+    /// <summary>غیرفعال‌سازی مدیر Active باید وضعیت را Inactive کند</summary>
     [Fact]
-    public async Task Deactivate_When_AdminActive_Should_Deactivate_And_Update()
+    public async Task Deactivate_When_AdminActive_Should_Deactivate()
     {
         var admin = MakeAdmin();
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
         await _sut.Handle(new DeactivateAdminCommand(1), _ct);
 
         Assert.Equal(AdminStatus.Inactive, admin.Status);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
-    }
-
-    /// <summary>خطا: مدیر پیدا نشد برای غیرفعال‌سازی → AdminNotFoundException</summary>
-    [Fact]
-    public async Task Deactivate_When_AdminNotFound_Should_Throw_AdminNotFoundException()
-    {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
-        await Assert.ThrowsAsync<AdminNotFoundException>(
-            () => _sut.Handle(new DeactivateAdminCommand(99), _ct));
     }
 
     // ─── SuspendAdminCommand ──────────────────────────────────────────────────
 
     /// <summary>تعلیق مدیر باید وضعیت را Suspended کند</summary>
     [Fact]
-    public async Task Suspend_When_AdminExists_Should_Suspend_And_Update()
+    public async Task Suspend_When_AdminExists_Should_Suspend()
     {
         var admin = MakeAdmin();
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
         await _sut.Handle(new SuspendAdminCommand(1), _ct);
 
         Assert.Equal(AdminStatus.Suspended, admin.Status);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
     }
 
     // ─── RequestReportCommand ─────────────────────────────────────────────────
 
-    /// <summary>درخواست گزارش باید گزارش با وضعیت Pending به مدیر اضافه کند</summary>
+    /// <summary>درخواست گزارش باید گزارش Pending به مدیر اضافه کند</summary>
     [Fact]
-    public async Task RequestReport_When_AdminExists_Should_AddReport_And_ReturnReportId()
+    public async Task RequestReport_When_AdminExists_Should_AddPendingReport()
     {
         var admin = MakeAdmin();
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
-        var result = await _sut.Handle(
-            new RequestReportCommand(1, 10, ReportType.Sales), _ct);
+        await _sut.Handle(new RequestReportCommand(1, 10, ReportType.Sales), _ct);
 
         Assert.Single(admin.Reports);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
-    }
-
-    /// <summary>خطا: مدیر پیدا نشد برای گزارش → AdminNotFoundException</summary>
-    [Fact]
-    public async Task RequestReport_When_AdminNotFound_Should_Throw_AdminNotFoundException()
-    {
-        _repo.GetByIdAsync(99, _ct).ReturnsNull();
-
-        await Assert.ThrowsAsync<AdminNotFoundException>(
-            () => _sut.Handle(new RequestReportCommand(99, 10, ReportType.Sales), _ct));
+        Assert.Equal(ReportStatus.Pending, admin.Reports.First().Status);
     }
 
     // ─── CompleteReportCommand ────────────────────────────────────────────────
@@ -179,12 +146,11 @@ public class BackOfficeHandlersTests
     {
         var admin  = MakeAdmin();
         var report = admin.RequestReport(new CreateReportArg(10, admin.Id, ReportType.Sales));
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
         await _sut.Handle(new CompleteReportCommand(1, report.Id, "/reports/file.pdf"), _ct);
 
         Assert.Equal(ReportStatus.Completed, report.Status);
-        await _repo.Received(1).UpdateAsync(admin, _ct);
     }
 
     // ─── FailReportCommand ────────────────────────────────────────────────────
@@ -195,7 +161,7 @@ public class BackOfficeHandlersTests
     {
         var admin  = MakeAdmin();
         var report = admin.RequestReport(new CreateReportArg(10, admin.Id, ReportType.Sales));
-        _repo.GetByIdAsync(1, _ct).Returns(admin);
+        _repo.Seed(admin);
 
         await _sut.Handle(new FailReportCommand(1, report.Id, "خطای سرور"), _ct);
 

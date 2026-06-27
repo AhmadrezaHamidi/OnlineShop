@@ -26,3 +26,13 @@ public sealed class InvalidRefreshTokenException : BusinessException
 {
     public InvalidRefreshTokenException() : base(Ahmad.OnlineShop.Domain.Resources.Message.InvalidRefreshTokenException) { }
 }
+
+public sealed class InvalidOtpException : BusinessException
+{
+    public InvalidOtpException() : base("کد تأیید نامعتبر یا منقضی شده است.") { }
+}
+
+public sealed class OtpNotRequestedException : BusinessException
+{
+    public OtpNotRequestedException() : base("ابتدا کد تأیید درخواست کنید.") { }
+}

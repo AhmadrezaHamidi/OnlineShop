@@ -148,9 +148,9 @@ public sealed class OrderEndpoints : IEndpoint
         long? userId = null,
         OrderStatus? status = null)
     {
-        var result = await queryBus.DispatchAsync<QueryPagedResult<GetOrderQueryResponse>>(
+        var result = await queryBus.DispatchAsync<PagedResult<GetOrderQueryResponse>>(
             new GetOrdersQuery(page, pageSize, userId, status), ct);
-        return Results.Ok(ApiResponse<QueryPagedResult<GetOrderQueryResponse>>.Ok(result));
+        return Results.Ok(ApiResponse<PagedResult<GetOrderQueryResponse>>.Ok(result));
     }
 
     private static async Task<IResult> GetOrder(
@@ -162,3 +162,4 @@ public sealed class OrderEndpoints : IEndpoint
         return Results.Ok(ApiResponse<GetOrderQueryResponse>.Ok(result));
     }
 }
+

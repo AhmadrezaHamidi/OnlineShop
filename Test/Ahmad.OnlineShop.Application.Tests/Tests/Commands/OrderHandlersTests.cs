@@ -1,8 +1,8 @@
-/// <summary>
-/// تست‌های Application Handler سفارش (OrderHandlers)
-/// پوشش‌دهنده: ایجاد، افزودن/حذف آیتم، چرخه وضعیت، پرداخت
-/// تکنولوژی: Fake Repository (بدون نیاز به مکینگ library)
-/// خطاهای تست‌شده: OrderNotFoundException
+﻿/// <summary>
+/// ØªØ³Øªâ€ŒÙ‡Ø§ÛŒ Application Handler Ø³ÙØ§Ø±Ø´ (OrderHandlers)
+/// Ù¾ÙˆØ´Ø´â€ŒØ¯Ù‡Ù†Ø¯Ù‡: Ø§ÛŒØ¬Ø§Ø¯ØŒ Ø§ÙØ²ÙˆØ¯Ù†/Ø­Ø°Ù Ø¢ÛŒØªÙ…ØŒ Ú†Ø±Ø®Ù‡ ÙˆØ¶Ø¹ÛŒØªØŒ Ù¾Ø±Ø¯Ø§Ø®Øª
+/// ØªÚ©Ù†ÙˆÙ„ÙˆÚ˜ÛŒ: Fake Repository (Ø¨Ø¯ÙˆÙ† Ù†ÛŒØ§Ø² Ø¨Ù‡ Ù…Ú©ÛŒÙ†Ú¯ library)
+/// Ø®Ø·Ø§Ù‡Ø§ÛŒ ØªØ³Øªâ€ŒØ´Ø¯Ù‡: OrderNotFoundException
 /// </summary>
 using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Order.Mapper;
@@ -21,10 +21,10 @@ public class OrderHandlersTests
         _sut = new OrderHandlers(_repo);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────
+    // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static OrderAgg MakePendingOrder()
-        => OrderAgg.Create(new CreateOrderArg(1, 100, PaymentMethod.Online));
+        => OrderAgg.Create(new CreateOrderArg(1, 100, PaymentMethod.ZarinPal));
 
     private static OrderAgg MakeOrderWithItem()
     {
@@ -41,22 +41,22 @@ public class OrderHandlersTests
         return order;
     }
 
-    // ─── CreateOrderCommand ───────────────────────────────────────────────────
+    // â”€â”€â”€ CreateOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>ایجاد سفارش باید آن را در Repository ذخیره کند</summary>
+    /// <summary>Ø§ÛŒØ¬Ø§Ø¯ Ø³ÙØ§Ø±Ø´ Ø¨Ø§ÛŒØ¯ Ø¢Ù† Ø±Ø§ Ø¯Ø± Repository Ø°Ø®ÛŒØ±Ù‡ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Create_Should_AddOrder_And_ReturnId()
     {
         var result = await _sut.Handle(
-            new CreateOrderCommand(100, PaymentMethod.Online), _ct);
+            new CreateOrderCommand(100, PaymentMethod.ZarinPal), _ct);
 
         Assert.NotNull(_repo.Added);
         Assert.Equal(100, _repo.Added!.UserId);
     }
 
-    // ─── PlaceOrderCommand ────────────────────────────────────────────────────
+    // â”€â”€â”€ PlaceOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>خطا: سفارش پیدا نشد → OrderNotFoundException</summary>
+    /// <summary>Ø®Ø·Ø§: Ø³ÙØ§Ø±Ø´ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ OrderNotFoundException</summary>
     [Fact]
     public async Task Place_When_OrderNotFound_Should_Throw_OrderNotFoundException()
     {
@@ -64,9 +64,9 @@ public class OrderHandlersTests
             () => _sut.Handle(new PlaceOrderCommand(99), _ct));
     }
 
-    // ─── AddOrderItemCommand ──────────────────────────────────────────────────
+    // â”€â”€â”€ AddOrderItemCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>افزودن آیتم باید TotalAmount سفارش را آپدیت کند</summary>
+    /// <summary>Ø§ÙØ²ÙˆØ¯Ù† Ø¢ÛŒØªÙ… Ø¨Ø§ÛŒØ¯ TotalAmount Ø³ÙØ§Ø±Ø´ Ø±Ø§ Ø¢Ù¾Ø¯ÛŒØª Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task AddItem_Should_AddItem_And_UpdateTotal()
     {
@@ -79,9 +79,9 @@ public class OrderHandlersTests
         Assert.Single(order.Items);
     }
 
-    // ─── RemoveOrderItemCommand ───────────────────────────────────────────────
+    // â”€â”€â”€ RemoveOrderItemCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>حذف آیتم باید آیتم را از سفارش پاک کند</summary>
+    /// <summary>Ø­Ø°Ù Ø¢ÛŒØªÙ… Ø¨Ø§ÛŒØ¯ Ø¢ÛŒØªÙ… Ø±Ø§ Ø§Ø² Ø³ÙØ§Ø±Ø´ Ù¾Ø§Ú© Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task RemoveItem_Should_RemoveItem_And_UpdateTotal()
     {
@@ -95,9 +95,9 @@ public class OrderHandlersTests
         Assert.Equal(0, order.TotalAmount);
     }
 
-    // ─── ConfirmOrderCommand ──────────────────────────────────────────────────
+    // â”€â”€â”€ ConfirmOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>CompletePayment باید سفارش را از طریق MarkPaymentCompleted تأیید کند</summary>
+    /// <summary>CompletePayment Ø¨Ø§ÛŒØ¯ Ø³ÙØ§Ø±Ø´ Ø±Ø§ Ø§Ø² Ø·Ø±ÛŒÙ‚ MarkPaymentCompleted ØªØ£ÛŒÛŒØ¯ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Confirm_Via_CompletePayment_Should_SetStatusConfirmed()
     {
@@ -110,9 +110,9 @@ public class OrderHandlersTests
         Assert.Equal(OrderStatus.Confirmed, order.Status);
     }
 
-    // ─── ShipOrderCommand ─────────────────────────────────────────────────────
+    // â”€â”€â”€ ShipOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>ارسال سفارش تأییدشده باید وضعیت را Shipped کند</summary>
+    /// <summary>Ø§Ø±Ø³Ø§Ù„ Ø³ÙØ§Ø±Ø´ ØªØ£ÛŒÛŒØ¯Ø´Ø¯Ù‡ Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Shipped Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Ship_When_OrderConfirmed_Should_SetStatusToShipped()
     {
@@ -124,9 +124,9 @@ public class OrderHandlersTests
         Assert.Equal(OrderStatus.Shipped, order.Status);
     }
 
-    // ─── DeliverOrderCommand ──────────────────────────────────────────────────
+    // â”€â”€â”€ DeliverOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>تحویل سفارش ارسال‌شده باید وضعیت را Delivered کند</summary>
+    /// <summary>ØªØ­ÙˆÛŒÙ„ Ø³ÙØ§Ø±Ø´ Ø§Ø±Ø³Ø§Ù„â€ŒØ´Ø¯Ù‡ Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Delivered Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Deliver_When_OrderShipped_Should_SetStatusToDelivered()
     {
@@ -139,23 +139,23 @@ public class OrderHandlersTests
         Assert.Equal(OrderStatus.Delivered, order.Status);
     }
 
-    // ─── CancelOrderCommand ───────────────────────────────────────────────────
+    // â”€â”€â”€ CancelOrderCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>لغو سفارش Pending باید وضعیت را Cancelled کند</summary>
+    /// <summary>Ù„ØºÙˆ Ø³ÙØ§Ø±Ø´ Pending Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Cancelled Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Cancel_When_OrderPending_Should_SetStatusToCancelled()
     {
         var order = MakeOrderWithItem();
         _repo.Seed(order);
 
-        await _sut.Handle(new CancelOrderCommand(1, "انصراف مشتری"), _ct);
+        await _sut.Handle(new CancelOrderCommand(1, "Ø§Ù†ØµØ±Ø§Ù Ù…Ø´ØªØ±ÛŒ"), _ct);
 
         Assert.Equal(OrderStatus.Cancelled, order.Status);
     }
 
-    // ─── RecordPaymentCommand ─────────────────────────────────────────────────
+    // â”€â”€â”€ RecordPaymentCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>ثبت پرداخت باید Payment را به سفارش اضافه کند</summary>
+    /// <summary>Ø«Ø¨Øª Ù¾Ø±Ø¯Ø§Ø®Øª Ø¨Ø§ÛŒØ¯ Payment Ø±Ø§ Ø¨Ù‡ Ø³ÙØ§Ø±Ø´ Ø§Ø¶Ø§ÙÙ‡ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task RecordPayment_Should_AddPaymentToOrder()
     {
@@ -167,9 +167,9 @@ public class OrderHandlersTests
         Assert.Single(order.Payments);
     }
 
-    // ─── CompletePaymentCommand ───────────────────────────────────────────────
+    // â”€â”€â”€ CompletePaymentCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>تکمیل پرداخت باید سفارش را Confirmed کند</summary>
+    /// <summary>ØªÚ©Ù…ÛŒÙ„ Ù¾Ø±Ø¯Ø§Ø®Øª Ø¨Ø§ÛŒØ¯ Ø³ÙØ§Ø±Ø´ Ø±Ø§ Confirmed Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task CompletePayment_Should_ConfirmOrder()
     {
@@ -183,9 +183,9 @@ public class OrderHandlersTests
         Assert.True(payment.IsSuccessful);
     }
 
-    // ─── FailPaymentCommand ───────────────────────────────────────────────────
+    // â”€â”€â”€ FailPaymentCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>شکست پرداخت باید وضعیت Payment را Failed کند</summary>
+    /// <summary>Ø´Ú©Ø³Øª Ù¾Ø±Ø¯Ø§Ø®Øª Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Payment Ø±Ø§ Failed Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task FailPayment_Should_MarkPaymentFailed()
     {
@@ -199,3 +199,4 @@ public class OrderHandlersTests
         Assert.Equal(OrderStatus.Pending,  order.Status);
     }
 }
+

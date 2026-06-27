@@ -1,4 +1,4 @@
-using Ahmad.OnlineShop.Domain.Bnpl.Exceptions;
+﻿using Ahmad.OnlineShop.Domain.Bnpl.Exceptions;
 
 namespace Ahmad.OnlineShop.Application.Query.Handlers;
 
@@ -7,7 +7,7 @@ public sealed class BnplQueryHandlers(
     ICreditLimitRepository  creditRepo) :
     IQueryHandler<GetContractQuery,      GetContractQueryResponse>,
     IQueryHandler<GetInstallmentsQuery,  List<GetInstallmentResponse>>,
-    IQueryHandler<GetUserContractsQuery, QueryPagedResult<GetContractQueryResponse>>,
+    IQueryHandler<GetUserContractsQuery, PagedResult<GetContractQueryResponse>>,
     IQueryHandler<GetCreditLimitQuery,   GetCreditLimitQueryResponse>
 {
     public async Task<GetContractQueryResponse> HandleAsync(GetContractQuery query, CancellationToken token)
@@ -29,12 +29,12 @@ public sealed class BnplQueryHandlers(
             .ToList();
     }
 
-    public async Task<QueryPagedResult<GetContractQueryResponse>> HandleAsync(GetUserContractsQuery query, CancellationToken token)
+    public async Task<PagedResult<GetContractQueryResponse>> HandleAsync(GetUserContractsQuery query, CancellationToken token)
     {
         var (contracts, total) = await contractRepo.GetByUserIdAsync(
             query.UserId, query.Page, query.PageSize, token);
 
-        return new QueryPagedResult<GetContractQueryResponse>(
+        return new PagedResult<GetContractQueryResponse>(
             contracts.Select(c => c.ToResponse()).ToList(),
             total, query.Page, query.PageSize);
     }
@@ -47,3 +47,4 @@ public sealed class BnplQueryHandlers(
         return credit.ToResponse();
     }
 }
+

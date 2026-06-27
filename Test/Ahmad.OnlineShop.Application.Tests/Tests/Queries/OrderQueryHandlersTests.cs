@@ -1,8 +1,8 @@
-/// <summary>
-/// تست‌های Application Query Handler سفارش (OrderQueryHandlers)
-/// پوشش‌دهنده: دریافت سفارش، لیست سفارشات
-/// تکنولوژی: Fake Repository
-/// خطاهای تست‌شده: OrderNotFoundException
+﻿/// <summary>
+/// ØªØ³Øªâ€ŒÙ‡Ø§ÛŒ Application Query Handler Ø³ÙØ§Ø±Ø´ (OrderQueryHandlers)
+/// Ù¾ÙˆØ´Ø´â€ŒØ¯Ù‡Ù†Ø¯Ù‡: Ø¯Ø±ÛŒØ§ÙØª Ø³ÙØ§Ø±Ø´ØŒ Ù„ÛŒØ³Øª Ø³ÙØ§Ø±Ø´Ø§Øª
+/// ØªÚ©Ù†ÙˆÙ„ÙˆÚ˜ÛŒ: Fake Repository
+/// Ø®Ø·Ø§Ù‡Ø§ÛŒ ØªØ³Øªâ€ŒØ´Ø¯Ù‡: OrderNotFoundException
 /// </summary>
 using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Query.Handlers;
@@ -23,14 +23,14 @@ public class OrderQueryHandlersTests
 
     private static OrderAgg MakeOrder()
     {
-        var order = OrderAgg.Create(new CreateOrderArg(1, 100, PaymentMethod.Online));
+        var order = OrderAgg.Create(new CreateOrderArg(1, 100, PaymentMethod.ZarinPal));
         order.AddItem(new AddOrderItemArg(1, 101, 2, 150_000m));
         return order;
     }
 
-    // ─── GetOrderQuery ────────────────────────────────────────────────────────
+    // â”€â”€â”€ GetOrderQuery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>دریافت سفارش موجود باید اطلاعات کامل برگرداند</summary>
+    /// <summary>Ø¯Ø±ÛŒØ§ÙØª Ø³ÙØ§Ø±Ø´ Ù…ÙˆØ¬ÙˆØ¯ Ø¨Ø§ÛŒØ¯ Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ú©Ø§Ù…Ù„ Ø¨Ø±Ú¯Ø±Ø¯Ø§Ù†Ø¯</summary>
     [Fact]
     public async Task GetOrder_When_Found_Should_ReturnOrderResponse()
     {
@@ -46,7 +46,7 @@ public class OrderQueryHandlersTests
         Assert.Single(result.Items);
     }
 
-    /// <summary>خطا: سفارش پیدا نشد → OrderNotFoundException</summary>
+    /// <summary>Ø®Ø·Ø§: Ø³ÙØ§Ø±Ø´ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ OrderNotFoundException</summary>
     [Fact]
     public async Task GetOrder_When_NotFound_Should_Throw_OrderNotFoundException()
     {
@@ -54,9 +54,9 @@ public class OrderQueryHandlersTests
             () => _sut.HandleAsync(new GetOrderQuery(99), _ct));
     }
 
-    // ─── GetOrdersQuery ───────────────────────────────────────────────────────
+    // â”€â”€â”€ GetOrdersQuery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>لیست سفارشات باید با صفحه‌بندی برگردد</summary>
+    /// <summary>Ù„ÛŒØ³Øª Ø³ÙØ§Ø±Ø´Ø§Øª Ø¨Ø§ÛŒØ¯ Ø¨Ø§ ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¨Ø±Ú¯Ø±Ø¯Ø¯</summary>
     [Fact]
     public async Task GetOrders_Should_ReturnPagedResult()
     {
@@ -70,3 +70,4 @@ public class OrderQueryHandlersTests
         Assert.Equal(20, result.PageSize);
     }
 }
+

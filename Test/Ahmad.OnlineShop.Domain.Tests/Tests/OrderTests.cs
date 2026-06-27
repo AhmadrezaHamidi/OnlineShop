@@ -18,13 +18,13 @@ public class OrderTests
     [Fact]
     public void Create_Should_Create_Order_With_Pending_Status()
     {
-        var arg = new CreateOrderArg(_orderId, _userId, PaymentMethod.Online);
+        var arg = new CreateOrderArg(_orderId, _userId, PaymentMethod.ZarinPal);
         var order = OrderAgg.Order.Create(arg);
 
         Assert.Equal(_orderId, order.Id);
         Assert.Equal(_userId, order.UserId);
         Assert.Equal(OrderStatus.Pending, order.Status);
-        Assert.Equal(PaymentMethod.Online, order.PaymentMethod);
+        Assert.Equal(PaymentMethod.ZarinPal, order.PaymentMethod);
         Assert.Equal(0, order.TotalAmount);
         Assert.Empty(order.Items);
         Assert.Empty(order.Payments);
@@ -173,7 +173,7 @@ public class OrderTests
 
     private OrderAgg.Order CreatePendingOrder()
     {
-        var arg = new CreateOrderArg(_orderId, _userId, PaymentMethod.Online);
+        var arg = new CreateOrderArg(_orderId, _userId, PaymentMethod.ZarinPal);
         return OrderAgg.Order.Create(arg);
     }
 
@@ -199,3 +199,4 @@ public class OrderTests
         return order;
     }
 }
+

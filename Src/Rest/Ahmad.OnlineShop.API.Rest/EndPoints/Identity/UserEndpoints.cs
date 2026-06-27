@@ -1,4 +1,4 @@
-using Ahmad.OnlineShop.Rest.EndPoints.Identity;
+﻿using Ahmad.OnlineShop.Rest.EndPoints.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Query.Queries;
 
@@ -13,7 +13,7 @@ public class UserEndpoints : IEndpoint
             .WithTags("Users")
             .RequireAuthorization();
 
-        // ── Queries ───────────────────────────────────────────────────────────
+        // â”€â”€ Queries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         group.MapGetEndpoint<GetUserQueryResponse>(
             IdentityConstants.Routes.GetUser,
@@ -22,7 +22,7 @@ public class UserEndpoints : IEndpoint
             IdentityConstants.Docs.GetUser.Summary,
             IdentityConstants.Docs.GetUser.Description);
 
-        group.MapGetEndpoint<IdentityPagedResult<GetUserQueryResponse>>(
+        group.MapGetEndpoint<PagedResult<GetUserQueryResponse>>(
             IdentityConstants.Routes.GetUsers,
             GetUsers,
             IdentityConstants.Names.GetUsers,
@@ -36,7 +36,7 @@ public class UserEndpoints : IEndpoint
             IdentityConstants.Docs.GetRoles.Summary,
             IdentityConstants.Docs.GetRoles.Description);
 
-        // ── Commands ──────────────────────────────────────────────────────────
+        // â”€â”€ Commands â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         group.MapPutEndpoint(
             IdentityConstants.Routes.UpdateProfile,
@@ -81,7 +81,7 @@ public class UserEndpoints : IEndpoint
             IdentityConstants.Docs.SuspendUser.Description);
     }
 
-    // ── Query Handlers ────────────────────────────────────────────────────────
+    // â”€â”€ Query Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static async Task<GetUserQueryResponse> GetUser(
         long id,
@@ -89,18 +89,18 @@ public class UserEndpoints : IEndpoint
         CancellationToken ct)
         => await queryBus.DispatchAsync<GetUserQueryResponse>(new GetUserQuery(id), ct);
 
-    private static async Task<IdentityPagedResult<GetUserQueryResponse>> GetUsers(
+    private static async Task<PagedResult<GetUserQueryResponse>> GetUsers(
         [AsParameters] GetUsersQuery query,
         IQueryBus queryBus,
         CancellationToken ct)
-        => await queryBus.DispatchAsync<IdentityPagedResult<GetUserQueryResponse>>(query, ct);
+        => await queryBus.DispatchAsync<PagedResult<GetUserQueryResponse>>(query, ct);
 
     private static async Task<IReadOnlyList<GetRoleQueryResponse>> GetRoles(
         IQueryBus queryBus,
         CancellationToken ct)
         => await queryBus.DispatchAsync<IReadOnlyList<GetRoleQueryResponse>>(new GetRolesQuery(), ct);
 
-    // ── Command Handlers ──────────────────────────────────────────────────────
+    // â”€â”€ Command Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static async Task<bool> UpdateProfile(
         long id,
@@ -141,3 +141,4 @@ public class UserEndpoints : IEndpoint
         CancellationToken ct)
         => await bus.Dispatch<bool>((ICommand<bool>)new SuspendUserCommand(id), ct);
 }
+

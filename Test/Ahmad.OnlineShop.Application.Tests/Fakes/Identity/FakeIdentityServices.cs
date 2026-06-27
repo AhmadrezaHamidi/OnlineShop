@@ -40,6 +40,9 @@ public class FakeSmsService : ISmsService
         LastCode  = code;
         return Task.FromResult(!ShouldFail);
     }
+
+    public Task<bool> SendBulkAsync(IReadOnlyList<string> phones, string message, CancellationToken token = default)
+        => Task.FromResult(!ShouldFail);
 }
 
 // ── IRefreshTokenRepository ───────────────────────────────────────────────────

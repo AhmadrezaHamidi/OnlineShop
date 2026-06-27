@@ -120,7 +120,7 @@ public sealed class BnplContractEndpoints : IEndpoint
     {
         var result = await queryBus.DispatchAsync(
             new GetUserContractsQuery(userId, page, pageSize), cancellation);
-        return Results.Ok(ApiResponse<QueryPagedResult<GetContractQueryResponse>>.Ok(result));
+        return Results.Ok(ApiResponse<PagedResult<GetContractQueryResponse>>.Ok(result));
     }
 
     private static async Task<IResult> GetInstallments(
@@ -132,3 +132,4 @@ public sealed class BnplContractEndpoints : IEndpoint
         return Results.Ok(ApiResponse<List<GetInstallmentResponse>>.Ok(result));
     }
 }
+

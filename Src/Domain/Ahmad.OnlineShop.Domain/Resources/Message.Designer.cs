@@ -484,5 +484,21 @@ namespace Ahmad.OnlineShop.Domain.Resources {
         internal static string InvalidRefreshTokenException {
             get { return ResourceManager.GetString("InvalidRefreshTokenException", resourceCulture); }
         }
+
+        internal static string InvalidOtpException {
+            get { return ResourceManager.GetString("InvalidOtpException", resourceCulture); }
+        }
+
+        internal static string OtpNotRequestedException {
+            get { return ResourceManager.GetString("OtpNotRequestedException", resourceCulture); }
+        }
+
+        internal static string ProductNotOwnedBySellerException {
+            get { return ResourceManager.GetString("ProductNotOwnedBySellerException", resourceCulture); }
+        }
+
+        internal static string InvalidSellerIdException {
+            get { return ResourceManager.GetString("InvalidSellerIdException", resourceCulture); }
+        }
     }
 }

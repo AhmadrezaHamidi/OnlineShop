@@ -1,4 +1,4 @@
-using Ahmad.OnlineShop.Domain.Products.Enums;
+﻿using Ahmad.OnlineShop.Domain.Products.Enums;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
 
 namespace Ahmad.OnlineShop.Rest.Endpoints;
@@ -11,9 +11,9 @@ public class ProductEndpoints : IEndpoint
             .WithApiVersionSet()
             .WithTags("Products");
 
-        // ── Queries ───────────────────────────────────────────────────────────
+        // â”€â”€ Queries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-        group.MapGetEndpoint<QueryPagedResult<GetProductQueryResponse>>(
+        group.MapGetEndpoint<PagedResult<GetProductQueryResponse>>(
             ProductConstants.Routes.GetProducts,
             GetProducts,
             ProductConstants.Names.GetProducts,
@@ -27,7 +27,7 @@ public class ProductEndpoints : IEndpoint
             ProductConstants.Docs.GetProduct.Summary,
             ProductConstants.Docs.GetProduct.Description);
 
-        // ── Commands ──────────────────────────────────────────────────────────
+        // â”€â”€ Commands â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         group.MapPostEndpoint(
             ProductConstants.Routes.CreateProduct,
@@ -72,9 +72,9 @@ public class ProductEndpoints : IEndpoint
             ProductConstants.Docs.ArchiveProduct.Description);
     }
 
-    // ── Query Handlers ────────────────────────────────────────────────────────
+    // â”€â”€ Query Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    private static async Task<QueryPagedResult<GetProductQueryResponse>> GetProducts(
+    private static async Task<PagedResult<GetProductQueryResponse>> GetProducts(
         IQueryBus      queryBus,
         CancellationToken ct,
         int            page       = 1,
@@ -82,7 +82,7 @@ public class ProductEndpoints : IEndpoint
         string?        search     = null,
         long?          categoryId = null,
         ProductStatus? status     = null)
-        => await queryBus.DispatchAsync<QueryPagedResult<GetProductQueryResponse>>(
+        => await queryBus.DispatchAsync<PagedResult<GetProductQueryResponse>>(
             new GetProductsQuery(page, pageSize, search, categoryId, status), ct);
 
     private static async Task<GetProductQueryResponse> GetProduct(
@@ -91,13 +91,14 @@ public class ProductEndpoints : IEndpoint
         CancellationToken ct)
         => await queryBus.DispatchAsync<GetProductQueryResponse>(new GetProductQuery(id), ct);
 
-    // ── Command Handlers ──────────────────────────────────────────────────────
+    // â”€â”€ Command Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static async Task<long> CreateProduct(
         CreateProductCommand command,
-        ICommandBus bus,
-        CancellationToken ct)
-        => await bus.Dispatch<long>(command, ct);
+        HttpContext          httpContext,
+        ICommandBus          bus,
+        CancellationToken    ct)
+        => await bus.Dispatch<long>(command with { SellerId = httpContext.GetUserId() }, ct);
 
     private static async Task<long> UpdateProduct(
         long id,
@@ -131,3 +132,4 @@ public class ProductEndpoints : IEndpoint
         CancellationToken ct)
         => await bus.Dispatch<long>(new ArchiveProductCommand(id), ct);
 }
+

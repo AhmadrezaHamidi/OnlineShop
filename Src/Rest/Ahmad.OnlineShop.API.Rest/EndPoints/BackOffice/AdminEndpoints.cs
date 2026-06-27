@@ -37,11 +37,11 @@ public class AdminEndpoints : IEndpoint
             async ([AsParameters] GetAdminUsersQuery query, IQueryBus queryBus, CancellationToken ct) =>
             {
                 var result = await queryBus.DispatchAsync(query, ct);
-                return Results.Ok(ApiResponse<BackOfficePagedResult<GetAdminUserQueryResponse>>.Ok(result));
+                return Results.Ok(ApiResponse<PagedResult<GetAdminUserQueryResponse>>.Ok(result));
             })
             .WithName(BackOfficeConstants.Names.GetAdmins)
             .WithSummary(BackOfficeConstants.Docs.GetAdmins.Summary)
-            .Produces<ApiResponse<BackOfficePagedResult<GetAdminUserQueryResponse>>>(StatusCodes.Status200OK);
+            .Produces<ApiResponse<PagedResult<GetAdminUserQueryResponse>>>(StatusCodes.Status200OK);
 
         group.MapGet(BackOfficeConstants.Routes.GetAuditLogs,
             async (long id, [FromQuery] int page, [FromQuery] int pageSize,

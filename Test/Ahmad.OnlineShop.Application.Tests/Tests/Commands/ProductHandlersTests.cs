@@ -1,8 +1,8 @@
-/// <summary>
-/// تست‌های Application Handler محصول (ProductHandlers)
-/// پوشش‌دهنده: ایجاد/آپدیت محصول، وضعیت، دسته‌بندی، موجودی، تصویر
-/// تکنولوژی: Fake Repository (بدون نیاز به mocking library)
-/// خطاهای تست‌شده: ProductNotFoundException | CategoryNotFoundException | EmptyCategoryNameException
+﻿/// <summary>
+/// ØªØ³Øªâ€ŒÙ‡Ø§ÛŒ Application Handler Ù…Ø­ØµÙˆÙ„ (ProductHandlers)
+/// Ù¾ÙˆØ´Ø´â€ŒØ¯Ù‡Ù†Ø¯Ù‡: Ø§ÛŒØ¬Ø§Ø¯/Ø¢Ù¾Ø¯ÛŒØª Ù…Ø­ØµÙˆÙ„ØŒ ÙˆØ¶Ø¹ÛŒØªØŒ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒØŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒØŒ ØªØµÙˆÛŒØ±
+/// ØªÚ©Ù†ÙˆÙ„ÙˆÚ˜ÛŒ: Fake Repository (Ø¨Ø¯ÙˆÙ† Ù†ÛŒØ§Ø² Ø¨Ù‡ mocking library)
+/// Ø®Ø·Ø§Ù‡Ø§ÛŒ ØªØ³Øªâ€ŒØ´Ø¯Ù‡: ProductNotFoundException | CategoryNotFoundException | EmptyCategoryNameException
 /// </summary>
 using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Handlers;
@@ -21,39 +21,42 @@ public class ProductHandlersTests
         _sut = new ProductHandlers(_productRepo, _categoryRepo);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────
+    // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static CategoryAgg MakeCategory() => new(10, "Electronics");
     private static ProductAgg  MakeProduct()  => ProductAgg.Create(
-        new CreateProductArg(1, 10, "Laptop", null, 50_000_000m, 1));
+        new CreateProductArg(Id: 1, SellerId: 100, CategoryId: 10, Name: "Laptop", Description: null, Price: 50_000_000m, InventoryId: 1));
 
-    // ─── CreateProductCommand ─────────────────────────────────────────────────
+    private static CreateProductCommand MakeCreateCommand(long sellerId = 100) =>
+        new(SellerId: sellerId, CategoryId: 10, Name: "Laptop", Description: null, Price: 50_000_000m);
 
-    /// <summary>ایجاد محصول باید آن را در Repository ذخیره کند</summary>
+    // â”€â”€â”€ CreateProductCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>Ø§ÛŒØ¬Ø§Ø¯ Ù…Ø­ØµÙˆÙ„ Ø¨Ø§ÛŒØ¯ Ø¢Ù† Ø±Ø§ Ø¯Ø± Repository Ø°Ø®ÛŒØ±Ù‡ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Create_When_CategoryExists_Should_AddProduct()
     {
         _categoryRepo.Seed(MakeCategory());
 
-        await _sut.Handle(new CreateProductCommand(10, "Laptop", null, 50_000_000m), _ct);
+        await _sut.Handle(new CreateProductCommand(SellerId: 100, CategoryId: 10, Name: "Laptop", Description: null, Price: 50_000_000m), _ct);
 
         Assert.NotNull(_productRepo.Added);
         Assert.Equal("Laptop", _productRepo.Added!.Name);
     }
 
-    /// <summary>خطا: دسته‌بندی پیدا نشد → CategoryNotFoundException</summary>
+    /// <summary>Ø®Ø·Ø§: Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ CategoryNotFoundException</summary>
     [Fact]
     public async Task Create_When_CategoryNotFound_Should_Throw_CategoryNotFoundException()
     {
         await Assert.ThrowsAsync<CategoryNotFoundException>(
-            () => _sut.Handle(new CreateProductCommand(10, "Laptop", null, 50_000_000m), _ct));
+            () => _sut.Handle(new CreateProductCommand(SellerId: 100, CategoryId: 10, Name: "Laptop", Description: null, Price: 50_000_000m), _ct));
 
         Assert.Null(_productRepo.Added);
     }
 
-    // ─── UpdateProductCommand ─────────────────────────────────────────────────
+    // â”€â”€â”€ UpdateProductCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>آپدیت محصول باید اطلاعات را تغییر داده و Repository را بروزرسانی کند</summary>
+    /// <summary>Ø¢Ù¾Ø¯ÛŒØª Ù…Ø­ØµÙˆÙ„ Ø¨Ø§ÛŒØ¯ Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ø±Ø§ ØªØºÛŒÛŒØ± Ø¯Ø§Ø¯Ù‡ Ùˆ Repository Ø±Ø§ Ø¨Ø±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Update_When_ProductAndCategoryExist_Should_UpdateAndSave()
     {
@@ -68,7 +71,7 @@ public class ProductHandlersTests
         Assert.Equal(20,          product.CategoryId);
     }
 
-    /// <summary>خطا: محصول پیدا نشد → ProductNotFoundException</summary>
+    /// <summary>Ø®Ø·Ø§: Ù…Ø­ØµÙˆÙ„ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ ProductNotFoundException</summary>
     [Fact]
     public async Task Update_When_ProductNotFound_Should_Throw_ProductNotFoundException()
     {
@@ -76,9 +79,9 @@ public class ProductHandlersTests
             () => _sut.Handle(new UpdateProductCommand(9999, "Name", null, 10), _ct));
     }
 
-    // ─── ActivateProductCommand ───────────────────────────────────────────────
+    // â”€â”€â”€ ActivateProductCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>فعال‌سازی محصول غیرفعال باید وضعیت را Active کند</summary>
+    /// <summary>ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ù…Ø­ØµÙˆÙ„ ØºÛŒØ±ÙØ¹Ø§Ù„ Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Active Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Activate_When_ProductInactive_Should_ActivateProduct()
     {
@@ -91,7 +94,7 @@ public class ProductHandlersTests
         Assert.Equal(ProductStatus.Active, product.Status);
     }
 
-    /// <summary>خطا: محصول پیدا نشد → ProductNotFoundException</summary>
+    /// <summary>Ø®Ø·Ø§: Ù…Ø­ØµÙˆÙ„ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ ProductNotFoundException</summary>
     [Fact]
     public async Task Activate_When_ProductNotFound_Should_Throw_ProductNotFoundException()
     {
@@ -99,9 +102,9 @@ public class ProductHandlersTests
             () => _sut.Handle(new ActivateProductCommand(9999), _ct));
     }
 
-    // ─── DeactivateProductCommand ─────────────────────────────────────────────
+    // â”€â”€â”€ DeactivateProductCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>غیرفعال‌سازی محصول Active باید وضعیت را Inactive کند</summary>
+    /// <summary>ØºÛŒØ±ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ù…Ø­ØµÙˆÙ„ Active Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Inactive Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Deactivate_When_ProductActive_Should_DeactivateProduct()
     {
@@ -113,9 +116,9 @@ public class ProductHandlersTests
         Assert.Equal(ProductStatus.Inactive, product.Status);
     }
 
-    // ─── ArchiveProductCommand ────────────────────────────────────────────────
+    // â”€â”€â”€ ArchiveProductCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>بایگانی محصول Active باید وضعیت را Archived کند</summary>
+    /// <summary>Ø¨Ø§ÛŒÚ¯Ø§Ù†ÛŒ Ù…Ø­ØµÙˆÙ„ Active Ø¨Ø§ÛŒØ¯ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Archived Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task Archive_When_ProductActive_Should_ArchiveProduct()
     {
@@ -127,9 +130,9 @@ public class ProductHandlersTests
         Assert.Equal(ProductStatus.Archived, product.Status);
     }
 
-    // ─── ReserveStockCommand ──────────────────────────────────────────────────
+    // â”€â”€â”€ ReserveStockCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>رزرو موجودی باید مقدار رزرو را افزایش دهد</summary>
+    /// <summary>Ø±Ø²Ø±Ùˆ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø¨Ø§ÛŒØ¯ Ù…Ù‚Ø¯Ø§Ø± Ø±Ø²Ø±Ùˆ Ø±Ø§ Ø§ÙØ²Ø§ÛŒØ´ Ø¯Ù‡Ø¯</summary>
     [Fact]
     public async Task ReserveStock_When_ProductExists_Should_ReserveInventory()
     {
@@ -142,9 +145,9 @@ public class ProductHandlersTests
         Assert.Equal(30, product.Inventory.ReservedQuantity);
     }
 
-    // ─── AddProductImageCommand ───────────────────────────────────────────────
+    // â”€â”€â”€ AddProductImageCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>افزودن تصویر باید تصویر را به محصول اضافه کند</summary>
+    /// <summary>Ø§ÙØ²ÙˆØ¯Ù† ØªØµÙˆÛŒØ± Ø¨Ø§ÛŒØ¯ ØªØµÙˆÛŒØ± Ø±Ø§ Ø¨Ù‡ Ù…Ø­ØµÙˆÙ„ Ø§Ø¶Ø§ÙÙ‡ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task AddImage_When_ProductExists_Should_AddImageToProduct()
     {
@@ -157,9 +160,9 @@ public class ProductHandlersTests
         Assert.Single(product.Images);
     }
 
-    // ─── CreateCategoryCommand ────────────────────────────────────────────────
+    // â”€â”€â”€ CreateCategoryCommand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /// <summary>ایجاد دسته‌بندی جدید باید آن را در Repository ذخیره کند</summary>
+    /// <summary>Ø§ÛŒØ¬Ø§Ø¯ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¬Ø¯ÛŒØ¯ Ø¨Ø§ÛŒØ¯ Ø¢Ù† Ø±Ø§ Ø¯Ø± Repository Ø°Ø®ÛŒØ±Ù‡ Ú©Ù†Ø¯</summary>
     [Fact]
     public async Task CreateCategory_When_NameNotExists_Should_AddCategory()
     {
@@ -171,7 +174,7 @@ public class ProductHandlersTests
         Assert.Equal("Electronics", _categoryRepo.Added!.Name);
     }
 
-    /// <summary>خطا: نام دسته‌بندی تکراری → EmptyCategoryNameException</summary>
+    /// <summary>Ø®Ø·Ø§: Ù†Ø§Ù… Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ ØªÚ©Ø±Ø§Ø±ÛŒ â†’ EmptyCategoryNameException</summary>
     [Fact]
     public async Task CreateCategory_When_NameExists_Should_Throw_EmptyCategoryNameException()
     {
@@ -181,3 +184,4 @@ public class ProductHandlersTests
             () => _sut.Handle(new CreateCategoryCommand("Electronics", null), _ct));
     }
 }
+

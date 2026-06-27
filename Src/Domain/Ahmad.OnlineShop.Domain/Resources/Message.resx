@@ -1,64 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -105,26 +46,35 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="CategoryCircularReferenceException" xml:space="preserve">
-    <value>دسته‌بندی نمی‌تواند به خودش یا زیرمجموعه‌هایش اشاره کند.</value>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ── Identity ── -->
+  <data name="UserNotFoundException" xml:space="preserve">
+    <value>کاربر مورد نظر یافت نشد.</value>
   </data>
-  <data name="CategoryNotFoundException" xml:space="preserve">
-    <value>دسته‌بندی یافت نشد</value>
+  <data name="UserExistException" xml:space="preserve">
+    <value>این شماره موبایل قبلاً در سیستم ثبت‌نام شده است.</value>
   </data>
-  <data name="EmptyCategoryNameException" xml:space="preserve">
-    <value>نام دسته‌بندی نمی‌تواند خالی باشد.</value>
+  <data name="ExistingUserException" xml:space="preserve">
+    <value>کاربری با این مشخصات از قبل در سیستم وجود دارد.</value>
+  </data>
+  <data name="IncorrectPasswordException" xml:space="preserve">
+    <value>نام کاربری یا رمز عبور اشتباه است.</value>
+  </data>
+  <data name="RoleNotFoundException" xml:space="preserve">
+    <value>نقش مورد نظر در سیستم یافت نشد.</value>
+  </data>
+  <data name="InvalidRefreshTokenException" xml:space="preserve">
+    <value>توکن نامعتبر یا منقضی شده است. لطفاً مجدداً وارد شوید.</value>
+  </data>
+  <data name="InvalidOtpException" xml:space="preserve">
+    <value>کد تأیید وارد شده نامعتبر یا منقضی شده است.</value>
+  </data>
+  <data name="OtpNotRequestedException" xml:space="preserve">
+    <value>ابتدا کد تأیید را دریافت کنید و سپس تأیید نمایید.</value>
   </data>
   <data name="EmptyNameException" xml:space="preserve">
     <value>نام و نام خانوادگی نمی‌توانند خالی باشند.</value>
@@ -132,140 +82,155 @@
   <data name="EmptyPhoneNumberException" xml:space="preserve">
     <value>شماره موبایل نمی‌تواند خالی باشد.</value>
   </data>
-  <data name="EmptyProductNameException" xml:space="preserve">
-    <value>نام محصول نمی‌تواند خالی باشد</value>
-  </data>
-  <data name="ExistingUserException" xml:space="preserve">
-    <value>کاربر از قبل وجود دارد.</value>
-  </data>
-  <data name="ImageInvalidBucketKeyException" xml:space="preserve">
-    <value>کلید باکت نمی‌تواند خالی باشد.</value>
-  </data>
-  <data name="ImageInvalidSortOrderException" xml:space="preserve">
-    <value>ترتیب نمایش نمی‌تواند منفی باشد.</value>
-  </data>
-  <data name="ImageInvalidUrlException" xml:space="preserve">
-    <value>آدرس تصویر نمی‌تواند خالی باشد.</value>
-  </data>
-  <data name="ImageNotFoundException" xml:space="preserve">
-    <value>تصویر یافت نشد.</value>
-  </data>
-  <data name="IncorrectPasswordException" xml:space="preserve">
-    <value>نام کاربری یا رمز عبور نامعتبر است.</value>
-  </data>
-  <data name="InsufficientStockException" xml:space="preserve">
-    <value>&gt;موجودی کافی برای انجام این عملیات وجود ندارد.</value>
-  </data>
-  <data name="InvalidImageUrlException" xml:space="preserve">
-    <value>آدرس تصویر نامعتبر است.</value>
+  <data name="InvalidPhoneNumberException" xml:space="preserve">
+    <value>فرمت شماره موبایل نامعتبر است. لطفاً شماره‌ای با ۱۱ رقم وارد کنید.</value>
   </data>
   <data name="InvalidNationalCodeException" xml:space="preserve">
-    <value>کد ملی نامعتبر است.</value>
+    <value>کد ملی وارد شده نامعتبر است. کد ملی باید ۱۰ رقم باشد.</value>
   </data>
-  <data name="InvalidPhoneNumberException" xml:space="preserve">
-    <value>فرمت شماره موبایل نامعتبر است.</value>
+  <data name="PasswordMismatchException" xml:space="preserve">
+    <value>رمز عبور جدید و تکرار آن یکسان نیستند.</value>
+  </data>
+
+  <!-- ── Products ── -->
+  <data name="ProductNotFoundException" xml:space="preserve">
+    <value>محصول مورد نظر یافت نشد.</value>
+  </data>
+  <data name="EmptyProductNameException" xml:space="preserve">
+    <value>نام محصول نمی‌تواند خالی باشد.</value>
   </data>
   <data name="InvalidPriceException" xml:space="preserve">
-    <value>قیمت محصول باید بزرگ‌تر از صفر باشد</value>
+    <value>قیمت محصول باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="ProductAlreadyActiveException" xml:space="preserve">
+    <value>محصول در حال حاضر فعال است.</value>
+  </data>
+  <data name="ProductAlreadyArchivedException" xml:space="preserve">
+    <value>محصول در حال حاضر بایگانی شده است.</value>
+  </data>
+  <data name="ProductAlreadyInactiveException" xml:space="preserve">
+    <value>محصول در حال حاضر غیرفعال است.</value>
+  </data>
+  <data name="ProductNotOwnedBySellerException" xml:space="preserve">
+    <value>شما مجاز به مدیریت این محصول نیستید.</value>
+  </data>
+  <data name="InvalidSellerIdException" xml:space="preserve">
+    <value>شناسه فروشنده نامعتبر است.</value>
+  </data>
+
+  <!-- ── Category ── -->
+  <data name="CategoryNotFoundException" xml:space="preserve">
+    <value>دسته‌بندی مورد نظر یافت نشد.</value>
+  </data>
+  <data name="EmptyCategoryNameException" xml:space="preserve">
+    <value>نام دسته‌بندی نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="CategoryCircularReferenceException" xml:space="preserve">
+    <value>دسته‌بندی نمی‌تواند به خودش یا زیرمجموعه‌هایش اشاره کند.</value>
+  </data>
+
+  <!-- ── Inventory ── -->
+  <data name="InsufficientStockException" xml:space="preserve">
+    <value>موجودی کافی برای انجام این عملیات وجود ندارد.</value>
   </data>
   <data name="InvalidQuantityException" xml:space="preserve">
-    <value>مقدار وارد شده معتبر نیست.</value>
-  </data>
-  <data name="InvalidReserveException" xml:space="preserve">
-    <value>عملیات رزرو معتبر نیست.</value>
+    <value>مقدار وارد شده باید بزرگ‌تر یا مساوی صفر باشد.</value>
   </data>
   <data name="InvalidReserveQuantityException" xml:space="preserve">
     <value>مقدار رزرو باید بزرگ‌تر از صفر باشد.</value>
   </data>
+  <data name="InvalidReserveException" xml:space="preserve">
+    <value>عملیات رزرو در وضعیت فعلی معتبر نیست.</value>
+  </data>
+  <data name="NothingToReleaseException" xml:space="preserve">
+    <value>موجودی رزرو شده‌ای برای آزادسازی وجود ندارد.</value>
+  </data>
+
+  <!-- ── Images ── -->
+  <data name="ImageNotFoundException" xml:space="preserve">
+    <value>تصویر مورد نظر یافت نشد.</value>
+  </data>
+  <data name="ImageInvalidUrlException" xml:space="preserve">
+    <value>آدرس تصویر نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="InvalidImageUrlException" xml:space="preserve">
+    <value>آدرس تصویر وارد شده نامعتبر است.</value>
+  </data>
+  <data name="ImageInvalidBucketKeyException" xml:space="preserve">
+    <value>کلید باکت تصویر نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="ImageInvalidSortOrderException" xml:space="preserve">
+    <value>ترتیب نمایش تصویر نمی‌تواند منفی باشد.</value>
+  </data>
   <data name="MaxImagesExceededException" xml:space="preserve">
     <value>تعداد تصاویر از حداکثر مجاز (۱۰ تصویر) بیشتر نمی‌تواند باشد.</value>
   </data>
-  <data name="NothingToReleaseException" xml:space="preserve">
-    <value>هیچ رزروی برای آزادسازی وجود ندارد.</value>
-  </data>
-  <data name="PasswordMismatchException" xml:space="preserve">
-    <value>رمز عبور جدید و تکرار آن مطابقت ندارند</value>
-  </data>
   <data name="PrimaryImageExistsException" xml:space="preserve">
-    <value>یک تصویر اصلی از قبل وجود دارد.</value>
+    <value>یک تصویر اصلی برای این محصول از قبل تعریف شده است.</value>
   </data>
-  <data name="ProductAlreadyActiveException" xml:space="preserve">
-    <value>.محصول در حال حاضر فعال است</value>
-  </data>
-  <data name="ProductAlreadyArchivedException" xml:space="preserve">
-    <value>محصول در حال حاضر آرشیو شده است</value>
-  </data>
-  <data name="ProductAlreadyInactiveException" xml:space="preserve">
-    <value>محصول در حال حاضر غیرفعال است</value>
-  </data>
-  <data name="ProductNotFoundException" xml:space="preserve">
-    <value>محصول یافت نشد.</value>
-  </data>
-  <data name="UserExistException" xml:space="preserve">
-    <value>فردی با این نامکاربری قبلا ثبات نام کرده است </value>
-  </data>
-  <data name="UserNotFoundException" xml:space="preserve">
-    <value>کاربر یافت نشد .</value>
-  </data>
+
+  <!-- ── BackOffice ── -->
   <data name="AdminNotFoundException" xml:space="preserve">
-    <value>ادمین مورد نظر یافت نشد.</value>
+    <value>مدیر مورد نظر یافت نشد.</value>
   </data>
   <data name="AdminEmailAlreadyExistsException" xml:space="preserve">
-    <value>ادمین با این ایمیل از قبل وجود دارد.</value>
+    <value>مدیری با این آدرس ایمیل قبلاً ثبت شده است.</value>
   </data>
   <data name="AdminInvalidEmailException" xml:space="preserve">
-    <value>ایمیل ادمین نامعتبر است.</value>
+    <value>آدرس ایمیل وارد شده نامعتبر است.</value>
   </data>
   <data name="AdminInvalidNameException" xml:space="preserve">
-    <value>نام کامل ادمین الزامی است.</value>
+    <value>نام کامل مدیر الزامی است.</value>
   </data>
   <data name="AdminAlreadyActiveException" xml:space="preserve">
-    <value>ادمین قبلاً فعال است.</value>
+    <value>حساب مدیر در حال حاضر فعال است.</value>
   </data>
   <data name="AdminAlreadyInactiveException" xml:space="preserve">
-    <value>ادمین قبلاً غیرفعال است.</value>
+    <value>حساب مدیر در حال حاضر غیرفعال است.</value>
   </data>
   <data name="ReportNotFoundException" xml:space="preserve">
     <value>گزارش مورد نظر یافت نشد.</value>
   </data>
   <data name="ReportAlreadyCompletedException" xml:space="preserve">
-    <value>گزارش قبلاً تکمیل شده است.</value>
+    <value>این گزارش قبلاً تکمیل شده است و قابل ویرایش نیست.</value>
   </data>
   <data name="AuditInvalidActionException" xml:space="preserve">
-    <value>عملیات لاگ الزامی است.</value>
+    <value>نوع عملیات برای ثبت در گزارش حسابرسی الزامی است.</value>
   </data>
   <data name="AuditInvalidEntityException" xml:space="preserve">
-    <value>نوع موجودیت لاگ الزامی است.</value>
+    <value>نوع موجودیت برای ثبت در گزارش حسابرسی الزامی است.</value>
   </data>
+
+  <!-- ── BNPL ── -->
   <data name="CreditLimitNotFoundException" xml:space="preserve">
-    <value>سقف اعتبار کاربر یافت نشد.</value>
+    <value>سقف اعتبار این کاربر تعریف نشده است.</value>
   </data>
   <data name="InsufficientCreditException" xml:space="preserve">
-    <value>سقف اعتبار کافی نیست.</value>
+    <value>اعتبار موجود شما برای این تراکنش کافی نیست.</value>
   </data>
   <data name="InvalidCreditLimitAmountException" xml:space="preserve">
-    <value>مقدار اعتبار باید بزرگتر از صفر باشد.</value>
+    <value>مقدار اعتبار باید بزرگ‌تر از صفر باشد.</value>
   </data>
   <data name="NegativeCreditException" xml:space="preserve">
-    <value>اعتبار استفاده‌شده نمی‌تواند منفی شود.</value>
+    <value>مقدار آزادسازی اعتبار از اعتبار مصرف‌شده بیشتر است.</value>
   </data>
   <data name="BnplContractNotFoundException" xml:space="preserve">
-    <value>قرارداد BNPL یافت نشد.</value>
+    <value>قرارداد اقساطی مورد نظر یافت نشد.</value>
   </data>
   <data name="BnplContractAlreadyCancelledException" xml:space="preserve">
-    <value>قرارداد قبلاً لغو شده است.</value>
+    <value>این قرارداد اقساطی قبلاً لغو شده است.</value>
   </data>
   <data name="BnplContractAlreadyCompletedException" xml:space="preserve">
-    <value>قرارداد قبلاً تکمیل شده است.</value>
+    <value>این قرارداد اقساطی قبلاً تکمیل شده است.</value>
   </data>
   <data name="BnplContractNotActiveException" xml:space="preserve">
-    <value>قرارداد در وضعیت فعال نیست.</value>
+    <value>این عملیات فقط روی قراردادهای فعال قابل اجرا است.</value>
   </data>
   <data name="InvalidInstallmentCountException" xml:space="preserve">
     <value>تعداد اقساط باید بین ۱ تا ۴۸ باشد.</value>
   </data>
   <data name="InvalidTotalAmountException" xml:space="preserve">
-    <value>مبلغ کل قرارداد باید بزرگتر از صفر باشد.</value>
+    <value>مبلغ کل قرارداد باید بزرگ‌تر از صفر باشد.</value>
   </data>
   <data name="InstallmentNotFoundException" xml:space="preserve">
     <value>قسط مورد نظر یافت نشد.</value>
@@ -274,8 +239,10 @@
     <value>این قسط قبلاً پرداخت شده است.</value>
   </data>
   <data name="InstallmentInvalidAmountException" xml:space="preserve">
-    <value>مبلغ قسط باید بزرگتر از صفر باشد.</value>
+    <value>مبلغ قسط باید بزرگ‌تر از صفر باشد.</value>
   </data>
+
+  <!-- ── Order ── -->
   <data name="OrderNotFoundException" xml:space="preserve">
     <value>سفارش مورد نظر یافت نشد.</value>
   </data>
@@ -283,22 +250,22 @@
     <value>سفارش باید حداقل یک آیتم داشته باشد.</value>
   </data>
   <data name="OrderAlreadyCancelledException" xml:space="preserve">
-    <value>سفارش قبلاً لغو شده است.</value>
+    <value>این سفارش قبلاً لغو شده است.</value>
   </data>
   <data name="OrderAlreadyDeliveredException" xml:space="preserve">
-    <value>سفارش قبلاً تحویل داده شده است.</value>
+    <value>این سفارش قبلاً تحویل داده شده و قابل تغییر نیست.</value>
   </data>
   <data name="OrderInvalidStatusTransitionException" xml:space="preserve">
     <value>تغییر وضعیت سفارش در حالت فعلی مجاز نیست.</value>
   </data>
   <data name="OrderItemNotFoundException" xml:space="preserve">
-    <value>آیتم سفارش یافت نشد.</value>
+    <value>آیتم مورد نظر در سفارش یافت نشد.</value>
   </data>
   <data name="OrderItemInvalidQuantityException" xml:space="preserve">
-    <value>تعداد آیتم باید بزرگتر از صفر باشد.</value>
+    <value>تعداد آیتم باید بزرگ‌تر از صفر باشد.</value>
   </data>
   <data name="OrderItemInvalidUnitPriceException" xml:space="preserve">
-    <value>قیمت واحد باید بزرگتر از صفر باشد.</value>
+    <value>قیمت واحد باید بزرگ‌تر از صفر باشد.</value>
   </data>
   <data name="PaymentNotFoundException" xml:space="preserve">
     <value>پرداخت مورد نظر یافت نشد.</value>
@@ -307,15 +274,9 @@
     <value>مبلغ پرداخت با مجموع سفارش مطابقت ندارد.</value>
   </data>
   <data name="PaymentInvalidAmountException" xml:space="preserve">
-    <value>مبلغ پرداخت نامعتبر است.</value>
+    <value>مبلغ پرداخت باید بزرگ‌تر از صفر باشد.</value>
   </data>
   <data name="OrderCannotConfirmWithoutPaymentException" xml:space="preserve">
-    <value>سفارش بدون پرداخت موفق قابل تأیید نیست.</value>
-  </data>
-  <data name="RoleNotFoundException" xml:space="preserve">
-    <value>نقش مورد نظر یافت نشد.</value>
-  </data>
-  <data name="InvalidRefreshTokenException" xml:space="preserve">
-    <value>توکن نامعتبر یا منقضی شده است.</value>
+    <value>تأیید سفارش بدون پرداخت موفق امکان‌پذیر نیست.</value>
   </data>
 </root>

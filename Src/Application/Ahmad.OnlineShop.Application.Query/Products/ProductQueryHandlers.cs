@@ -1,4 +1,4 @@
-using Ahmad.OnlineShop.Domain.Products.Exceptions;
+﻿using Ahmad.OnlineShop.Domain.Products.Exceptions;
 
 namespace Ahmad.OnlineShop.Application.Query.Handlers;
 
@@ -6,7 +6,7 @@ public sealed class ProductQueryHandlers(
     IProductRepository productRepository,
     ICategoryRepository categoryRepository) :
     IQueryHandler<GetProductQuery, GetProductQueryResponse>,
-    IQueryHandler<GetProductsQuery, QueryPagedResult<GetProductQueryResponse>>,
+    IQueryHandler<GetProductsQuery, PagedResult<GetProductQueryResponse>>,
     IQueryHandler<GetProductImagesQuery, List<GetProductImageResponse>>,
     IQueryHandler<GetInventoryQuery, GetProductInventoryResponse>,
     IQueryHandler<GetCategoriesQuery, List<GetCategoryQueryResponse>>
@@ -19,12 +19,12 @@ public sealed class ProductQueryHandlers(
         return product.ToResponse();
     }
 
-    public async Task<QueryPagedResult<GetProductQueryResponse>> HandleAsync(GetProductsQuery q, CancellationToken token)
+    public async Task<PagedResult<GetProductQueryResponse>> HandleAsync(GetProductsQuery q, CancellationToken token)
     {
         var (items, total) = await productRepository.GetListAsync(
             q.Page, q.PageSize, q.Search, q.CategoryId, q.Status, token);
 
-        return new QueryPagedResult<GetProductQueryResponse>(
+        return new PagedResult<GetProductQueryResponse>(
             items.Select(p => p.ToResponse()).ToList(),
             total, q.Page, q.PageSize);
     }
@@ -54,3 +54,4 @@ public sealed class ProductQueryHandlers(
         return categories.Select(c => c.ToResponse()).ToList();
     }
 }
+

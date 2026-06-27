@@ -1,4 +1,4 @@
-using BackOffice.Application.Query.Contracts;
+﻿using BackOffice.Application.Query.Contracts;
 using BackOffice.Application.Query.Queries;
 using Ahmad.OnlineShop.Domain.BackOffice.Exceptions;
 
@@ -6,7 +6,7 @@ namespace BackOffice.Application.Query.Handlers;
 
 public class BackOfficeQueryHandlers(IAdminUserReadRepository readRepo) :
     IQueryHandler<GetAdminUserQuery,  GetAdminUserQueryResponse>,
-    IQueryHandler<GetAdminUsersQuery, BackOfficePagedResult<GetAdminUserQueryResponse>>,
+    IQueryHandler<GetAdminUsersQuery, PagedResult<GetAdminUserQueryResponse>>,
     IQueryHandler<GetAuditLogsQuery,  List<GetAuditLogQueryResponse>>,
     IQueryHandler<GetReportsQuery,    List<GetReportQueryResponse>>
 {
@@ -18,7 +18,7 @@ public class BackOfficeQueryHandlers(IAdminUserReadRepository readRepo) :
         return admin;
     }
 
-    public async Task<BackOfficePagedResult<GetAdminUserQueryResponse>> HandleAsync(GetAdminUsersQuery query, CancellationToken token)
+    public async Task<PagedResult<GetAdminUserQueryResponse>> HandleAsync(GetAdminUsersQuery query, CancellationToken token)
     {
         var (items, total) = await readRepo.GetListAsync(
             page:     query.Page,
@@ -27,7 +27,7 @@ public class BackOfficeQueryHandlers(IAdminUserReadRepository readRepo) :
             role:     query.Role,
             token:    token);
 
-        return new BackOfficePagedResult<GetAdminUserQueryResponse>(
+        return new PagedResult<GetAdminUserQueryResponse>(
             Items:      items,
             TotalCount: total,
             Page:       query.Page,
@@ -40,3 +40,4 @@ public class BackOfficeQueryHandlers(IAdminUserReadRepository readRepo) :
     public async Task<List<GetReportQueryResponse>> HandleAsync(GetReportsQuery query, CancellationToken token)
         => await readRepo.GetReportsAsync(query.AdminId, query.Page, query.PageSize, token);
 }
+

@@ -74,7 +74,7 @@ public sealed class Order : AggregateRoot<long>
     {
         GuardPaymentAmountMatches(arg.Amount);
 
-        var payment = new Payment(arg.PaymentId, Id, arg.Amount, arg.Provider);
+        var payment = new Payment(arg.PaymentId, Id, arg.Amount, arg.Method, arg.Provider);
         _payments.Add(payment);
         RaiseDomainEvent(new PaymentRecordedEvent(arg.PaymentId, Id, arg.Amount, PaymentStatus.Pending, arg.Provider));
         return payment;

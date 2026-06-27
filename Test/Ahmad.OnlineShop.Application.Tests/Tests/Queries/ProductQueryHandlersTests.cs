@@ -23,7 +23,7 @@ public class ProductQueryHandlersTests
     }
 
     private static ProductAgg MakeProduct() =>
-        ProductAgg.Create(new CreateProductArg(1, 10, "Laptop", "Gaming", 50_000_000m, 1));
+        ProductAgg.Create(new CreateProductArg(Id: 1, SellerId: 100, CategoryId: 10, Name: "Laptop", Description: "Gaming", Price: 50_000_000m, InventoryId: 1));
 
     // ─── GetProductQuery ──────────────────────────────────────────────────────
 

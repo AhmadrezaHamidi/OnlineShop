@@ -1,4 +1,4 @@
-using Identity.Application.Query.Contracts;
+﻿using Identity.Application.Query.Contracts;
 using Identity.Application.Query.Queries;
 using Identity.Domain.Exceptions;
 
@@ -8,7 +8,7 @@ public sealed class IdentityQueryHandlers(
     IUserReadRepository userReadRepo,
     IRoleReadRepository roleReadRepo) :
     IQueryHandler<GetUserQuery,  GetUserQueryResponse>,
-    IQueryHandler<GetUsersQuery, IdentityPagedResult<GetUserQueryResponse>>,
+    IQueryHandler<GetUsersQuery, PagedResult<GetUserQueryResponse>>,
     IQueryHandler<GetRolesQuery, IReadOnlyList<GetRoleQueryResponse>>
 {
     public async Task<GetUserQueryResponse> HandleAsync(GetUserQuery query, CancellationToken token)
@@ -19,7 +19,7 @@ public sealed class IdentityQueryHandlers(
         return user;
     }
 
-    public async Task<IdentityPagedResult<GetUserQueryResponse>> HandleAsync(GetUsersQuery query, CancellationToken token)
+    public async Task<PagedResult<GetUserQueryResponse>> HandleAsync(GetUsersQuery query, CancellationToken token)
     {
         var (items, total) = await userReadRepo.GetListAsync(
             page:     query.Page,
@@ -28,7 +28,7 @@ public sealed class IdentityQueryHandlers(
             status:   query.Status,
             token:    token);
 
-        return new IdentityPagedResult<GetUserQueryResponse>(
+        return new PagedResult<GetUserQueryResponse>(
             Items:      items,
             TotalCount: total,
             Page:       query.Page,
@@ -38,3 +38,4 @@ public sealed class IdentityQueryHandlers(
     public async Task<IReadOnlyList<GetRoleQueryResponse>> HandleAsync(GetRolesQuery query, CancellationToken token)
         => await roleReadRepo.GetAllAsync(token);
 }
+

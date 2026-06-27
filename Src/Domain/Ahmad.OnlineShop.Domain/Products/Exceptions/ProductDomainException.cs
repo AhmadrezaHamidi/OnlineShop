@@ -14,6 +14,18 @@ public sealed class ProductNotFoundException : BusinessException
         : base(Resources.Message.ProductNotFoundException) { }
 }
 
+public sealed class ProductNotOwnedBySellerException : BusinessException
+{
+    public ProductNotOwnedBySellerException()
+        : base(Resources.Message.ProductNotOwnedBySellerException) { }
+}
+
+public sealed class InvalidSellerIdException : BusinessException
+{
+    public InvalidSellerIdException()
+        : base(Resources.Message.InvalidSellerIdException) { }
+}
+
 public sealed class EmptyProductNameException : BusinessException
 {
     public EmptyProductNameException()

@@ -1,4 +1,4 @@
-using Ahmad.OnlineShop.Domain.Order.Enums;
+﻿using Ahmad.OnlineShop.Domain.Order.Enums;
 using AhmadBase.Application.Query;
 
 namespace Ahmad.OnlineShop.Application.Query.Queries;
@@ -8,4 +8,5 @@ public record GetOrdersQuery(
     int PageSize,
     long? UserId = null,
     OrderStatus? Status = null
-) : IQuery<QueryPagedResult<GetOrderQueryResponse>>;
+) : IQuery<PagedResult<GetOrderQueryResponse>>;
+

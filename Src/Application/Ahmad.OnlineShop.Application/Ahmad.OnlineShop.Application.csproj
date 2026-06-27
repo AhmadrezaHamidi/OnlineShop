@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
+    <ProjectReference Include="..\..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
     <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.API.Config\Ahmad.OnlineShop.Config.csproj" />
     <ProjectReference Include="..\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />

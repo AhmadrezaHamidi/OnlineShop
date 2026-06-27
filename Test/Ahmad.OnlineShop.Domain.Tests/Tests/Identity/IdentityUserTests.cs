@@ -1,6 +1,10 @@
 /// <summary>
-/// تست‌های Aggregate Root کاربر هویت (Identity User)
-/// پوشش‌دهنده: ثبت‌نام، تغییر رمز، آپدیت پروفایل، وضعیت، نقش‌ها
+/// تست‌های Aggregate Root کاربر Identity (OTP-based)
+/// ─────────────────────────────────────────────────────────────────────
+/// سیستم جدید: ورود با OTP — نه پسورد
+/// User فقط شماره موبایل دارد — بدون Email یا PasswordHash
+///
+/// پوشش‌دهنده: ایجاد کاربر، نوع کاربر، آپدیت پروفایل، وضعیت، نقش‌ها
 /// خطاهای تست‌شده: UserAlreadyExistsException
 /// </summary>
 using Identity.Domain.Enums;
@@ -10,91 +14,88 @@ namespace Ahmad.OnlineShop.Domain.Identity.Tests;
 
 public class IdentityUserTests
 {
-    private static IdentityUser RegisterUser(
-        long    id    = 1,
-        string  name  = "Ahmad Hamidi",
-        string  email = "ahmad@example.com",
-        string  hash  = "hashed_pass",
-        string? phone = "09123456789")
-        => IdentityUser.Register(id, name, email, hash, phone);
+    // ── Factory ──────────────────────────────────────────────────────────────
 
-    // ── Register ─────────────────────────────────────────────────────────────
+    private static IdentityUser CreateCustomer(
+        long   id    = 1,
+        string phone = "09121234567")
+        => IdentityUser.Create(id, phone, UserType.Customer);
 
-    /// <summary>ثبت‌نام باید مشخصات را ست کند و وضعیت Active باشد</summary>
+    private static IdentityUser CreateSeller(
+        long   id    = 2,
+        string phone = "09129876543")
+        => IdentityUser.Create(id, phone, UserType.Seller);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // بخش اول: ایجاد کاربر
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>ایجاد مشتری باید مشخصات را ست کند و وضعیت Active باشد</summary>
     [Fact]
-    public void Register_Should_Set_Properties_And_ActiveStatus()
+    public void Create_Customer_Should_Set_PhoneNumber_And_ActiveStatus()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer(id: 1, phone: "09121234567");
 
         Assert.Equal(1,               user.Id);
-        Assert.Equal("Ahmad Hamidi",  user.FullName);
-        Assert.Equal("ahmad@example.com", user.Email);
-        Assert.Equal("hashed_pass",   user.PasswordHash);
-        Assert.Equal("09123456789",   user.PhoneNumber);
+        Assert.Equal("09121234567",   user.PhoneNumber);
+        Assert.Equal(UserType.Customer, user.UserType);
         Assert.Equal(UserStatus.Active, user.Status);
         Assert.Empty(user.RoleIds);
     }
 
-    /// <summary>ایمیل باید به حروف کوچک نرمال‌سازی شود</summary>
+    /// <summary>ایجاد فروشنده باید UserType.Seller داشته باشد</summary>
     [Fact]
-    public void Register_Should_Normalize_Email_To_Lowercase()
+    public void Create_Seller_Should_Set_UserType_Seller()
     {
-        var user = RegisterUser(email: "AHMAD@EXAMPLE.COM");
+        var seller = CreateSeller(id: 2, phone: "09129876543");
 
-        Assert.Equal("ahmad@example.com", user.Email);
+        Assert.Equal(UserType.Seller, seller.UserType);
+        Assert.Equal(UserStatus.Active, seller.Status);
     }
 
-    /// <summary>ثبت‌نام بدون شماره موبایل باید موفق باشد</summary>
+    /// <summary>بدون UserType مشخص، نوع پیش‌فرض Customer است</summary>
     [Fact]
-    public void Register_Without_Phone_Should_Succeed()
+    public void Create_Without_UserType_Should_Default_To_Customer()
     {
-        var user = RegisterUser(phone: null);
+        var user = IdentityUser.Create(1, "09121234567");
 
-        Assert.Null(user.PhoneNumber);
+        Assert.Equal(UserType.Customer, user.UserType);
     }
 
-    // ── ChangePassword ───────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    // بخش دوم: آپدیت پروفایل
+    // ═══════════════════════════════════════════════════════════════════════
 
-    /// <summary>تغییر رمز باید PasswordHash را آپدیت کند</summary>
+    /// <summary>آپدیت پروفایل باید FullName را ست کند</summary>
     [Fact]
-    public void ChangePassword_Should_Update_PasswordHash()
+    public void UpdateProfile_Should_Set_FullName()
     {
-        var user = RegisterUser();
-        user.ChangePassword("new_hash");
+        var user = CreateCustomer();
 
-        Assert.Equal("new_hash", user.PasswordHash);
+        user.UpdateProfile("Ahmad Hamidi");
+
+        Assert.Equal("Ahmad Hamidi", user.FullName);
     }
 
-    // ── UpdateProfile ─────────────────────────────────────────────────────────
-
-    /// <summary>آپدیت پروفایل باید FullName و PhoneNumber را تغییر دهد</summary>
+    /// <summary>پس از ایجاد FullName خالی است (OTP — نامی وجود ندارد)</summary>
     [Fact]
-    public void UpdateProfile_Should_Update_FullName_And_Phone()
+    public void Create_Should_Have_Null_FullName_Initially()
     {
-        var user = RegisterUser();
-        user.UpdateProfile("Ali Rezaei", "09987654321");
+        var user = CreateCustomer();
 
-        Assert.Equal("Ali Rezaei",  user.FullName);
-        Assert.Equal("09987654321", user.PhoneNumber);
+        Assert.Null(user.FullName);
     }
 
-    /// <summary>آپدیت پروفایل با موبایل null باید PhoneNumber را پاک کند</summary>
-    [Fact]
-    public void UpdateProfile_With_Null_Phone_Should_Clear_Phone()
-    {
-        var user = RegisterUser();
-        user.UpdateProfile("Ali Rezaei", null);
-
-        Assert.Null(user.PhoneNumber);
-    }
-
-    // ── Activate / Deactivate / Suspend ──────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    // بخش سوم: وضعیت کاربر
+    // ═══════════════════════════════════════════════════════════════════════
 
     /// <summary>غیرفعال‌سازی باید وضعیت را Inactive کند</summary>
     [Fact]
     public void Deactivate_Should_Change_Status_To_Inactive()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.Deactivate();
 
         Assert.Equal(UserStatus.Inactive, user.Status);
@@ -104,42 +105,47 @@ public class IdentityUserTests
     [Fact]
     public void Suspend_Should_Change_Status_To_Suspended()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.Suspend();
 
         Assert.Equal(UserStatus.Suspended, user.Status);
-    }
-
-    /// <summary>خطا: فعال‌سازی کاربر از قبل Active → UserAlreadyExistsException</summary>
-    [Fact]
-    public void Activate_When_AlreadyActive_Should_Throw_UserAlreadyExistsException()
-    {
-        var user = RegisterUser();
-
-        Assert.Throws<UserAlreadyExistsException>(() => user.Activate());
     }
 
     /// <summary>فعال‌سازی بعد از غیرفعال‌سازی باید وضعیت را Active کند</summary>
     [Fact]
     public void Activate_After_Deactivate_Should_Change_Status_To_Active()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
         user.Deactivate();
+
         user.Activate();
 
         Assert.Equal(UserStatus.Active, user.Status);
     }
 
-    // ── AssignRole / RemoveRole ───────────────────────────────────────────────
+    /// <summary>خطا: Activate کاربر Active → UserAlreadyExistsException</summary>
+    [Fact]
+    public void Activate_When_AlreadyActive_Should_Throw_UserAlreadyExistsException()
+    {
+        var user = CreateCustomer(); // status = Active
+
+        Assert.Throws<UserAlreadyExistsException>(() => user.Activate());
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // بخش چهارم: مدیریت نقش‌ها
+    // ═══════════════════════════════════════════════════════════════════════
 
     /// <summary>اختصاص نقش باید RoleId را اضافه کند</summary>
     [Fact]
     public void AssignRole_Should_Add_RoleId()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.AssignRole(10);
 
-        Assert.Contains(10, user.RoleIds);
+        Assert.Contains(10L, user.RoleIds);
         Assert.Single(user.RoleIds);
     }
 
@@ -147,7 +153,8 @@ public class IdentityUserTests
     [Fact]
     public void AssignRole_Same_Role_Twice_Should_Not_Duplicate()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.AssignRole(10);
         user.AssignRole(10);
 
@@ -158,19 +165,22 @@ public class IdentityUserTests
     [Fact]
     public void AssignRole_Multiple_Roles_Should_Add_All()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.AssignRole(10);
         user.AssignRole(20);
+        user.AssignRole(30);
 
-        Assert.Equal(2, user.RoleIds.Count);
+        Assert.Equal(3, user.RoleIds.Count);
     }
 
     /// <summary>حذف نقش باید RoleId را پاک کند</summary>
     [Fact]
     public void RemoveRole_Should_Remove_RoleId()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
         user.AssignRole(10);
+
         user.RemoveRole(10);
 
         Assert.Empty(user.RoleIds);
@@ -180,7 +190,8 @@ public class IdentityUserTests
     [Fact]
     public void RemoveRole_When_NotAssigned_Should_DoNothing()
     {
-        var user = RegisterUser();
+        var user = CreateCustomer();
+
         user.RemoveRole(999);
 
         Assert.Empty(user.RoleIds);

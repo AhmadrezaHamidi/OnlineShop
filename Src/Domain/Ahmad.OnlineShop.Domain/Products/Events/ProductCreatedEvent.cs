@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace Ahmad.OnlineShop.Domain.Products.Events;
 
 public sealed record ProductCreatedEvent(
-  long ProductId,
-  string Name,
-  decimal Price,
-  long CategoryId
+    long    ProductId,
+    long    SellerId,
+    string  Name,
+    decimal Price
 ) : IEvent;
 
 /// <summary>قیمت محصول تغییر کرد</summary>

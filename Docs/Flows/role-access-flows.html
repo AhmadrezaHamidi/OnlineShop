@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Ahmad OnlineShop — Role Access &amp; Flows</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',Tahoma,sans-serif; background:#f0f2f5; color:#212529; }
+
+/* ── Cover ── */
+.cover { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+         color:white; padding:60px 40px; text-align:center; page-break-after:always; }
+.cover h1 { font-size:36px; letter-spacing:2px; margin-bottom:12px; }
+.cover .sub { font-size:16px; color:#a8b2d8; margin-bottom:40px; }
+.cover .badges { display:flex; justify-content:center; gap:15px; flex-wrap:wrap; }
+.badge { padding:8px 20px; border-radius:20px; font-size:13px; font-weight:bold; }
+.badge-seller { background:#e94560; }
+.badge-admin  { background:#533483; }
+.badge-customer { background:#0f3460; border:1px solid #a8b2d8; }
+
+/* ── Layout ── */
+.page { max-width:1100px; margin:0 auto; padding:30px 20px; }
+.section { background:white; border-radius:14px; padding:28px; margin-bottom:24px;
+           box-shadow:0 2px 12px rgba(0,0,0,.07); border:1px solid #e9ecef; }
+.section-title { font-size:20px; font-weight:700; margin-bottom:20px; padding-bottom:12px;
+                 border-bottom:2px solid #e9ecef; display:flex; align-items:center; gap:10px; }
+.icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center;
+        justify-content:center; font-size:16px; }
+.icon-seller  { background:#fff0f3; }
+.icon-admin   { background:#f3f0ff; }
+.icon-order   { background:#f0f9ff; }
+.icon-payment { background:#f0fff4; }
+
+/* ── Role Header ── */
+.role-header { display:flex; align-items:center; gap:15px; padding:18px 22px;
+               border-radius:10px; margin-bottom:20px; }
+.role-seller  { background:linear-gradient(135deg,#fff0f3,#ffe4e8); border:1px solid #f8a5b5; }
+.role-admin   { background:linear-gradient(135deg,#f3f0ff,#e8e4ff); border:1px solid #b8a5f8; }
+.role-customer { background:linear-gradient(135deg,#f0f9ff,#e4f2ff); border:1px solid #a5c8f8; }
+.role-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+.dot-seller   { background:#e94560; }
+.dot-admin    { background:#533483; }
+.dot-customer { background:#0f3460; }
+.role-title { font-size:18px; font-weight:700; }
+.role-sub   { font-size:13px; color:#6c757d; margin-top:2px; }
+
+/* ── Tables ── */
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead tr { background:#1a1a2e; color:white; }
+th { padding:11px 14px; text-align:right; font-weight:600; }
+td { padding:9px 14px; border-bottom:1px solid #f1f3f5; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:nth-child(even) { background:#fafbfc; }
+tr:hover { background:#f0f9ff; }
+
+/* ── Method Tags ── */
+.m { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:700;
+     font-family:monospace; margin-left:4px; }
+.get    { background:#d4edda; color:#155724; }
+.post   { background:#cce5ff; color:#004085; }
+.patch  { background:#fff3cd; color:#856404; }
+.put    { background:#fde8d8; color:#7f3a00; }
+.delete { background:#f8d7da; color:#721c24; }
+
+/* ── Access icons ── */
+.yes { color:#28a745; font-weight:bold; }
+.no  { color:#dc3545; }
+.cond { color:#fd7e14; }
+
+/* ── Flow Steps ── */
+.flow { display:flex; flex-direction:column; gap:0; margin:15px 0; }
+.flow-step { display:grid; grid-template-columns:36px 1fr; gap:12px; }
+.flow-left { display:flex; flex-direction:column; align-items:center; }
+.flow-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center;
+               justify-content:center; font-size:13px; font-weight:bold; color:white; flex-shrink:0; }
+.fc-seller   { background:#e94560; }
+.fc-admin    { background:#533483; }
+.fc-order    { background:#0077b6; }
+.fc-payment  { background:#2d9348; }
+.fc-zarinpal { background:#eb6d2f; }
+.fc-cod      { background:#555; }
+.flow-line   { flex:1; width:2px; background:#e9ecef; margin:4px auto; }
+.flow-content { padding:8px 0 14px; }
+.flow-title { font-size:14px; font-weight:600; margin-bottom:3px; }
+.flow-desc  { font-size:12px; color:#6c757d; }
+.flow-code  { font-family:monospace; background:#1a1a2e; color:#00d4aa; padding:4px 10px;
+              border-radius:5px; font-size:11px; display:inline-block; margin-top:4px; }
+
+/* ── Boxes ── */
+.warn { background:#fff8e1; border-right:4px solid #ffc107; padding:12px 16px; border-radius:6px; margin:12px 0; font-size:13px; }
+.info { background:#e8f4fd; border-right:4px solid #17a2b8; padding:12px 16px; border-radius:6px; margin:12px 0; font-size:13px; }
+.ok   { background:#e8f5e9; border-right:4px solid #28a745; padding:12px 16px; border-radius:6px; margin:12px 0; font-size:13px; }
+.err  { background:#fdecea; border-right:4px solid #dc3545; padding:12px 16px; border-radius:6px; margin:12px 0; font-size:13px; }
+
+/* ── Cols ── */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+/* ── JWT ── */
+.jwt { background:#1a1a2e; border-radius:10px; padding:16px; }
+.jwt code { color:#00d4aa; font-family:monospace; font-size:12px; line-height:1.8; display:block; }
+.jwt .key   { color:#e94560; }
+.jwt .val   { color:#a8d8a8; }
+.jwt .com   { color:#6c757d; }
+
+/* ── Divider ── */
+.divider { border:none; border-top:2px dashed #e9ecef; margin:30px 0; }
+
+/* ── Status Flow ── */
+.status-chain { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:12px 0; font-size:13px; }
+.status { padding:5px 14px; border-radius:20px; font-weight:600; font-size:12px; }
+.s-pending   { background:#fff3cd; color:#856404; }
+.s-confirmed { background:#d4edda; color:#155724; }
+.s-process   { background:#cce5ff; color:#004085; }
+.s-shipped   { background:#e2d9f3; color:#4b0082; }
+.s-delivered { background:#d1ecf1; color:#0c5460; }
+.s-cancelled { background:#f8d7da; color:#721c24; }
+.s-refunded  { background:#fdecea; color:#78290f; }
+.arrow-right { color:#adb5bd; font-size:16px; }
+
+/* ── Print ── */
+@media print {
+  body { background:white; }
+  .section { box-shadow:none; border:1px solid #dee2e6; break-inside:avoid; }
+  .page { padding:10px; }
+  .cover { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- COVER -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <h1>🛒 Ahmad OnlineShop</h1>
+  <div class="sub">مستندات دسترسی نقش‌ها و Flow فرآیندها</div>
+  <div class="sub" style="margin-bottom:30px; font-size:13px;">Role-Based Access Control — Payment &amp; Order Flows</div>
+  <div class="badges">
+    <span class="badge badge-customer">👤 Customer</span>
+    <span class="badge badge-seller">🏪 Seller</span>
+    <span class="badge badge-admin">🔐 Admin (BackOffice)</span>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: JWT Token ساختار -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon icon-payment">🔑</div>
+    ۱. ساختار JWT Token و نقش‌ها
+  </div>
+
+  <p style="font-size:13px; color:#6c757d; margin-bottom:15px;">
+    بعد از تأیید OTP، یک JWT صادر می‌شود که <strong>نوع کاربر</strong> و <strong>نقش‌ها</strong> در آن قرار دارد.
+    هر endpoint بر اساس Claim های این token دسترسی را چک می‌کند.
+  </p>
+
+  <div class="grid2">
+    <div>
+      <div style="font-size:13px; font-weight:600; margin-bottom:8px;">مشتری (Customer)</div>
+      <div class="jwt">
+        <code>
+<span class="com">// Customer Token</span>
+{
+  <span class="key">"sub"</span>: <span class="val">"12345"</span>,
+  <span class="key">"phone"</span>: <span class="val">"09121234567"</span>,
+  <span class="key">"type"</span>: <span class="val">"Customer"</span>,
+  <span class="key">"roles"</span>: <span class="val">[]</span>,
+  <span class="key">"exp"</span>: <span class="val">1234571490</span>
+}
+        </code>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px; font-weight:600; margin-bottom:8px;">فروشنده (Seller)</div>
+      <div class="jwt">
+        <code>
+<span class="com">// Seller Token</span>
+{
+  <span class="key">"sub"</span>: <span class="val">"67890"</span>,
+  <span class="key">"phone"</span>: <span class="val">"09129876543"</span>,
+  <span class="key">"type"</span>: <span class="val">"Seller"</span>,
+  <span class="key">"roles"</span>: <span class="val">["Seller"]</span>,
+  <span class="key">"exp"</span>: <span class="val">1234571490</span>
+}
+        </code>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn" style="margin-top:15px;">
+    ⚠️ <strong>ادمین‌ها</strong> از سیستم BackOffice جداگانه‌ای استفاده می‌کنند و به دیتابیس به صورت دستی اضافه می‌شوند.
+    آن‌ها JWT مخصوص BackOffice با Role های مختلف دریافت می‌کنند.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: SELLER ENDPOINTS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon icon-seller">🏪</div>
+    ۲. دسترسی‌های فروشنده (Seller)
+  </div>
+
+  <div class="role-header role-seller">
+    <div class="role-dot dot-seller"></div>
+    <div>
+      <div class="role-title">🏪 Seller Role</div>
+      <div class="role-sub">فروشنده محصولات خود را مدیریت می‌کند — فقط به محصولات خودش دسترسی دارد</div>
+    </div>
+  </div>
+
+  <!-- محصول -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#e94560;">📦 مدیریت محصول</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m post">POST</span></td><td><code>/api/products</code></td><td>ثبت محصول جدید</td><td>SellerId از Token گرفته می‌شود</td></tr>
+      <tr><td><span class="m put">PUT</span></td><td><code>/api/products/{id}</code></td><td>ویرایش محصول</td><td>فقط محصول خودش</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/price</code></td><td>تغییر قیمت</td><td>رویداد PriceChangedEvent</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/activate</code></td><td>فعال‌سازی محصول</td><td>—</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/deactivate</code></td><td>غیرفعال‌سازی</td><td>—</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/archive</code></td><td>بایگانی</td><td>—</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/api/products/{id}</code></td><td>مشاهده محصول</td><td>عمومی — همه می‌توانند ببینند</td></tr>
+    </tbody>
+  </table>
+
+  <!-- موجودی -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#e94560;">📊 مدیریت موجودی</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>شرط</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/inventory/replenish</code></td><td>تأمین موجودی</td><td>فروشنده مالک محصول</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/api/products/{id}/inventory</code></td><td>مشاهده موجودی</td><td>فروشنده مالک محصول</td></tr>
+    </tbody>
+  </table>
+
+  <!-- تصاویر -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#e94560;">🖼️ مدیریت تصاویر</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m post">POST</span></td><td><code>/api/products/{id}/images</code></td><td>افزودن تصویر</td></tr>
+      <tr><td><span class="m delete">DELETE</span></td><td><code>/api/products/{id}/images/{imgId}</code></td><td>حذف تصویر</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/images/{imgId}/primary</code></td><td>تنظیم تصویر اصلی</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/products/{id}/images/{imgId}/reorder</code></td><td>تغییر ترتیب</td></tr>
+    </tbody>
+  </table>
+
+  <!-- سفارشات فروشنده -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#e94560;">🛒 سفارشات محصولات من</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>فیلتر</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m get">GET</span></td><td><code>/api/products?sellerId={mine}</code></td><td>محصولات من</td><td>SellerId از Token</td></tr>
+    </tbody>
+  </table>
+
+  <div class="err">❌ <strong>دسترسی ندارد:</strong> BackOffice endpoints | سفارشات سایر کاربران | تغییر Role | مدیریت ادمین</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: ADMIN ENDPOINTS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon icon-admin">🔐</div>
+    ۳. دسترسی‌های ادمین (BackOffice)
+  </div>
+
+  <div class="role-header role-admin">
+    <div class="role-dot dot-admin"></div>
+    <div>
+      <div class="role-title">🔐 Admin Roles</div>
+      <div class="role-sub">SuperAdmin | ProductManager | OrderManager | FinanceManager | SupportAgent</div>
+    </div>
+  </div>
+
+  <!-- مدیریت ادمین‌ها -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#533483;">👥 مدیریت ادمین‌ها — فقط SuperAdmin</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>نقش</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Admins</code></td><td>لیست مدیران</td><td>SuperAdmin</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Admins/{id}</code></td><td>مشخصات مدیر</td><td>SuperAdmin</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/BackOffice/Admins/{id}/Role</code></td><td>تغییر نقش</td><td>SuperAdmin</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/BackOffice/Admins/{id}/Activate</code></td><td>فعال‌سازی</td><td>SuperAdmin</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/BackOffice/Admins/{id}/Suspend</code></td><td>تعلیق</td><td>SuperAdmin</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Admins/{id}/AuditLogs</code></td><td>لاگ فعالیت</td><td>SuperAdmin</td></tr>
+    </tbody>
+  </table>
+
+  <!-- سفارشات -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#533483;">📋 مدیریت سفارشات</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>نقش</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Orders</code></td><td>همه سفارشات (با فیلتر)</td><td>OrderManager | SuperAdmin</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Orders?status=Pending</code></td><td>سفارشات در انتظار</td><td>OrderManager</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Orders?method=CashOnDelivery</code></td><td>سفارشات درب منزل</td><td>OrderManager</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/api/v1/orders/{id}/payments/{pid}/complete</code></td><td>تأیید پرداخت درب منزل</td><td>OrderManager</td></tr>
+    </tbody>
+  </table>
+
+  <!-- گزارشات -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#533483;">📊 گزارشات</div>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>عملیات</th><th>نقش</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m get">GET</span></td><td><code>/BackOffice/Reports</code></td><td>لیست گزارشات</td><td>FinanceManager | SuperAdmin</td></tr>
+      <tr><td><span class="m post">POST</span></td><td><code>/BackOffice/Reports</code></td><td>درخواست گزارش</td><td>FinanceManager | SuperAdmin</td></tr>
+      <tr><td><span class="m patch">PATCH</span></td><td><code>/BackOffice/Reports/{id}/Complete</code></td><td>تأیید گزارش</td><td>SuperAdmin</td></tr>
+    </tbody>
+  </table>
+
+  <!-- مقایسه نقش‌ها -->
+  <div style="font-size:14px; font-weight:700; margin:15px 0 8px; color:#533483;">🔑 جدول مقایسه دسترسی ادمین‌ها</div>
+  <table>
+    <thead>
+      <tr>
+        <th>عملیات</th>
+        <th>SuperAdmin</th>
+        <th>OrderManager</th>
+        <th>FinanceManager</th>
+        <th>ProductManager</th>
+        <th>SupportAgent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>مدیریت ادمین‌ها</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td></tr>
+      <tr><td>همه سفارشات</td><td class="yes">✅</td><td class="yes">✅</td><td class="cond">👁 فقط مشاهده</td><td class="no">❌</td><td class="cond">👁 فقط مشاهده</td></tr>
+      <tr><td>تأیید پرداخت</td><td class="yes">✅</td><td class="yes">✅</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td></tr>
+      <tr><td>گزارشات مالی</td><td class="yes">✅</td><td class="no">❌</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td></tr>
+      <tr><td>مدیریت محصولات</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td><td class="yes">✅</td><td class="no">❌</td></tr>
+      <tr><td>لاگ فعالیت‌ها</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: PAYMENT FLOWS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon icon-payment">💳</div>
+    ۴. Flow های پرداخت
+  </div>
+
+  <div class="grid2">
+
+    <!-- ZarinPal -->
+    <div>
+      <div style="font-size:15px; font-weight:700; color:#eb6d2f; margin-bottom:12px;">💳 پرداخت زرین‌پال (آنلاین)</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-order">۱</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">ثبت سفارش</div>
+            <div class="flow-code">POST /api/v1/orders<br>{ paymentMethod: "ZarinPal" }</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-order">۲</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">افزودن آیتم‌ها</div>
+            <div class="flow-code">POST /api/v1/orders/{id}/items</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-zarinpal">۳</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">درخواست پرداخت ZarinPal</div>
+            <div class="flow-code">POST /api/v1/orders/{id}/payments<br>→ دریافت Authority + RedirectUrl</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-zarinpal">۴</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Redirect کاربر به درگاه</div>
+            <div class="flow-code">zarinpal.com/pg/StartPay/{authority}</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-zarinpal">۵</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">بازگشت به Callback</div>
+            <div class="flow-code">GET /payment/callback?Status=OK&amp;Authority=xxx</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-payment">۶</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Verify + تأیید</div>
+            <div class="flow-code">PATCH /orders/{id}/payments/{pid}/complete<br>→ OrderStatus: Confirmed ✅</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle" style="background:#dc3545">!!</div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">پرداخت ناموفق</div>
+            <div class="flow-code">PATCH /orders/{id}/payments/{pid}/fail<br>→ OrderStatus: Pending (تلاش مجدد)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cash on Delivery -->
+    <div>
+      <div style="font-size:15px; font-weight:700; color:#555; margin-bottom:12px;">🚚 پرداخت درب منزل (COD)</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-order">۱</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">ثبت سفارش</div>
+            <div class="flow-code">POST /api/v1/orders<br>{ paymentMethod: "CashOnDelivery" }</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-order">۲</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">افزودن آیتم‌ها و ثبت نهایی</div>
+            <div class="flow-code">POST /api/v1/orders/{id}/items<br>POST /api/v1/orders/{id}/place</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-cod">۳</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">ارسال سفارش</div>
+            <div class="flow-code">PATCH /api/v1/orders/{id}/ship<br>→ OrderStatus: Shipped</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-cod">۴</div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">تحویل به مشتری + دریافت پول</div>
+            <div class="flow-code">ادمین پرداخت نقدی را ثبت می‌کند<br>POST /orders/{id}/payments (COD)</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-circle fc-payment">۵</div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">تأیید تحویل</div>
+            <div class="flow-code">PATCH /orders/{id}/payments/{pid}/complete<br>+ PATCH /orders/{id}/deliver<br>→ OrderStatus: Delivered ✅</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: ORDER FLOW کامل -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon icon-order">🛒</div>
+    ۵. Flow کامل سفارش
+  </div>
+
+  <!-- Status Chain -->
+  <div style="font-size:13px; margin-bottom:15px; font-weight:600;">چرخه وضعیت سفارش:</div>
+  <div class="status-chain">
+    <span class="status s-pending">⏳ Pending</span>
+    <span class="arrow-right">→</span>
+    <span class="status s-confirmed">✅ Confirmed</span>
+    <span class="arrow-right">→</span>
+    <span class="status s-process">⚙️ Processing</span>
+    <span class="arrow-right">→</span>
+    <span class="status s-shipped">📦 Shipped</span>
+    <span class="arrow-right">→</span>
+    <span class="status s-delivered">🏠 Delivered</span>
+  </div>
+  <div class="status-chain" style="margin-top:8px;">
+    <span style="font-size:12px; color:#6c757d;">هر مرحله (قبل از Delivered) می‌تواند →</span>
+    <span class="status s-cancelled">❌ Cancelled</span>
+    &nbsp;&nbsp;
+    <span style="font-size:12px; color:#6c757d;">Delivered می‌تواند →</span>
+    <span class="status s-refunded">↩️ Refunded</span>
+  </div>
+
+  <hr class="divider">
+
+  <!-- کامل‌ترین Flow -->
+  <div style="font-size:14px; font-weight:700; margin-bottom:12px;">API های هر مرحله:</div>
+  <table>
+    <thead><tr><th>وضعیت</th><th>API</th><th>عامل</th><th>شرط</th></tr></thead>
+    <tbody>
+      <tr><td><span class="status s-pending">Pending</span></td><td><code>POST /orders</code></td><td>Customer</td><td>JWT Required</td></tr>
+      <tr><td>+ آیتم</td><td><code>POST /orders/{id}/items</code></td><td>Customer</td><td>Status = Pending</td></tr>
+      <tr><td>+ پرداخت</td><td><code>POST /orders/{id}/payments</code></td><td>Customer</td><td>—</td></tr>
+      <tr><td><span class="status s-confirmed">Confirmed</span></td><td><code>PATCH /orders/{id}/payments/{pid}/complete</code></td><td>System/Admin</td><td>پرداخت موفق</td></tr>
+      <tr><td><span class="status s-process">Processing</span></td><td><code>PATCH /orders/{id}/process</code> (اختیاری)</td><td>OrderManager</td><td>Status = Confirmed</td></tr>
+      <tr><td><span class="status s-shipped">Shipped</span></td><td><code>PATCH /orders/{id}/ship</code></td><td>OrderManager</td><td>Status = Confirmed</td></tr>
+      <tr><td><span class="status s-delivered">Delivered</span></td><td><code>PATCH /orders/{id}/deliver</code></td><td>OrderManager</td><td>Status = Shipped</td></tr>
+      <tr><td><span class="status s-cancelled">Cancelled</span></td><td><code>DELETE /orders/{id}</code> یا <code>PATCH /orders/{id}/cancel</code></td><td>Customer / Admin</td><td>قبل از Delivered</td></tr>
+    </tbody>
+  </table>
+
+  <!-- موجودی در سفارش -->
+  <div class="info" style="margin-top:15px;">
+    ℹ️ <strong>موجودی محصول در هر مرحله:</strong><br>
+    • <strong>AddItem:</strong> موجودی Reserve می‌شود<br>
+    • <strong>RemoveItem:</strong> موجودی Release می‌شود<br>
+    • <strong>Cancel:</strong> تمام موجودی‌های Reserved آزاد می‌شوند<br>
+    • <strong>ConfirmStock</strong> (بعد از پرداخت): موجودی به صورت قطعی کسر می‌شود
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: BNPL FLOW -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon" style="background:#e8f5e9">💰</div>
+    ۶. Flow پرداخت اقساطی (BNPL)
+  </div>
+
+  <table>
+    <thead><tr><th>گام</th><th>API</th><th>عملیات</th><th>خروجی</th></tr></thead>
+    <tbody>
+      <tr><td>۱</td><td><code>GET /bnpl/users/{id}/credit</code></td><td>بررسی سقف اعتبار</td><td>TotalLimit, AvailableLimit</td></tr>
+      <tr><td>۲</td><td><code>POST /bnpl/contracts</code></td><td>ایجاد قرارداد اقساطی</td><td>ContractId + اقساط</td></tr>
+      <tr><td>۳</td><td><code>GET /bnpl/contracts/{id}/installments</code></td><td>مشاهده برنامه اقساط</td><td>لیست اقساط با تاریخ</td></tr>
+      <tr><td>۴</td><td><code>POST /bnpl/contracts/{id}/installments/{iid}/pay</code></td><td>پرداخت هر قسط</td><td>InstallmentStatus → Paid</td></tr>
+      <tr><td>۵ (خودکار)</td><td>—</td><td>پس از آخرین قسط</td><td>ContractStatus → Completed</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    ⚠️ اگر قرارداد Defaulted شود (قسط‌ها پرداخت نشوند)، سقف اعتبار بلوکه می‌ماند.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: Error Codes -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">
+    <div class="icon" style="background:#fdecea">⚠️</div>
+    ۷. کدهای خطا مهم
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div style="font-size:13px; font-weight:700; margin-bottom:8px; color:#e94560;">پرداخت و سفارش</div>
+      <table>
+        <thead><tr><th>Exception</th><th>علت</th></tr></thead>
+        <tbody>
+          <tr><td>PaymentAmountMismatchException</td><td>مبلغ با سفارش برابر نیست</td></tr>
+          <tr><td>PaymentNotFoundException</td><td>پرداخت پیدا نشد</td></tr>
+          <tr><td>OrderCannotConfirmWithoutPaymentException</td><td>پرداخت موفق وجود ندارد</td></tr>
+          <tr><td>OrderAlreadyCancelledException</td><td>سفارش قبلاً لغو شده</td></tr>
+          <tr><td>OrderAlreadyDeliveredException</td><td>بعد از تحویل نمی‌توان لغو کرد</td></tr>
+          <tr><td>OrderNoItemsException</td><td>سفارش بدون آیتم</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:13px; font-weight:700; margin-bottom:8px; color:#533483;">محصول و فروشنده</div>
+      <table>
+        <thead><tr><th>Exception</th><th>علت</th></tr></thead>
+        <tbody>
+          <tr><td>ProductNotOwnedBySellerException</td><td>محصول متعلق به این فروشنده نیست</td></tr>
+          <tr><td>InsufficientStockException</td><td>موجودی کافی نیست</td></tr>
+          <tr><td>InvalidPriceException</td><td>قیمت صفر یا منفی</td></tr>
+          <tr><td>MaxImagesExceededException</td><td>بیش از ۱۰ تصویر</td></tr>
+          <tr><td>PrimaryImageExistsException</td><td>تصویر اصلی از قبل وجود دارد</td></tr>
+          <tr><td>InvalidOtpException</td><td>OTP نامعتبر/منقضی/تکراری</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<div style="background:#1a1a2e; color:#6c757d; text-align:center; padding:20px; font-size:12px; margin-top:20px;">
+  Ahmad OnlineShop — Role Access &amp; Flow Documentation v1.0 | تولیدشده: ۱۴۰۵
+  <br>برای به‌روزرسانی: <code style="color:#00d4aa">Docs/Flows/role-access-flows.html</code>
+</div>
+
+</body>
+</html>

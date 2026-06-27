@@ -8,6 +8,7 @@ public static class ProductMapper
     public static CreateProductArg Map(this CreateProductCommand command, long id, long inventoryId)
         => new(
             Id:          id,
+            SellerId:    command.SellerId,
             CategoryId:  command.CategoryId,
             Name:        command.Name,
             Description: command.Description,

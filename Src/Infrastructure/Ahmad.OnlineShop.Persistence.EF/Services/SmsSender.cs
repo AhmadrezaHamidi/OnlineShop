@@ -25,6 +25,16 @@ public sealed class SmsSender : ISmsService
         return await SendAsync(payload, token);
     }
 
+    /// <summary>ارسال پیام دلخواه به چند شماره</summary>
+    public async Task<bool> SendBulkAsync(
+        IReadOnlyList<string> phones,
+        string                message,
+        CancellationToken     token = default)
+    {
+        var payload = SmsMapper.ToBulkRequest(phones.ToList(), message, _options);
+        return await SendAsync(payload, token);
+    }
+
     // ─── Private ─────────────────────────────────────────────────────────────
 
     private async Task<bool> SendAsync(SmsBulkRequest payload, CancellationToken token)

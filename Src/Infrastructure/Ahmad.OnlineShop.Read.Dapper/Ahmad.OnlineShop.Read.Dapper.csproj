@@ -1,9 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper"               Version="2.1.35" />
+    <PackageReference Include="Dapper.FastCrud"      Version="3.0.50" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Query\Ahmad.OnlineShop.Application.Query.csproj" />
+    <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Query.Contract\Ahmad.OnlineShop.Application.Query.Contract.csproj" />
+    <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
+  </ItemGroup>
 
 </Project>

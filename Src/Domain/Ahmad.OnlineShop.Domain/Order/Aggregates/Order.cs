@@ -8,33 +8,39 @@ namespace Ahmad.OnlineShop.Domain.Order.Aggregates;
 
 public sealed class Order : AggregateRoot<long>
 {
-    private readonly List<OrderItem> _items = [];
-    private readonly List<Payment> _payments = [];
+    private readonly List<OrderItem> _items    = [];
+    private readonly List<Payment>   _payments = [];
 
-    public long UserId { get; private set; }
-    public OrderStatus Status { get; private set; }
-    public decimal TotalAmount { get; private set; }
+    public long          UserId        { get; private set; }
+    public OrderStatus   Status        { get; private set; }
+    public decimal       TotalAmount   { get; private set; }
     public PaymentMethod PaymentMethod { get; private set; }
-    public DateTime PlacedAt { get; private set; }
+    public DateTime      PlacedAt      { get; private set; }
+    public DateTime      CreatedAt     { get; private set; }
 
-    public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
-    public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
+    public IReadOnlyCollection<OrderItem> Items    => _items.AsReadOnly();
+    public IReadOnlyCollection<Payment>   Payments => _payments.AsReadOnly();
 
     private Order() { }
 
-    private Order(CreateOrderArg arg)
-        : base(arg.Id)
+    private Order(CreateOrderArg arg) : base(arg.Id)
     {
-        UserId = arg.UserId;
-        Status = OrderStatus.Pending;
+        UserId        = arg.UserId;
+        Status        = OrderStatus.Pending;
         PaymentMethod = arg.PaymentMethod;
-        TotalAmount = 0;
-        PlacedAt = DateTime.UtcNow;
+        TotalAmount   = 0;
+        CreatedAt     = DateTime.UtcNow;
+        PlacedAt      = DateTime.UtcNow;
     }
 
     public static Order Create(CreateOrderArg arg)
-        => new(arg);
+    {
+        var order = new Order(arg);
+        order.RaiseDomainEvent(new OrderCreatedEvent(arg.Id, arg.UserId, arg.PaymentMethod));
+        return order;
+    }
 
+    // ── Items ─────────────────────────────────────────────
 
     public OrderItem AddItem(AddOrderItemArg arg)
     {
@@ -43,6 +49,10 @@ public sealed class Order : AggregateRoot<long>
         var item = new OrderItem(arg.ItemId, Id, arg.ProductId, arg.Quantity, arg.UnitPrice);
         _items.Add(item);
         RecalculateTotal();
+
+        RaiseDomainEvent(new OrderItemAddedEvent(
+            Id, item.Id, arg.ProductId, arg.Quantity, arg.UnitPrice, TotalAmount));
+
         return item;
     }
 
@@ -55,6 +65,9 @@ public sealed class Order : AggregateRoot<long>
 
         _items.Remove(item!);
         RecalculateTotal();
+
+        RaiseDomainEvent(new OrderItemRemovedEvent(
+            Id, itemId, item!.ProductId, item.Quantity, TotalAmount));
     }
 
     public void Place()
@@ -64,8 +77,7 @@ public sealed class Order : AggregateRoot<long>
 
         RaiseDomainEvent(new OrderPlacedEvent(
             Id, UserId, TotalAmount, PaymentMethod,
-            _items.Select(i => new OrderItemSnapshot(i.ProductId, i.Quantity, i.UnitPrice)).ToList()
-        ));
+            _items.Select(i => new OrderItemSnapshot(i.ProductId, i.Quantity, i.UnitPrice)).ToList()));
     }
 
     // ── Payment ───────────────────────────────────────────
@@ -76,7 +88,8 @@ public sealed class Order : AggregateRoot<long>
 
         var payment = new Payment(arg.PaymentId, Id, arg.Amount, arg.Method, arg.Provider);
         _payments.Add(payment);
-        RaiseDomainEvent(new PaymentRecordedEvent(arg.PaymentId, Id, arg.Amount, PaymentStatus.Pending, arg.Provider));
+        RaiseDomainEvent(new PaymentRecordedEvent(
+            arg.PaymentId, Id, arg.Amount, PaymentStatus.Pending, arg.Provider));
         return payment;
     }
 
@@ -84,7 +97,6 @@ public sealed class Order : AggregateRoot<long>
     {
         var payment = _payments.FirstOrDefault(p => p.Id == paymentId);
         GuardPaymentExists(payment);
-
         payment!.MarkCompleted();
         Confirm();
     }
@@ -129,8 +141,7 @@ public sealed class Order : AggregateRoot<long>
         Status = OrderStatus.Cancelled;
         RaiseDomainEvent(new OrderCancelledEvent(
             Id, UserId, reason,
-            _items.Select(i => new OrderItemSnapshot(i.ProductId, i.Quantity, i.UnitPrice)).ToList()
-        ));
+            _items.Select(i => new OrderItemSnapshot(i.ProductId, i.Quantity, i.UnitPrice)).ToList()));
     }
 
     // ── Guards ────────────────────────────────────────────
@@ -161,14 +172,12 @@ public sealed class Order : AggregateRoot<long>
 
     private static void GuardItemExists(OrderItem? item)
     {
-        if (item is null)
-            throw new OrderItemNotFoundException();
+        if (item is null) throw new OrderItemNotFoundException();
     }
 
     private static void GuardPaymentExists(Payment? payment)
     {
-        if (payment is null)
-            throw new PaymentNotFoundException();
+        if (payment is null) throw new PaymentNotFoundException();
     }
 
     private void GuardPaymentAmountMatches(decimal amount)
@@ -194,8 +203,6 @@ public sealed class Order : AggregateRoot<long>
         if (Status == OrderStatus.Delivered)
             throw new OrderAlreadyDeliveredException();
     }
-
-    // ── Helpers ───────────────────────────────────────────
 
     private void RecalculateTotal()
         => TotalAmount = _items.Sum(i => i.TotalPrice);

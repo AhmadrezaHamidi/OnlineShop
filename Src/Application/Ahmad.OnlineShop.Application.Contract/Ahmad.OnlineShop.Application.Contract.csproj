@@ -9,9 +9,9 @@
 	<ItemGroup>
 		<PackageReference Include="AhmadBase.Application" Version="5.0.0" />
 		<PackageReference Include="AhmadBase.Web" Version="1.0.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.6" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -19,3 +19,4 @@
 	</ItemGroup>
 
 </Project>
+

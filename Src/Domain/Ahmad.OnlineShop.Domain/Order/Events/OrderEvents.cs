@@ -3,6 +3,32 @@ using AhmadBase.Doamin;
 
 namespace Ahmad.OnlineShop.Domain.Order.Events;
 
+/// <summary>سفارش جدید ایجاد شد</summary>
+public sealed record OrderCreatedEvent(
+    long          OrderId,
+    long          UserId,
+    PaymentMethod PaymentMethod
+) : IEvent;
+
+/// <summary>آیتم به سفارش افزوده شد</summary>
+public sealed record OrderItemAddedEvent(
+    long    OrderId,
+    long    ItemId,
+    long    ProductId,
+    int     Quantity,
+    decimal UnitPrice,
+    decimal NewTotalAmount
+) : IEvent;
+
+/// <summary>آیتم از سفارش حذف شد</summary>
+public sealed record OrderItemRemovedEvent(
+    long    OrderId,
+    long    ItemId,
+    long    ProductId,
+    int     Quantity,
+    decimal NewTotalAmount
+) : IEvent;
+
 public sealed record OrderShippedEvent(
     long OrderId,
     long UserId

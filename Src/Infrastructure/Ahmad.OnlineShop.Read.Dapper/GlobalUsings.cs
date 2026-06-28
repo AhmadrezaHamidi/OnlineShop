@@ -1,0 +1,13 @@
+global using Dapper;
+global using System.Data;
+global using Microsoft.Data.SqlClient;
+global using Ahmad.OnlineShop.Application.Query.Queries;
+global using Ahmad.OnlineShop.Domain.BackOffice.Enums;
+global using Ahmad.OnlineShop.Domain.Order.Enums;
+global using Ahmad.OnlineShop.Domain.Products.Enums;
+global using BackOffice.Application.Query.Contracts;
+global using BackOffice.Application.Query.Queries;
+global using Identity.Application.Query.Contracts;
+global using Identity.Application.Query.Queries;
+global using Identity.Domain.Enums;
+global using AhmadBase.Application.Query;

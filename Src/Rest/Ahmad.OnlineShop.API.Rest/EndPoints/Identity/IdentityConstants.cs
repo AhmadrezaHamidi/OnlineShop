@@ -24,19 +24,20 @@ public static class IdentityConstants
 
     public static class Names
     {
-        public const string GetUsers       = "GetUsers";
-        public const string GetUser        = "GetUser";
-        public const string GetRoles       = "GetRoles";
-        public const string AssignRole     = "AssignRole";
-        public const string RemoveRole     = "RemoveRole";
-        public const string ActivateUser   = "ActivateUser";
-        public const string DeactivateUser = "DeactivateUser";
-        public const string SuspendUser    = "SuspendUser";
-        public const string UpdateProfile  = "UpdateProfile";
-        public const string RequestOtp   = "RequestOtp";
-        public const string VerifyOtp    = "VerifyOtp";
-        public const string Logout       = "Logout";
-        public const string RefreshToken = "RefreshToken";
+        private const string Prefix = "Identity_";
+        public const string GetUsers       = Prefix + "GetUsers";
+        public const string GetUser        = Prefix + "GetUser";
+        public const string GetRoles       = Prefix + "GetRoles";
+        public const string AssignRole     = Prefix + "AssignRole";
+        public const string RemoveRole     = Prefix + "RemoveRole";
+        public const string ActivateUser   = Prefix + "ActivateUser";
+        public const string DeactivateUser = Prefix + "DeactivateUser";
+        public const string SuspendUser    = Prefix + "SuspendUser";
+        public const string UpdateProfile  = Prefix + "UpdateProfile";
+        public const string RequestOtp     = Prefix + "RequestOtp";
+        public const string VerifyOtp      = Prefix + "VerifyOtp";
+        public const string Logout         = Prefix + "Logout";
+        public const string RefreshToken   = Prefix + "RefreshToken";
     }
 
     public static class Docs

@@ -24,46 +24,44 @@ public sealed class OrderReadRepository(IDbConnection connection)
         var items    = new Dictionary<long, GetOrderItemResponse>();
         var payments = new Dictionary<long, GetPaymentResponse>();
 
-        await connection.QueryAsync<dynamic>(sql, (row) =>
+        await connection.QueryAsync(sql, (OrderRow o, OrderItemRow? i, PaymentRow? p) =>
         {
             if (response is null)
             {
                 response = new GetOrderQueryResponse(
-                    Id:            row.Id,
-                    UserId:        row.UserId,
-                    Status:        (OrderStatus)row.Status,
-                    TotalAmount:   row.TotalAmount,
-                    PaymentMethod: (PaymentMethod)row.PaymentMethod,
-                    PlacedAt:      row.PlacedAt,
+                    Id:            o.Id,
+                    UserId:        o.UserId,
+                    Status:        o.Status,
+                    TotalAmount:   o.TotalAmount,
+                    PaymentMethod: o.PaymentMethod,
+                    PlacedAt:      o.PlacedAt,
                     Items:         new List<GetOrderItemResponse>(),
                     Payments:      new List<GetPaymentResponse>());
             }
 
-            if (row.ItemId != null && !items.ContainsKey((long)row.ItemId))
+            if (i is not null && i.ItemId != 0 && !items.ContainsKey(i.ItemId))
             {
-                var item = new GetOrderItemResponse(
-                    Id:         (long)row.ItemId,
-                    ProductId:  row.ProductId,
-                    Quantity:   row.Quantity,
-                    UnitPrice:  row.UnitPrice,
-                    TotalPrice: row.TotalPrice);
-                items[(long)row.ItemId] = item;
+                items[i.ItemId] = new GetOrderItemResponse(
+                    Id:         i.ItemId,
+                    ProductId:  i.ProductId,
+                    Quantity:   i.Quantity,
+                    UnitPrice:  i.UnitPrice,
+                    TotalPrice: i.TotalPrice);
             }
 
-            if (row.PayId != null && !payments.ContainsKey((long)row.PayId))
+            if (p is not null && p.PayId != 0 && !payments.ContainsKey(p.PayId))
             {
-                var payment = new GetPaymentResponse(
-                    Id:           (long)row.PayId,
-                    Amount:       row.Amount,
-                    Status:       (PaymentStatus)row.PayStatus,
-                    Provider:     row.Provider,
-                    PaidAt:       row.PaidAt,
-                    IsSuccessful: row.IsSuccessful);
-                payments[(long)row.PayId] = payment;
+                payments[p.PayId] = new GetPaymentResponse(
+                    Id:           p.PayId,
+                    Amount:       p.Amount,
+                    Status:       p.PayStatus,
+                    Provider:     p.Provider,
+                    PaidAt:       p.PaidAt,
+                    IsSuccessful: p.IsSuccessful);
             }
 
             return response;
-        }, new { Id = id });
+        }, new { Id = id }, splitOn: "ItemId,PayId");
 
         if (response is null) return null;
 
@@ -124,5 +122,24 @@ public sealed class OrderReadRepository(IDbConnection connection)
         public PaymentMethod PaymentMethod { get; set; }
         public DateTime      PlacedAt      { get; set; }
         public DateTime      CreatedAt     { get; set; }
+    }
+
+    private sealed class OrderItemRow
+    {
+        public long    ItemId     { get; set; }
+        public long    ProductId  { get; set; }
+        public int     Quantity   { get; set; }
+        public decimal UnitPrice  { get; set; }
+        public decimal TotalPrice { get; set; }
+    }
+
+    private sealed class PaymentRow
+    {
+        public long          PayId        { get; set; }
+        public decimal       Amount       { get; set; }
+        public PaymentStatus PayStatus    { get; set; }
+        public string?       Provider     { get; set; }
+        public DateTime?     PaidAt       { get; set; }
+        public bool          IsSuccessful { get; set; }
     }
 }

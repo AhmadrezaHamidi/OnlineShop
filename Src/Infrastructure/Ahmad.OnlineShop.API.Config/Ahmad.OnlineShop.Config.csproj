@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,9 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AhmadBase.Web" Version="1.0.5" />
+    <PackageReference Include="AhmadBase.Web"    Version="1.0.5" />
     <PackageReference Include="AhmadBase.Config" Version="1.0.5" />
     <PackageReference Include="Ahmad.Base.Doamin" Version="5.0.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />
+    <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Query\Ahmad.OnlineShop.Application.Query.csproj" />
+    <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
+    <ProjectReference Include="..\Ahmad.OnlineShop.Persistence.EF\Ahmad.OnlineShop.Persistence.EF.csproj" />
+    <ProjectReference Include="..\Ahmad.OnlineShop.Read.Dapper\Ahmad.OnlineShop.Read.Dapper.csproj" />
   </ItemGroup>
 
 </Project>

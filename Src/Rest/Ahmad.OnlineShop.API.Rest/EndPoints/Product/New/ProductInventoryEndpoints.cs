@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
 
 namespace Ahmad.OnlineShop.Rest.Endpoints;
@@ -56,28 +57,28 @@ public class ProductInventoryEndpoints : IEndpoint
 
     private static async Task<long> ReplenishStock(
         long id,
-        ReplenishStockCommand command,
+        [FromBody] ReplenishStockCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { ProductId = id }, ct);
 
     private static async Task<long> ReserveStock(
         long id,
-        ReserveStockCommand command,
+        [FromBody] ReserveStockCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { ProductId = id }, ct);
 
     private static async Task<long> ReleaseStock(
         long id,
-        ReleaseStockCommand command,
+        [FromBody] ReleaseStockCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { ProductId = id }, ct);
 
     private static async Task<long> ConfirmStock(
         long id,
-        ConfirmStockCommand command,
+        [FromBody] ConfirmStockCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { ProductId = id }, ct);

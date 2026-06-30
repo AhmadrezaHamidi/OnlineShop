@@ -1,4 +1,5 @@
 /// <summary>Fake پیاده‌سازی IJwtService، ISmsService، IRefreshTokenRepository، IRoleRepository</summary>
+using AhmadBase.External.Service;
 using Identity.Application.Services;
 using Identity.Domain.Entities;
 using Identity.Domain.Repositories;

@@ -2,12 +2,15 @@ using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Application.Order.Mapper;
 using Ahmad.OnlineShop.Domain.Order.Args;
 using Ahmad.OnlineShop.Domain.Order.Exceptions;
+using Ahmad.OnlineShop.Persistence.EF;
 using OrderAgg = Ahmad.OnlineShop.Domain.Order;
 
 
 namespace Ahmad.OnlineShop.Application.Handlers;
 
-public sealed class OrderHandlers(IOrderRepository repository) :
+public sealed class OrderHandlers(
+    IOrderRepository      repository,
+    ApplicationDbContext  context) :
     ICommandHandler<CreateOrderCommand, long>,
     ICommandHandler<PlaceOrderCommand, long>,
     ICommandHandler<AddOrderItemCommand, long>,
@@ -28,6 +31,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
         var order = OrderAgg.Aggregates.Order.Create(command.Map(id));
 
         await repository.AddAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -38,6 +42,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.Place();
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -57,6 +62,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
             UnitPrice: command.UnitPrice));
 
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return item.Id;
     }
 
@@ -67,6 +73,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.RemoveItem(command.ItemId);
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return command.ItemId;
     }
 
@@ -81,6 +88,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.Confirm();
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -91,6 +99,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.Ship();
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -101,6 +110,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.Deliver();
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -111,6 +121,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.Cancel(command.Reason);
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return order.Id;
     }
 
@@ -125,6 +136,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         var payment = order.RecordPayment(new RecordPaymentArg(command.PaymentId, command.Amount, command.Provider));
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return payment.Id;
     }
 
@@ -135,6 +147,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.MarkPaymentCompleted(command.PaymentId);
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return command.PaymentId;
     }
 
@@ -145,6 +158,7 @@ public sealed class OrderHandlers(IOrderRepository repository) :
 
         order.MarkPaymentFailed(command.PaymentId);
         await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
         return command.PaymentId;
     }
 

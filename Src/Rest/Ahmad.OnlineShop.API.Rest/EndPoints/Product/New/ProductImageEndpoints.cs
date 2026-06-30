@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
 
 namespace Ahmad.OnlineShop.Rest.Endpoints;
@@ -57,7 +58,7 @@ public class ProductImageEndpoints : IEndpoint
 
     private static async Task<long> AddImage(
         long id,
-        AddProductImageCommand command,
+        [FromBody] AddProductImageCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { ProductId = id }, ct);
@@ -79,7 +80,7 @@ public class ProductImageEndpoints : IEndpoint
     private static async Task<Guid> ReorderImage(
         long id,
         Guid imageId,
-        ReorderProductImageCommand command,
+        [FromBody] ReorderProductImageCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<Guid>(command with { ProductId = id, ImageId = imageId }, ct);

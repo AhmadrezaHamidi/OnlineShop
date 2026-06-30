@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Ahmad.OnlineShop.Domain.Bnpl.Args;
 using Ahmad.OnlineShop.Domain.Bnpl.Events;
 using Ahmad.OnlineShop.Domain.Bnpl.Exceptions;
@@ -10,6 +11,7 @@ public sealed class CreditLimit : AggregateRoot<long>
     public long UserId { get; private set; }
     public decimal TotalLimit { get; private set; }
     public decimal UsedLimit { get; private set; }
+    [NotMapped]
     public decimal AvailableLimit => TotalLimit - UsedLimit;
     public DateTime UpdatedAt { get; private set; }
 

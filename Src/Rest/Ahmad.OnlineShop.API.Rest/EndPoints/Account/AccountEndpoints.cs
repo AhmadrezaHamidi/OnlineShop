@@ -7,6 +7,7 @@ using AhmadBase.Web;
 using AhmadBase.Web.Securities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Ahmad.OnlineShop.Rest.EndPoints.Account;
@@ -84,25 +85,25 @@ public sealed class AccountEndpoints : IEndpoint
     }
 
     private static async Task<long> RegisterAccount(
-        RegisterCommand command,
+        [FromBody] RegisterCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<long>(command, cancellation);
 
     private static async Task<TokenResponse> LoginAccount(
-        LoginCommand command,
+        [FromBody] LoginCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<TokenResponse>(command, cancellation);
 
     private static async Task<TokenResponse> RefreshAccountToken(
-        RefreshTokenCommand command,
+        [FromBody] RefreshTokenCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<TokenResponse>(command, cancellation);
 
     private static async Task<long> LogoutAccount(
-        LogoutCommand command,
+        [FromBody] LogoutCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<long>(command, cancellation);
@@ -117,13 +118,13 @@ public sealed class AccountEndpoints : IEndpoint
     }
 
     private static async Task<long> UpdateAccountProfile(
-        UpdateProfileCommand command,
+        [FromBody] UpdateProfileCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<long>(command, cancellation);
 
     private static async Task<long> ChangeAccountPassword(
-        ChangePasswordCommand command,
+        [FromBody] ChangePasswordCommand command,
         ICommandBus sender,
         CancellationToken cancellation)
         => await sender.Dispatch<long>(command, cancellation);

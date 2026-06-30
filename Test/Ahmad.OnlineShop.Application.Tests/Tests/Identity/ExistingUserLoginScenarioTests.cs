@@ -5,6 +5,7 @@
 /// - فروشنده موجود با OTP وارد می‌شود
 /// - VerifyOtp برای هر دو نوع کاربر JWT صادر می‌کند
 /// </summary>
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Tests.Fakes.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Handlers;
@@ -30,7 +31,7 @@ public class ExistingUserLoginScenarioTests
 
     public ExistingUserLoginScenarioTests()
     {
-        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt);
+        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt, FakeIdentityDb.Create());
     }
 
     // ── سناریو: مشتری موجود ──────────────────────────────────────────────────

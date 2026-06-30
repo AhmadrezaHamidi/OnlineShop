@@ -18,6 +18,7 @@ public sealed class ProductImage : TEntity<Guid>
 
     private ProductImage(CreateProductImageArg arg)
     {
+        Id = arg.Id;
         ProductId = arg.ProductId;
         Url = arg.Url;
         BucketKey = arg.BucketKey;

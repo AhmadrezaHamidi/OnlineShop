@@ -2,12 +2,15 @@ using Ahmad.OnlineShop.Application.BackOffice.Mapper;
 using Ahmad.OnlineShop.Domain.BackOffice.Aggregates;
 using Ahmad.OnlineShop.Domain.BackOffice.Args;
 using Ahmad.OnlineShop.Domain.BackOffice.Exceptions;
+using Ahmad.OnlineShop.Persistence.EF;
 using BackOffice.Application.Commands;
 using BackOffice.Domain.Repositories;
 
 namespace Ahmad.OnlineShop.Application.BackOffice;
 
-public class BackOfficeHandlers(IAdminUserRepository repository) :
+public class BackOfficeHandlers(
+    IAdminUserRepository repository,
+    ApplicationDbContext context) :
     ICommandHandler<CreateAdminUserCommand, long>,
     ICommandHandler<ChangeAdminRoleCommand, long>,
     ICommandHandler<ActivateAdminCommand, long>,
@@ -29,6 +32,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         var admin = AdminUser.Create(command.Map(id));
 
         await repository.AddAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return admin.Id;
     }
@@ -41,6 +45,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.ChangeRole(command.NewRole);
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return admin.Id;
     }
@@ -57,6 +62,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.Activate();
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return admin.Id;
     }
@@ -69,6 +75,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.Deactivate();
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return admin.Id;
     }
@@ -81,6 +88,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.Suspend();
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return admin.Id;
     }
@@ -97,6 +105,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         var report = admin.RequestReport(new CreateReportArg(command.ReportId, admin.Id, command.Type));
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return report.Id;
     }
@@ -109,6 +118,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.CompleteReport(command.ReportId, command.FilePath);
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return command.ReportId;
     }
@@ -121,6 +131,7 @@ public class BackOfficeHandlers(IAdminUserRepository repository) :
         admin.FailReport(command.ReportId, command.Reason);
 
         await repository.UpdateAsync(admin, token);
+        await context.SaveChangesAsync(token);
 
         return command.ReportId;
     }

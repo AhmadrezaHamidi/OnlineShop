@@ -7,6 +7,7 @@
 /// سناریو ۴: Logout → Refresh Token حذف شود
 /// سناریو ۵: Rotation — بعد از Refresh، توکن قدیمی باید حذف شود
 /// </summary>
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Tests.Fakes.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Handlers;
@@ -33,7 +34,7 @@ public class TokenManagementScenarioTests
 
     public TokenManagementScenarioTests()
     {
-        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt);
+        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt, FakeIdentityDb.Create());
     }
 
     // ── Helper ──────────────────────────────────────────────────────────────

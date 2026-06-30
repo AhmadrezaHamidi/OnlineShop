@@ -1,13 +1,10 @@
-﻿using Ahmad.OnlineShop.Domain.Products.Enums;
 using AhmadBase.Doamin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ahmad.OnlineShop.Domain.Products.Events;
 
+// ── Product ───────────────────────────────────────────────────────────────────
+
+/// <summary>محصول جدید ایجاد شد</summary>
 public sealed record ProductCreatedEvent(
     long    ProductId,
     long    SellerId,
@@ -17,48 +14,53 @@ public sealed record ProductCreatedEvent(
 
 /// <summary>قیمت محصول تغییر کرد</summary>
 public sealed record ProductPriceChangedEvent(
-    long ProductId,
+    long    ProductId,
     decimal OldPrice,
     decimal NewPrice
 ) : IEvent;
 
+/// <summary>وضعیت محصول تغییر کرد</summary>
 public sealed record ProductStatusChangedEvent(
     long ProductId,
-    ProductStatus NewStatus
+    int  NewStatus   // ProductStatus as int
 ) : IEvent;
+
+// ── Inventory ─────────────────────────────────────────────────────────────────
 
 /// <summary>موجودی رزرو شد</summary>
 public sealed record StockReservedEvent(
     long ProductId,
-    int ReservedQuantity,
-    int RemainingAvailable
+    int  ReservedQuantity,
+    int  RemainingAvailable
 ) : IEvent;
 
 /// <summary>موجودی آزاد شد (بعد از کنسل سفارش)</summary>
 public sealed record StockReleasedEvent(
     long ProductId,
-    int ReleasedQuantity
+    int  ReleasedQuantity
 ) : IEvent;
 
 /// <summary>موجودی به پایان رسید یا زیر حد بحرانی رفت</summary>
 public sealed record StockDepletedEvent(
     long ProductId,
-    int CurrentQuantity
+    int  CurrentQuantity
 ) : IEvent;
 
-/// <summary>موجودی اضافه شد</summary>
+/// <summary>موجودی تأمین شد</summary>
 public sealed record StockReplenishedEvent(
     long ProductId,
-    int AddedQuantity,
-    int NewTotalQuantity
+    int  AddedQuantity,
+    int  NewTotalQuantity
 ) : IEvent;
+
+// ── Images ────────────────────────────────────────────────────────────────────
 
 /// <summary>تصویر جدیدی به محصول اضافه شد</summary>
 public sealed record ProductImageAddedEvent(
-    long ProductId,
-    Guid ImageId,
+    long   ProductId,
+    Guid   ImageId,
     string Url,
-    ImageType Type
+    int    Type       // ImageType as int
 ) : IEvent;
 
 /// <summary>تصویر از محصول حذف شد</summary>

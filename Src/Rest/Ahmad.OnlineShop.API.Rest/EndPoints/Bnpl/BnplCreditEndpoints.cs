@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 ﻿using AhmadBase.Application;
 using AhmadBase.Application.Query;
 using AhmadBase.Web;
@@ -55,7 +56,7 @@ public sealed class BnplCreditEndpoints : IEndpoint
 
     private static async Task<IResult> IncreaseCredit(
         long userId,
-        IncreaseCreditLimitCommand command,
+        [FromBody] IncreaseCreditLimitCommand command,
         ICommandBus commandBus,
         CancellationToken cancellation)
     {
@@ -66,7 +67,7 @@ public sealed class BnplCreditEndpoints : IEndpoint
 
     private static async Task<IResult> BlockCredit(
         long userId,
-        BlockCreditCommand command,
+        [FromBody] BlockCreditCommand command,
         ICommandBus commandBus,
         CancellationToken cancellation)
     {
@@ -77,7 +78,7 @@ public sealed class BnplCreditEndpoints : IEndpoint
 
     private static async Task<IResult> ReleaseCredit(
         long userId,
-        ReleaseCreditCommand command,
+        [FromBody] ReleaseCreditCommand command,
         ICommandBus commandBus,
         CancellationToken cancellation)
     {

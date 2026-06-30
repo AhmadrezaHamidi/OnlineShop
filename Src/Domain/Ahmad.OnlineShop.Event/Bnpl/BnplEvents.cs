@@ -1,4 +1,4 @@
-﻿using AhmadBase.Doamin;
+using AhmadBase.Doamin;
 
 namespace Ahmad.OnlineShop.Domain.Bnpl.Events;
 

@@ -1,13 +1,15 @@
 using Ahmad.OnlineShop.Application.Product.Mapper;
 using Ahmad.OnlineShop.Domain.Products.Exceptions;
+using Ahmad.OnlineShop.Persistence.EF;
 using ProductAgg = Ahmad.OnlineShop.Domain.Products.Product;
 using CategoryAgg = Ahmad.OnlineShop.Domain.Products.Category;
 
 namespace Ahmad.OnlineShop.Application.Handlers;
 
 public sealed class ProductHandlers(
-    IProductRepository productRepository,
-    ICategoryRepository categoryRepository) :
+    IProductRepository  productRepository,
+    ICategoryRepository categoryRepository,
+    ApplicationDbContext context) :
     ICommandHandler<CreateProductCommand, long>,
     ICommandHandler<UpdateProductCommand, long>,
     ICommandHandler<ChangeProductPriceCommand, long>,
@@ -36,6 +38,7 @@ public sealed class ProductHandlers(
         var product = ProductAgg.Create(cmd.Map(productId, productId));
 
         await productRepository.AddAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -49,6 +52,7 @@ public sealed class ProductHandlers(
 
         product.UpdateDetails(cmd.Name, cmd.Description, cmd.CategoryId);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -59,6 +63,7 @@ public sealed class ProductHandlers(
 
         product.ChangePrice(cmd.NewPrice);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -73,6 +78,7 @@ public sealed class ProductHandlers(
 
         product.Activate();
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -83,6 +89,7 @@ public sealed class ProductHandlers(
 
         product.Deactivate();
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -93,6 +100,7 @@ public sealed class ProductHandlers(
 
         product.Archive();
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -113,6 +121,7 @@ public sealed class ProductHandlers(
         var category = new CategoryAgg(id, cmd.Name, cmd.ParentId);
 
         await categoryRepository.Add(category, token);
+        await context.SaveChangesAsync(token);
         return category.Id;
     }
 
@@ -129,6 +138,7 @@ public sealed class ProductHandlers(
         category.ChangeParent(cmd.ParentId);
 
         await categoryRepository.Update(category, token);
+        await context.SaveChangesAsync(token);
         return category.Id;
     }
 
@@ -143,6 +153,7 @@ public sealed class ProductHandlers(
 
         product.ReserveStock(cmd.Quantity);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -153,6 +164,7 @@ public sealed class ProductHandlers(
 
         product.ReleaseStock(cmd.Quantity);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -163,6 +175,7 @@ public sealed class ProductHandlers(
 
         product.ConfirmStock(cmd.Quantity);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -173,6 +186,7 @@ public sealed class ProductHandlers(
 
         product.ReplenishStock(cmd.Quantity);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -187,6 +201,7 @@ public sealed class ProductHandlers(
 
         product.AddImage(cmd.Map());
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return product.Id;
     }
 
@@ -197,6 +212,7 @@ public sealed class ProductHandlers(
 
         product.RemoveImage(cmd.ImageId);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return cmd.ImageId;
     }
 
@@ -207,6 +223,7 @@ public sealed class ProductHandlers(
 
         product.SetPrimaryImage(cmd.ImageId);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return cmd.ImageId;
     }
 
@@ -220,6 +237,7 @@ public sealed class ProductHandlers(
 
         image.Reorder(cmd.NewSortOrder);
         await productRepository.UpdateAsync(product, token);
+        await context.SaveChangesAsync(token);
         return cmd.ImageId;
     }
 

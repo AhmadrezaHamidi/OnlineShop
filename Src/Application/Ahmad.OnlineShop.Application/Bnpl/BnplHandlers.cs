@@ -2,19 +2,21 @@ using Ahmad.OnlineShop.Application.Bnpl.Mapper;
 using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
 using Ahmad.OnlineShop.Domain.Bnpl.Enums;
 using Ahmad.OnlineShop.Domain.Bnpl.Exceptions;
+using Ahmad.OnlineShop.Persistence.EF;
 
 namespace Ahmad.OnlineShop.Application.Handlers;
 
 public sealed class BnplHandlers(
     IBnplContractRepository contractRepo,
-    ICreditLimitRepository  creditRepo) :
-    ICommandHandler<CreateBnplContractCommand,   long>,
-    ICommandHandler<PayInstallmentCommand,        long>,
-    ICommandHandler<IncreaseCreditLimitCommand,   long>,
-    ICommandHandler<BlockCreditCommand,           long>,
-    ICommandHandler<ReleaseCreditCommand,         long>,
+    ICreditLimitRepository  creditRepo,
+    ApplicationDbContext    context) :
+    ICommandHandler<CreateBnplContractCommand, long>,
+    ICommandHandler<PayInstallmentCommand, long>,
+    ICommandHandler<IncreaseCreditLimitCommand, long>,
+    ICommandHandler<BlockCreditCommand, long>,
+    ICommandHandler<ReleaseCreditCommand, long>,
     ICommandHandler<MarkContractDefaultedCommand, long>,
-    ICommandHandler<CancelBnplContractCommand,    long>
+    ICommandHandler<CancelBnplContractCommand, long>
 {
     #region Contract Commands
 
@@ -31,6 +33,7 @@ public sealed class BnplHandlers(
 
         await contractRepo.AddAsync(contract, token);
         await creditRepo.UpdateAsync(credit, token);
+        await context.SaveChangesAsync(token);
 
         return contract.Id;
     }
@@ -55,6 +58,7 @@ public sealed class BnplHandlers(
         }
 
         await contractRepo.UpdateAsync(contract, token);
+        await context.SaveChangesAsync(token);
 
         return contract.Id;
     }
@@ -67,6 +71,7 @@ public sealed class BnplHandlers(
         contract.MarkDefaulted();
 
         await contractRepo.UpdateAsync(contract, token);
+        await context.SaveChangesAsync(token);
 
         return contract.Id;
     }
@@ -94,6 +99,7 @@ public sealed class BnplHandlers(
         }
 
         await contractRepo.UpdateAsync(contract, token);
+        await context.SaveChangesAsync(token);
 
         return contract.Id;
     }
@@ -110,6 +116,7 @@ public sealed class BnplHandlers(
         credit.IncreaseTotalLimit(command.NewLimit);
 
         await creditRepo.UpdateAsync(credit, token);
+        await context.SaveChangesAsync(token);
 
         return credit.Id;
     }
@@ -122,6 +129,7 @@ public sealed class BnplHandlers(
         credit.Block(command.Amount);
 
         await creditRepo.UpdateAsync(credit, token);
+        await context.SaveChangesAsync(token);
 
         return credit.Id;
     }
@@ -134,6 +142,7 @@ public sealed class BnplHandlers(
         credit.Release(command.Amount);
 
         await creditRepo.UpdateAsync(credit, token);
+        await context.SaveChangesAsync(token);
 
         return credit.Id;
     }

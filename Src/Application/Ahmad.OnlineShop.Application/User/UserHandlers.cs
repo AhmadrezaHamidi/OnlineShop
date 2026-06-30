@@ -17,13 +17,12 @@ namespace Ahmad.OnlineShop.Application.User;
 /// </summary>
 public class UserHandlers(
     IUserRepository repository,
-    JwtHandler      jwtHandler,
-    JWTOptions      jwtOptions) :
-    ICommandHandler<LoginCommand,          TokenResponse>,
+    JWTOptions jwtOptions) :
+    ICommandHandler<LoginCommand, TokenResponse>,
     ICommandHandler<ChangePasswordCommand, long>,
-    ICommandHandler<LogoutCommand,         long>,
-    ICommandHandler<RefreshTokenCommand,   TokenResponse>,
-    ICommandHandler<RegisterCommand,       object>
+    ICommandHandler<LogoutCommand, long>,
+    ICommandHandler<RefreshTokenCommand, TokenResponse>,
+    ICommandHandler<RegisterCommand, long>
 {
     public async Task<TokenResponse> Handle(LoginCommand command, CancellationToken token)
     {
@@ -32,20 +31,22 @@ public class UserHandlers(
             throw new UserNotFoundException();
 
         var hashedPassword = PasswordHasher.HashPassword(command.Password, jwtOptions.Secret);
-        var sessionId      = user.Login(hashedPassword);
+        var sessionId = user.Login(hashedPassword);
         await repository.Update(token);
+
+        Console.WriteLine($"[DEBUG] TokenExpireMinutes={jwtOptions.TokenExpireMinutes} RefreshExpireMinutes={jwtOptions.RefreshExpireMinutes} Secret={jwtOptions.Secret}");
 
         return JwtHandler.GenerateTokens(new TokenRequest
         {
-            UserId             = user.Id.ToString(),
-            Username           = user.UserName!,
-            DisplayName        = user.DisplayName,
-            SessionId          = sessionId,
-            Roles              = user.Roles.Select(r => r.RoleId.ToString()).ToList(),
-            ValidIssuer        = jwtOptions.ValidIssuer,
-            ValidAudience      = jwtOptions.ValidAudience,
+            UserId = user.Id.ToString(),
+            Username = user.UserName!,
+            DisplayName = user.DisplayName,
+            SessionId = sessionId,
+            Roles = user.Roles.Select(r => r.RoleId.ToString()).ToList(),
+            ValidIssuer = jwtOptions.ValidIssuer,
+            ValidAudience = jwtOptions.ValidAudience,
             TokenExpireMinutes = jwtOptions.TokenExpireMinutes,
-            Secret             = jwtOptions.Secret
+            Secret = jwtOptions.Secret
         });
     }
 
@@ -80,14 +81,14 @@ public class UserHandlers(
     {
         JwtHandler.ValidateRefreshToken(new RefreshTokenRequest
         {
-            Token         = command.RefreshToken,
-            ValidIssuer   = jwtOptions.ValidIssuer,
+            Token = command.RefreshToken,
+            ValidIssuer = jwtOptions.ValidIssuer,
             ValidAudience = jwtOptions.ValidAudience,
-            Secret        = jwtOptions.Secret
+            Secret = jwtOptions.Secret
         });
 
         var result = JwtHandler.GetRefreshResult(command.RefreshToken);
-        var user   = await repository.Get(result.UserId, token)
+        var user = await repository.Get(result.UserId, token)
             ?? throw new UserNotFoundException();
 
         user.Logout(result.SessionId);
@@ -96,19 +97,19 @@ public class UserHandlers(
 
         return JwtHandler.GenerateTokens(new TokenRequest
         {
-            UserId             = user.Id.ToString(),
-            Username           = user.UserName!,
-            DisplayName        = user.DisplayName,
-            SessionId          = sessionId,
-            Roles              = user.Roles.Select(r => r.RoleId.ToString()).ToList(),
-            ValidIssuer        = jwtOptions.ValidIssuer,
-            ValidAudience      = jwtOptions.ValidAudience,
+            UserId = user.Id.ToString(),
+            Username = user.UserName!,
+            DisplayName = user.DisplayName,
+            SessionId = sessionId,
+            Roles = user.Roles.Select(r => r.RoleId.ToString()).ToList(),
+            ValidIssuer = jwtOptions.ValidIssuer,
+            ValidAudience = jwtOptions.ValidAudience,
             TokenExpireMinutes = jwtOptions.TokenExpireMinutes,
-            Secret             = jwtOptions.Secret
+            Secret = jwtOptions.Secret
         });
     }
 
-    public async Task<object> Handle(RegisterCommand command, CancellationToken token)
+    public async Task<long> Handle(RegisterCommand command, CancellationToken token)
     {
         if (command.Password != command.ConfirmPassword)
             throw new PasswordMismatchException();
@@ -118,11 +119,18 @@ public class UserHandlers(
         if (existing is not null)
             throw new ExistingUserException();
 
-        var id   = repository.GetNextId();
-        var user = UserAgg.Create(new CreateUserArg(id, command.MobileNumber));
-        user.ChangePassword(PasswordHasher.HashPassword(command.Password, null));
+        var id = repository.GetNextId();
+        var user = UserAgg.Create(new CreateUserArg(id, command.MobileNumber ?? string.Empty));
+        user.UserName = command.UserName;
+        user.ChangePassword(PasswordHasher.HashPassword(command.Password, jwtOptions.Secret));
+
+        // DisplayName برای JWT لازم است — اگر نام/نام‌خانوادگی ندادند، از UserName استفاده می‌شود
+        var firstName = string.IsNullOrWhiteSpace(command.FirstName) ? command.UserName : command.FirstName;
+        var lastName  = string.IsNullOrWhiteSpace(command.LastName)  ? command.UserName : command.LastName;
+        user.Modify(new ModifyUserArg(firstName, lastName, command.Email));
 
         await repository.Add(user, token);
-        return new { };
+        await repository.Update(token);
+        return user.Id;
     }
 }

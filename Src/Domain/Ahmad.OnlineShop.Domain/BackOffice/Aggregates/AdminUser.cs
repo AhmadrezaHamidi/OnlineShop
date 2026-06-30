@@ -38,7 +38,7 @@ public sealed class AdminUser : AggregateRoot<long>
         GuardEmail(arg.Email);
 
         var admin = new AdminUser(arg);
-        admin.RaiseDomainEvent(new AdminUserCreatedEvent(arg.Id, arg.FullName, arg.Email, arg.Role));
+        admin.RaiseDomainEvent(new AdminUserCreatedEvent(arg.Id, arg.FullName, arg.Email, (int)arg.Role));
         return admin;
     }
 
@@ -46,20 +46,20 @@ public sealed class AdminUser : AggregateRoot<long>
     {
         GuardNotAlreadyActive();
         Status = AdminStatus.Active;
-        RaiseDomainEvent(new AdminStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new AdminStatusChangedEvent(Id, (int)Status));
     }
 
     public void Deactivate()
     {
         GuardNotAlreadyInactive();
         Status = AdminStatus.Inactive;
-        RaiseDomainEvent(new AdminStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new AdminStatusChangedEvent(Id, (int)Status));
     }
 
     public void Suspend()
     {
         Status = AdminStatus.Suspended;
-        RaiseDomainEvent(new AdminStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new AdminStatusChangedEvent(Id, (int)Status));
     }
 
     public void ChangeRole(AdminRole newRole) => Role = newRole;
@@ -84,7 +84,7 @@ public sealed class AdminUser : AggregateRoot<long>
         GuardReportExists(report);
 
         report!.MarkCompleted(filePath);
-        RaiseDomainEvent(new ReportGeneratedEvent(reportId, Id, report.Type, filePath));
+        RaiseDomainEvent(new ReportGeneratedEvent(reportId, Id, (int)report.Type, filePath));
     }
 
     public void FailReport(long reportId, string reason)

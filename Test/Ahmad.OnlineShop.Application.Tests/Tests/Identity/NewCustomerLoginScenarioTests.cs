@@ -6,6 +6,7 @@
 ///
 /// انتظار: کاربر خودکار در سیستم ثبت شود، UserType = Customer
 /// </summary>
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Tests.Fakes.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Handlers;
@@ -30,7 +31,7 @@ public class NewCustomerLoginScenarioTests
 
     public NewCustomerLoginScenarioTests()
     {
-        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt);
+        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt, FakeIdentityDb.Create());
     }
 
     // ── گام ۱: درخواست OTP ────────────────────────────────────────────────────

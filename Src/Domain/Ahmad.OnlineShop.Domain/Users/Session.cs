@@ -17,6 +17,7 @@ public class Session : TEntity<long>
 
     private Session(long userId, Guid sessionId)
     {
+        Id = DateTime.UtcNow.Ticks; // بدون دسترسی به DB در Domain — شناسه یکتای زمان‌محور
         UserId = userId;
         SessionId = sessionId;
         IsActive = true;

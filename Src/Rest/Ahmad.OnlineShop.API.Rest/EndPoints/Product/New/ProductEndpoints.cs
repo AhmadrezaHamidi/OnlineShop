@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 ﻿using Ahmad.OnlineShop.Domain.Products.Enums;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
 
@@ -94,7 +95,7 @@ public class ProductEndpoints : IEndpoint
     // â”€â”€ Command Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static async Task<long> CreateProduct(
-        CreateProductCommand command,
+        [FromBody] CreateProductCommand command,
         HttpContext          httpContext,
         ICommandBus          bus,
         CancellationToken    ct)
@@ -102,14 +103,14 @@ public class ProductEndpoints : IEndpoint
 
     private static async Task<long> UpdateProduct(
         long id,
-        UpdateProductCommand command,
+        [FromBody] UpdateProductCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { Id = id }, ct);
 
     private static async Task<long> ChangePrice(
         long id,
-        ChangeProductPriceCommand command,
+        [FromBody] ChangeProductPriceCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { Id = id }, ct);

@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
+    <ProjectReference Include="..\..\Host\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
     <ProjectReference Include="..\..\Domain\Ahmad.OnlineShop.Domain\Ahmad.OnlineShop.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.API.Config\Ahmad.OnlineShop.Config.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.Persistence.EF\Ahmad.OnlineShop.Persistence.EF.csproj" />
     <ProjectReference Include="..\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AhmadBase.Application" Version="5.0.0" />
-    <PackageReference Include="AhmadBase.Helper" Version="5.0.0" />
-    <PackageReference Include="AhmadBase.Web" Version="1.0.5" />
+    <PackageReference Include="AhmadBase.Application"      Version="5.0.0" />
+    <PackageReference Include="AhmadBase.Helper"           Version="5.0.0" />
+    <PackageReference Include="AhmadBase.Web"              Version="1.0.5" />
+    <PackageReference Include="AhmadBase.External.Service" Version="1.1.4" />
   </ItemGroup>
 
   <ItemGroup>

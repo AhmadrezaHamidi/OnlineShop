@@ -1,6 +1,7 @@
 ﻿using Ahmad.OnlineShop.Rest.EndPoints.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Query.Queries;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.Rest.Endpoints;
 
@@ -104,7 +105,7 @@ public class UserEndpoints : IEndpoint
 
     private static async Task<bool> UpdateProfile(
         long id,
-        UpdateProfileCommand command,
+        [FromBody] UpdateProfileCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<bool>((ICommand<bool>)(command with { UserId = id }), ct);

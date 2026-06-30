@@ -8,13 +8,13 @@ public sealed class UserReadRepository(IDbConnection connection) : IUserReadRepo
     public async Task<GetUserQueryResponse?> GetByIdAsync(long userId, CancellationToken token = default)
     {
         const string sql = """
-            SELECT Id, PhoneNumber, FullName, UserType, Status, CreatedAt
+            SELECT Id, PhoneNumber, FullName, Status, CreatedAt, RoleIds
             FROM [dbo].[IdentityUsers]
             WHERE Id = @UserId
             """;
 
-        return await connection.QueryFirstOrDefaultAsync<GetUserQueryResponse>(
-            sql, new { UserId = userId });
+        var row = await connection.QueryFirstOrDefaultAsync<UserRow>(sql, new { UserId = userId });
+        return row?.ToResponse();
     }
 
     public async Task<(IReadOnlyList<GetUserQueryResponse> Items, int Total)> GetListAsync(
@@ -42,7 +42,7 @@ public sealed class UserReadRepository(IDbConnection connection) : IUserReadRepo
 
         var countSql = $"SELECT COUNT(*) FROM [dbo].[IdentityUsers] {whereClause}";
         var dataSql  = $"""
-            SELECT Id, PhoneNumber, FullName, UserType, Status, CreatedAt
+            SELECT Id, PhoneNumber, FullName, Status, CreatedAt, RoleIds
             FROM [dbo].[IdentityUsers]
             {whereClause}
             ORDER BY CreatedAt DESC
@@ -50,10 +50,34 @@ public sealed class UserReadRepository(IDbConnection connection) : IUserReadRepo
             """;
 
         var total = await connection.QuerySingleAsync<int>(countSql, param);
-        var items = (await connection.QueryAsync<GetUserQueryResponse>(dataSql, param))
+        var items = (await connection.QueryAsync<UserRow>(dataSql, param))
+                        .Select(r => r.ToResponse())
                         .ToList()
                         .AsReadOnly();
 
         return (items, total);
+    }
+
+    // ── Row Mapping ───────────────────────────────────────────────────────────
+
+    private sealed class UserRow
+    {
+        public long      Id          { get; set; }
+        public string?   PhoneNumber { get; set; }
+        public string?   FullName    { get; set; }
+        public int       Status      { get; set; }
+        public DateTime  CreatedAt   { get; set; }
+        public string?   RoleIds     { get; set; }
+
+        public GetUserQueryResponse ToResponse() => new(
+            Id:          Id,
+            FullName:    FullName ?? string.Empty,
+            Email:       PhoneNumber ?? string.Empty,
+            PhoneNumber: PhoneNumber,
+            Status:      (UserStatus)Status,
+            CreatedAt:   CreatedAt,
+            RoleIds:     string.IsNullOrEmpty(RoleIds)
+                            ? Array.Empty<long>()
+                            : RoleIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray());
     }
 }

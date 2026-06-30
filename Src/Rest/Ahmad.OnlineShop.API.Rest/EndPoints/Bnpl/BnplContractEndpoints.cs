@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 ﻿using AhmadBase.Application;
 using AhmadBase.Application.Query;
 using AhmadBase.Web;
@@ -63,7 +64,7 @@ public sealed class BnplContractEndpoints : IEndpoint
     // ── Handlers ──────────────────────────────────────────────────────────────
 
     private static async Task<IResult> CreateContract(
-        CreateBnplContractCommand command,
+        [FromBody] CreateBnplContractCommand command,
         ICommandBus commandBus,
         CancellationToken cancellation)
     {

@@ -1,6 +1,15 @@
 ﻿using AhmadBase.Config.Applications;
+using Ahmad.OnlineShop.Persistence.EF.Dev;
 
-await new WebBuilder(WebApplication.CreateBuilder(args))
+var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    var connStr = builder.Configuration.GetConnectionString("CommandConnection") ?? string.Empty;
+    await DevSeedData.SeedAsync(connStr);
+}
+
+await new WebBuilder(builder)
     .PrintApplicationName()
     .ConfigureEnvironmentVariable()
     .ConfigureSerilog()

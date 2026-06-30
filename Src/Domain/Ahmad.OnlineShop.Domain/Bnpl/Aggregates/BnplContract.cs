@@ -100,7 +100,9 @@ public sealed class BnplContract : AggregateRoot<long>
         {
             var installmentAmount = i == InstallmentCount ? amount + remainder : amount;
             var dueDate = firstDueDate.AddDays(intervalDays * (i - 1));
-            _installments.Add(new Installment(0, Id, i, installmentAmount, dueDate));
+            // شناسه یکتای هر قسط: ترکیب شناسه قرارداد و شماره قسط (حداکثر ۴۸ قسط در GuardInstallmentCount)
+            var installmentId = Id * 1000 + i;
+            _installments.Add(new Installment(installmentId, Id, i, installmentAmount, dueDate));
         }
     }
 

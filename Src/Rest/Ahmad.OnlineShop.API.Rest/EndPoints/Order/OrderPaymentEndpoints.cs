@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Rest.EndPoints.Order;
 using AhmadBase.Application;
@@ -31,7 +32,7 @@ public sealed class OrderPaymentEndpoints : IEndpoint
 
     private static async Task<IResult> RecordPayment(
         long id,
-        RecordPaymentCommand command,
+        [FromBody] RecordPaymentCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {

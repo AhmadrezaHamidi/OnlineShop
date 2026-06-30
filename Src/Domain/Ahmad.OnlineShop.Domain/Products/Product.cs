@@ -85,21 +85,21 @@ public class Product : AggregateRoot<long>
     {
         GuardNotAlreadyActive();
         Status = ProductStatus.Active;
-        RaiseDomainEvent(new ProductStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new ProductStatusChangedEvent(Id, (int)Status));
     }
 
     public void Deactivate()
     {
         GuardNotAlreadyInactive();
         Status = ProductStatus.Inactive;
-        RaiseDomainEvent(new ProductStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new ProductStatusChangedEvent(Id, (int)Status));
     }
 
     public void Archive()
     {
         GuardNotAlreadyArchived();
         Status = ProductStatus.Archived;
-        RaiseDomainEvent(new ProductStatusChangedEvent(Id, Status));
+        RaiseDomainEvent(new ProductStatusChangedEvent(Id, (int)Status));
     }
 
     // ── Inventory ──────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ public class Product : AggregateRoot<long>
 
         var image = ProductImage.Create(arg);
         _images.Add(image);
-        RaiseDomainEvent(new ProductImageAddedEvent(Id, image.Id, arg.Url, arg.Type));
+        RaiseDomainEvent(new ProductImageAddedEvent(Id, image.Id, arg.Url, (int)arg.Type));
         return image;
     }
 

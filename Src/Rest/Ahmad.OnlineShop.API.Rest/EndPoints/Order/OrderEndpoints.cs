@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 ﻿using Ahmad.OnlineShop.Application.Commands;
 using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Application.Query.Queries;
@@ -65,7 +66,7 @@ public sealed class OrderEndpoints : IEndpoint
 
     // ── Command Handlers ─────────────────────────────────────────────
     private static async Task<IResult> CreateOrder(
-        CreateOrderCommand command,
+        [FromBody] CreateOrderCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {
@@ -75,7 +76,7 @@ public sealed class OrderEndpoints : IEndpoint
 
     private static async Task<IResult> AddItem(
         long id,
-        AddOrderItemCommand command,
+        [FromBody] AddOrderItemCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {
@@ -131,7 +132,7 @@ public sealed class OrderEndpoints : IEndpoint
 
     private static async Task<IResult> CancelOrder(
         long id,
-        CancelOrderCommand command,
+        [FromBody] CancelOrderCommand command,
         ICommandBus bus,
         CancellationToken ct)
     {

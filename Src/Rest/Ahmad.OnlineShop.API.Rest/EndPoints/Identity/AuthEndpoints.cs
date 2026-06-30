@@ -1,11 +1,12 @@
 using Ahmad.OnlineShop.Rest.EndPoints.Identity;
 using Identity.Application.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.Rest.Endpoints;
 
 /// <summary>
 /// Endpoints احراز هویت با OTP
-/// جریان: RequestOtp ← دریافت SMS ← VerifyOtp ← JWT
+/// جریان: RequestOtp → دریافت SMS → VerifyOtp → JWT
 /// </summary>
 public class AuthEndpoints : IEndpoint
 {
@@ -47,30 +48,26 @@ public class AuthEndpoints : IEndpoint
 
     // ── Handlers ──────────────────────────────────────────────────────────────
 
-    /// <summary>ارسال OTP به شماره موبایل</summary>
     private static async Task<bool> RequestOtp(
-        RequestOtpCommand command,
+        [FromBody] RequestOtpCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<bool>(command, ct);
 
-    /// <summary>تأیید OTP و صدور JWT</summary>
     private static async Task<LoginCommandResponse> VerifyOtp(
-        VerifyOtpCommand command,
+        [FromBody] VerifyOtpCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
 
-    /// <summary>تجدید توکن</summary>
     private static async Task<LoginCommandResponse> RefreshToken(
-        RefreshTokenCommand command,
+        [FromBody] RefreshTokenCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<LoginCommandResponse>((ICommand<LoginCommandResponse>)command, ct);
 
-    /// <summary>خروج از سیستم</summary>
     private static async Task<bool> Logout(
-        LogoutCommand command,
+        [FromBody] LogoutCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<bool>((ICommand<bool>)command, ct);

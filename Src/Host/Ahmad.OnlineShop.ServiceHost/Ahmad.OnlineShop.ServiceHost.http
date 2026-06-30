@@ -1,6 +1,761 @@
-@Ahmad.OnlineShop.ServiceHost_HostAddress = http://localhost:5141
+### ═══════════════════════════════════════════════════════════
+### Ahmad OnlineShop API — HTTP Test File کامل
+### Base URL: http://localhost:5141
+### در Dev: OTP همیشه 00000 است
+### ═══════════════════════════════════════════════════════════
 
-GET {{Ahmad.OnlineShop.ServiceHost_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = http://localhost:5141
+@apiVersion = 1
+@api = {{baseUrl}}/api/v{{apiVersion}}
+
+### ──────────────────────────────────────────────────────────
+### کاربران تست از Seed (همه OTP = 00000):
+###   Admin    → 09000000001  (Id=100, roleId=1)
+###   Seller   → 09000000002  (Id=101, roleId=2)
+###   Customer → 09000000003  (Id=102, roleId=3)
+### بعد از VerifyOtp توکن‌ها رو این‌جا قرار بده:
+### ──────────────────────────────────────────────────────────
+@adminToken    = PASTE_ADMIN_TOKEN_HERE
+@sellerToken   = PASTE_SELLER_TOKEN_HERE
+@customerToken = PASTE_CUSTOMER_TOKEN_HERE
+@adminId    = 100
+@sellerId   = 101
+@customerId = 102
+@categoryId = 1
+@productId  = 1
+@orderId    = 1
+@bnplContractId = 1
+
+
+### ═══════════════════════════════════════════════════════════
+### §1 — IDENTITY / AUTH  (بدون JWT)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: ارسال OTP برای ادمین Seed شده
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000001"
+}
+
+###
+
+### سناریو: تأیید OTP ادمین → دریافت JWT (کد ثابت Dev: 00000)
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000001",
+  "code": "00000"
+}
+
+###
+
+### سناریو: ارسال OTP برای فروشنده
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000002"
+}
+
+###
+
+### سناریو: تأیید OTP فروشنده → دریافت JWT
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000002",
+  "code": "00000"
+}
+
+###
+
+### سناریو: ارسال OTP برای مشتری
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000003"
+}
+
+###
+
+### سناریو: تأیید OTP مشتری → دریافت JWT
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000003",
+  "code": "00000"
+}
+
+###
+
+### سناریو: کاربر کاملاً جدید — اول‌بار ورود (auto-register)
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09121234567"
+}
+
+###
+
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09121234567",
+  "code": "00000"
+}
+
+###
+
+### سناریو خطا: کد اشتباه → باید 422 بده
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000001",
+  "code": "99999"
+}
+
+###
+
+### سناریو: Refresh Token (refreshToken رو از VerifyOtp بردار)
+POST {{api}}/Identity/Auth/RefreshToken
+Content-Type: application/json
+
+{
+  "accessToken":  "{{adminToken}}",
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+###
+
+### سناریو: Logout
+POST {{api}}/Identity/Auth/Logout
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §2 — IDENTITY / USERS  (نیاز به JWT)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: لیست همه کاربران (Admin)
+GET {{api}}/Identity/Users?page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: جستجوی کاربر با شماره موبایل
+GET {{api}}/Identity/Users?page=1&pageSize=10&search=0900
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: دریافت اطلاعات یک کاربر خاص
+GET {{api}}/Identity/Users/{{customerId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: لیست نقش‌ها
+GET {{api}}/Identity/Roles
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: ویرایش پروفایل خودِ کاربر
+PUT {{api}}/Identity/Users/{{customerId}}/Profile
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "fullName": "علی رضایی"
+}
+
+###
+
+### سناریو: تعلیق کاربر توسط ادمین
+POST {{api}}/Identity/Users/{{customerId}}/Suspend
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: فعال‌سازی دوباره کاربر
+POST {{api}}/Identity/Users/{{customerId}}/Activate
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: غیرفعال‌سازی کاربر
+POST {{api}}/Identity/Users/{{customerId}}/Deactivate
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: اختصاص نقش Seller به یک مشتری
+POST {{api}}/Identity/Users/{{customerId}}/Roles/2
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: حذف نقش از کاربر
+DELETE {{api}}/Identity/Users/{{customerId}}/Roles/2
+Authorization: Bearer {{adminToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §3 — CATEGORIES  (محصول → دسته‌بندی)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: لیست دسته‌بندی‌ها (Seed: لوازم جانبی Id=1)
+GET {{api}}/Product/Categories
+
+###
+
+### سناریو: ایجاد دسته‌بندی جدید توسط ادمین
+POST {{api}}/Product/Categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "موبایل و تبلت",
+  "parentId": null
+}
+
+###
+
+### سناریو: ویرایش دسته‌بندی
+PUT {{api}}/Product/Categories/{{categoryId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "لوازم جانبی موبایل",
+  "parentId": null
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §4 — PRODUCTS  (فروشنده محصول می‌سازد)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: فروشنده محصول جدید می‌سازد (SellerId خودکار از JWT خوانده می‌شود)
+POST {{api}}/Product
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "categoryId": 1,
+  "name": "هندزفری بی‌سیم",
+  "description": "هندزفری بلوتوث با کیفیت بالا",
+  "price": 450000
+}
+
+###
+
+### سناریو: لیست محصولات (بدون فیلتر)
+GET {{api}}/Product?page=1&pageSize=20
+
+###
+
+### سناریو: لیست محصولات یک دسته‌بندی خاص
+GET {{api}}/Product?page=1&pageSize=20&categoryId={{categoryId}}
+
+###
+
+### سناریو: دریافت یک محصول با Id
+GET {{api}}/Product/{{productId}}
+
+###
+
+### سناریو: ویرایش محصول
+PUT {{api}}/Product/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "name": "هندزفری بی‌سیم پرو",
+  "description": "نسخه جدید با باتری بهتر",
+  "categoryId": 1
+}
+
+###
+
+### سناریو: تغییر قیمت محصول
+PATCH {{api}}/Product/{{productId}}/Price
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "newPrice": 399000
+}
+
+###
+
+### سناریو: فعال‌سازی محصول
+PATCH {{api}}/Product/{{productId}}/Activate
+Authorization: Bearer {{sellerToken}}
+
+###
+
+### سناریو: غیرفعال‌سازی محصول
+PATCH {{api}}/Product/{{productId}}/Deactivate
+Authorization: Bearer {{sellerToken}}
+
+###
+
+### سناریو: آرشیو کردن محصول
+PATCH {{api}}/Product/{{productId}}/Archive
+Authorization: Bearer {{sellerToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §5 — PRODUCT INVENTORY  (موجودی)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: مشاهده موجودی محصول
+GET {{api}}/Product/{{productId}}/Inventory
+Authorization: Bearer {{sellerToken}}
+
+###
+
+### سناریو: افزایش موجودی (Replenish)
+PATCH {{api}}/Product/{{productId}}/Inventory/Replenish
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "quantity": 100
+}
+
+###
+
+### سناریو: رزرو موجودی (هنگام افزودن به سبد خرید)
+PATCH {{api}}/Product/{{productId}}/Inventory/Reserve
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 2
+}
+
+###
+
+### سناریو: آزادسازی موجودی رزرو شده (کنسل سفارش)
+PATCH {{api}}/Product/{{productId}}/Inventory/Release
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 2
+}
+
+###
+
+### سناریو: قطعی‌سازی موجودی (بعد از تحویل سفارش)
+PATCH {{api}}/Product/{{productId}}/Inventory/Confirm
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "quantity": 1
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §6 — PRODUCT IMAGES
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: افزودن تصویر به محصول
+POST {{api}}/Product/{{productId}}/Images
+Content-Type: application/json
+Authorization: Bearer {{sellerToken}}
+
+{
+  "url": "https://cdn.example.com/products/handsfree-1.jpg",
+  "bucketKey": "products/handsfree-1.jpg",
+  "type": 1
+}
+
+###
+
+### سناریو: لیست تصاویر محصول
+GET {{api}}/Product/{{productId}}/Images
+Authorization: Bearer {{sellerToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §7 — ORDERS  (Flow کامل سفارش مشتری)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: مشتری سفارش جدید می‌سازد (PaymentMethod: 1=Online, 2=CashOnDelivery)
+POST {{api}}/Order
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "userId": {{customerId}},
+  "paymentMethod": 2
+}
+
+###
+
+### سناریو: افزودن آیتم به سفارش
+POST {{api}}/Order/{{orderId}}/Items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "productId": {{productId}},
+  "quantity": 2,
+  "unitPrice": 399000
+}
+
+###
+
+### سناریو: لیست سفارشات (با فیلتر کاربر)
+GET {{api}}/Order?page=1&pageSize=10&userId={{customerId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: دریافت جزئیات سفارش
+GET {{api}}/Order/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: حذف آیتم از سفارش (itemId از مرحله AddItem)
+DELETE {{api}}/Order/{{orderId}}/Items/1
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: ثبت نهایی سفارش (Place)
+POST {{api}}/Order/{{orderId}}/Place
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: ثبت پرداخت برای سفارش
+POST {{api}}/Order/{{orderId}}/Payments
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "paymentId": 1,
+  "amount": 798000,
+  "provider": "ZarinPal"
+}
+
+###
+
+### سناریو: تأیید پرداخت موفق (Complete)
+PATCH {{api}}/Order/{{orderId}}/Payments/1/Complete
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: تأیید سفارش بعد از پرداخت موفق
+POST {{api}}/Order/{{orderId}}/Confirm
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: ارسال سفارش
+POST {{api}}/Order/{{orderId}}/Ship
+Authorization: Bearer {{sellerToken}}
+
+###
+
+### سناریو: تحویل سفارش
+POST {{api}}/Order/{{orderId}}/Deliver
+Authorization: Bearer {{sellerToken}}
+
+###
+
+### سناریو: لغو سفارش با دلیل
+POST {{api}}/Order/{{orderId}}/Cancel
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "reason": "انصراف مشتری"
+}
+
+###
+
+### سناریو: شکست پرداخت
+PATCH {{api}}/Order/{{orderId}}/Payments/1/Fail
+Authorization: Bearer {{adminToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §8 — BNPL CREDIT  (اعتبار اقساطی مشتری)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: مشاهده اعتبار مشتری (اگر هنوز نساخته باشیم 404 می‌دهد)
+GET {{api}}/bnpl/users/{{customerId}}/credit
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: افزایش سقف اعتبار مشتری
+PUT {{api}}/bnpl/users/{{customerId}}/credit/increase
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "newLimit": 10000000
+}
+
+###
+
+### سناریو: بلوکه‌کردن بخشی از اعتبار (هنگام خرید اقساطی)
+PATCH {{api}}/bnpl/users/{{customerId}}/credit/block
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "amount": 2000000
+}
+
+###
+
+### سناریو: آزادسازی اعتبار بلوکه‌شده (کنسل قرارداد)
+PATCH {{api}}/bnpl/users/{{customerId}}/credit/release
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "amount": 2000000
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §9 — BNPL CONTRACTS  (قرارداد اقساطی)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: ایجاد قرارداد اقساطی برای سفارش
+POST {{api}}/bnpl/contracts
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "orderId": {{orderId}},
+  "userId": {{customerId}},
+  "totalAmount": 2000000,
+  "installmentCount": 4,
+  "firstDueDate": "2026-08-01T00:00:00Z",
+  "intervalDays": 30
+}
+
+###
+
+### سناریو: دریافت جزئیات قرارداد (همراه اقساط)
+GET {{api}}/bnpl/contracts/{{bnplContractId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: لیست قراردادهای یک کاربر
+GET {{api}}/bnpl/users/{{customerId}}/contracts?page=1&pageSize=10
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: لیست اقساط یک قرارداد
+GET {{api}}/bnpl/contracts/{{bnplContractId}}/installments
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: پرداخت یک قسط (installmentId از GetInstallments)
+POST {{api}}/bnpl/contracts/{{bnplContractId}}/installments/1/pay
+Authorization: Bearer {{customerToken}}
+
+###
+
+### سناریو: لغو قرارداد اقساطی
+PATCH {{api}}/bnpl/contracts/{{bnplContractId}}/cancel
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: ثبت قرارداد به‌عنوان معوق (Default)
+PATCH {{api}}/bnpl/contracts/{{bnplContractId}}/default
+Authorization: Bearer {{adminToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §10 — BACKOFFICE / ADMINS  (مدیریت ادمین‌ها)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: ایجاد ادمین جدید در BackOffice (مجزا از Identity!)
+POST {{api}}/BackOffice/Admins
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "fullName": "احمد حمیدی فرد",
+  "email": "ahmad@example.com",
+  "role": 1
+}
+
+###
+
+### سناریو: لیست ادمین‌ها
+GET {{api}}/BackOffice/Admins?page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: دریافت یک ادمین خاص
+GET {{api}}/BackOffice/Admins/1
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: تغییر نقش ادمین
+PATCH {{api}}/BackOffice/Admins/1/Role
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "newRole": 2
+}
+
+###
+
+### سناریو: تعلیق ادمین
+PATCH {{api}}/BackOffice/Admins/1/Suspend
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: فعال‌سازی ادمین
+PATCH {{api}}/BackOffice/Admins/1/Activate
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: غیرفعال‌سازی ادمین
+PATCH {{api}}/BackOffice/Admins/1/Deactivate
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: مشاهده Audit Log های یک ادمین
+GET {{api}}/BackOffice/Admins/1/AuditLogs?page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §11 — BACKOFFICE / REPORTS  (گزارش‌گیری)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: درخواست گزارش جدید (Type: 1=Sales مثلا)
+POST {{api}}/BackOffice/Reports
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "adminId": 1,
+  "reportId": 1,
+  "type": 1
+}
+
+###
+
+### سناریو: لیست گزارش‌های یک ادمین
+GET {{api}}/BackOffice/Reports?adminId=1&page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+### سناریو: تکمیل گزارش (بعد از تولید فایل)
+PATCH {{api}}/BackOffice/Reports/1/Complete
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "adminId": 1,
+  "filePath": "/reports/sales-2026-06.xlsx"
+}
+
+###
+
+### سناریو: شکست گزارش
+PATCH {{api}}/BackOffice/Reports/1/Fail
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "adminId": 1,
+  "reason": "خطا در اتصال به دیتابیس"
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+### §12 — ACCOUNT  (سیستم قدیمی Username/Password — جدا از OTP)
+### ═══════════════════════════════════════════════════════════
+
+### سناریو: ثبت‌نام حساب با Username/Password
+POST {{api}}/Account/Register
+Content-Type: application/json
+
+{
+  "userName": "ahmad_test",
+  "password": "P@ssw0rd123",
+  "confirmPassword": "P@ssw0rd123",
+  "firstName": "احمد",
+  "lastName": "حمیدی",
+  "email": "ahmad.test@example.com",
+  "mobileNumber": "09123456789"
+}
+
+###
+
+### سناریو: ورود با Username/Password
+POST {{api}}/Account/Login
+Content-Type: application/json
+
+{
+  "userName": "ahmad_test",
+  "password": "P@ssw0rd123"
+}
 
 ###

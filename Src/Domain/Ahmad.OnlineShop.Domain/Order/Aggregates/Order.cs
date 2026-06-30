@@ -36,7 +36,7 @@ public sealed class Order : AggregateRoot<long>
     public static Order Create(CreateOrderArg arg)
     {
         var order = new Order(arg);
-        order.RaiseDomainEvent(new OrderCreatedEvent(arg.Id, arg.UserId, arg.PaymentMethod));
+        order.RaiseDomainEvent(new OrderCreatedEvent(arg.Id, arg.UserId, (int)arg.PaymentMethod));
         return order;
     }
 
@@ -76,7 +76,7 @@ public sealed class Order : AggregateRoot<long>
         GuardStatusIsPending();
 
         RaiseDomainEvent(new OrderPlacedEvent(
-            Id, UserId, TotalAmount, PaymentMethod,
+            Id, UserId, TotalAmount, (int)PaymentMethod,
             _items.Select(i => new OrderItemSnapshot(i.ProductId, i.Quantity, i.UnitPrice)).ToList()));
     }
 
@@ -89,7 +89,7 @@ public sealed class Order : AggregateRoot<long>
         var payment = new Payment(arg.PaymentId, Id, arg.Amount, arg.Method, arg.Provider);
         _payments.Add(payment);
         RaiseDomainEvent(new PaymentRecordedEvent(
-            arg.PaymentId, Id, arg.Amount, PaymentStatus.Pending, arg.Provider));
+            arg.PaymentId, Id, arg.Amount, (int)PaymentStatus.Pending, arg.Provider));
         return payment;
     }
 

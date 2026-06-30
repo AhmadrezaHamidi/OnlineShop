@@ -17,8 +17,9 @@ public sealed class Report : TEntity<long>
 
     private Report() { }
 
-    internal Report(CreateReportArg arg) 
+    internal Report(CreateReportArg arg)
     {
+        Id = arg.Id;
         AdminUserId = arg.AdminUserId;
         Type = arg.Type;
         Status = ReportStatus.Pending;

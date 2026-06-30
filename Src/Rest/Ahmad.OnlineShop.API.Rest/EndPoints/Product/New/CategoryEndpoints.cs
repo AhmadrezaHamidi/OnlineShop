@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
 
 namespace Ahmad.OnlineShop.Rest.Endpoints;
@@ -40,14 +41,14 @@ public class CategoryEndpoints : IEndpoint
         => await queryBus.DispatchAsync<List<GetCategoryQueryResponse>>(new GetCategoriesQuery(), ct);
 
     private static async Task<long> CreateCategory(
-        CreateCategoryCommand command,
+        [FromBody] CreateCategoryCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command, ct);
 
     private static async Task<long> UpdateCategory(
         long id,
-        UpdateCategoryCommand command,
+        [FromBody] UpdateCategoryCommand command,
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<long>(command with { Id = id }, ct);

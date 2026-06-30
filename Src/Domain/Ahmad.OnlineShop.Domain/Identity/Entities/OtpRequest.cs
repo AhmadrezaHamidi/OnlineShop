@@ -11,24 +11,24 @@ namespace Identity.Domain.Entities;
 /// </summary>
 public sealed class OtpRequest
 {
-    public long     Id          { get; private set; }
-    public string   PhoneNumber { get; private set; } = string.Empty;
-    public string   Code        { get; private set; } = string.Empty;
-    public DateTime ExpiresAt   { get; private set; }
-    public bool     IsUsed      { get; private set; }
+    public long Id { get; private set; }
+    public string PhoneNumber { get; private set; } = string.Empty;
+    public string Code { get; private set; } = string.Empty;
+    public DateTime ExpiresAt { get; private set; }
+    public bool IsUsed { get; private set; }
 
     public bool IsExpired => DateTime.UtcNow > ExpiresAt;
-    public bool IsValid   => !IsUsed && !IsExpired;
+    public bool IsValid => !IsUsed && !IsExpired;
 
     private OtpRequest() { }
 
     public OtpRequest(long id, string phoneNumber, string code, int expiryMinutes = 5)
     {
-        Id          = id;
+        Id = id;
         PhoneNumber = phoneNumber;
-        Code        = code;
-        ExpiresAt   = DateTime.UtcNow.AddMinutes(expiryMinutes);
-        IsUsed      = false;
+        Code = code;
+        ExpiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);
+        IsUsed = false;
     }
 
     /// <summary>

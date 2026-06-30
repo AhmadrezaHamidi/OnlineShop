@@ -5,6 +5,7 @@
 /// - فعال / غیرفعال / تعلیق کاربر
 /// - اختصاص / حذف نقش
 /// </summary>
+using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Tests.Fakes.Identity;
 using Identity.Application.Commands;
 using Identity.Application.Handlers;
@@ -30,7 +31,7 @@ public class UserManagementScenarioTests
 
     public UserManagementScenarioTests()
     {
-        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt);
+        _sut = new IdentityHandlers(_userRepo, _refreshRepo, _roleRepo, _otpRepo, _sms, _jwt, FakeIdentityDb.Create());
     }
 
     // ── آپدیت پروفایل ─────────────────────────────────────────────────────────

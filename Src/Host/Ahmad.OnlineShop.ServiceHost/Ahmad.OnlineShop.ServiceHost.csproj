@@ -4,10 +4,13 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Ahmad.OnlineShop.xml</DocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
+    <ProjectReference Include="..\Ahmad.OnlineShop.Option\Ahmad.OnlineShop.Option.csproj" />
     <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Contract\Ahmad.OnlineShop.Application.Contract.csproj" />
     <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Query.Contract\Ahmad.OnlineShop.Application.Query.Contract.csproj" />
     <ProjectReference Include="..\..\Application\Ahmad.OnlineShop.Application.Query\Ahmad.OnlineShop.Application.Query.csproj" />
@@ -19,9 +22,6 @@
     <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.Persistence.EF\Ahmad.OnlineShop.Persistence.EF.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Ahmad.OnlineShop.Read.Dapper\Ahmad.OnlineShop.Read.Dapper.csproj" />
     <ProjectReference Include="..\..\Rest\Ahmad.OnlineShop.API.Rest\Ahmad.OnlineShop.Rest.csproj" />
-    <ProjectReference Include="..\..\..\Test\Ahmad.OnlineShop.Application.Tests\Ahmad.OnlineShop.Application.Tests.csproj" />
-    <ProjectReference Include="..\..\..\Test\Ahmad.OnlineShop.Domain.Tests\Ahmad.OnlineShop.Domain.Tests.csproj" />
-    <ProjectReference Include="..\..\..\Test\Ahmad.OnlineShop.Integration.Tests\Ahmad.OnlineShop.Integration.Tests.csproj" />
   </ItemGroup>
 
 </Project>

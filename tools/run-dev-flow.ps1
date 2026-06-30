@@ -1,4 +1,4 @@
-# ╔══════════════════════════════════════════════════════════════════╗
+﻿# ╔══════════════════════════════════════════════════════════════════╗
 # ║  Ahmad OnlineShop — Dev Flow Runner                               ║
 # ║  Project رو Run می‌کنه + همه Flow های اصلی رو تست می‌کنه          ║
 # ║                                                                    ║
@@ -35,6 +35,13 @@ if ($StartServer) {
 
     W-Step "منتظر آماده شدن سرور (10 ثانیه) ..."
     Start-Sleep 10
+}
+
+# ── Helper: null-safe property access (?. polyfill for PS 5.1) ────────────────
+function Get-Prop {
+    param($Object, [string]$Name)
+    if ($null -eq $Object) { return $null }
+    return $Object.$Name
 }
 
 # ── Helper: API Call ──────────────────────────────────────────────────────────
@@ -84,7 +91,7 @@ $login = Call POST "api/v1/Identity/Auth/Login/verify" @{
     phoneNumber = $newPhone; code = "00000"
 } -Label "تأیید OTP با کد 00000"
 
-$customerToken = $login?.accessToken
+$customerToken = Get-Prop $login 'accessToken'
 if ($customerToken) {
     W-OK "JWT دریافت شد ✓"
     W-Info "UserId: $($login.userId)"
@@ -106,7 +113,7 @@ $adminLogin = Call POST "api/v1/Identity/Auth/Login/verify" @{
     phoneNumber = "09000000001"; code = "00000"
 } -Label "تأیید OTP ادمین"
 
-$adminToken = $adminLogin?.accessToken
+$adminToken = Get-Prop $adminLogin 'accessToken'
 if ($adminToken) { W-OK "JWT ادمین دریافت شد ✓" }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -118,8 +125,8 @@ $sellerLogin = Call POST "api/v1/Identity/Auth/Login/verify" @{
     phoneNumber = "09000000002"; code = "00000"
 } -Label "تأیید OTP فروشنده"
 
-$sellerToken = $sellerLogin?.accessToken
-$sellerId    = $sellerLogin?.userId
+$sellerToken = Get-Prop $sellerLogin 'accessToken'
+$sellerId    = Get-Prop $sellerLogin 'userId'
 
 if ($sellerToken) {
     W-OK "JWT فروشنده دریافت شد ✓"
@@ -134,7 +141,8 @@ if ($sellerToken) {
         quantity    = 100
     } -Token $sellerToken -Label "ایجاد محصول جدید"
 
-    $productId = $product?.id ?? $product?.productId
+    $productId = Get-Prop $product 'id'
+    if ($null -eq $productId) { $productId = Get-Prop $product 'productId' }
     W-Info "ProductId: $productId"
 }
 
@@ -148,7 +156,8 @@ if ($customerToken -and $productId) {
         paymentMethod = 1
     } -Token $customerToken -Label "ایجاد سفارش"
 
-    $orderId = $order?.id ?? $order?.orderId
+    $orderId = Get-Prop $order 'id'
+    if ($null -eq $orderId) { $orderId = Get-Prop $order 'orderId' }
     W-Info "OrderId: $orderId"
 
     if ($orderId) {
@@ -167,17 +176,25 @@ if ($customerToken -and $productId) {
 W-Header "Flow 5: Token Management"
 # ───────────────────────────────────────────────────────────────────────────────
 
-if ($login?.refreshToken) {
+$loginRefreshToken = Get-Prop $login 'refreshToken'
+if ($loginRefreshToken) {
     $refreshed = Call POST "api/v1/Identity/Auth/Refresh" @{
         accessToken  = $customerToken
-        refreshToken = $login.refreshToken
+        refreshToken = $loginRefreshToken
     } -Label "Refresh Token"
 
-    if ($refreshed?.accessToken) { W-OK "توکن جدید دریافت شد ✓" }
+    $refreshedAccessToken  = Get-Prop $refreshed 'accessToken'
+    $refreshedRefreshToken = Get-Prop $refreshed 'refreshToken'
+    if ($refreshedAccessToken) { W-OK "توکن جدید دریافت شد ✓" }
+
+    $logoutRefreshToken = $refreshedRefreshToken
+    if ($null -eq $logoutRefreshToken) { $logoutRefreshToken = $loginRefreshToken }
+    $logoutToken = $refreshedAccessToken
+    if ($null -eq $logoutToken) { $logoutToken = $customerToken }
 
     Call POST "api/v1/Identity/Auth/Logout" @{
-        refreshToken = $refreshed?.refreshToken ?? $login.refreshToken
-    } -Token ($refreshed?.accessToken ?? $customerToken) -Label "Logout"
+        refreshToken = $logoutRefreshToken
+    } -Token $logoutToken -Label "Logout"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -1,4 +1,4 @@
-# ╔══════════════════════════════════════════════════════════════════╗
+﻿# ╔══════════════════════════════════════════════════════════════════╗
 # ║  Ahmad OnlineShop — Docker Setup                                  ║
 # ║  همه چیز رو از صفر راه می‌اندازد:                                ║
 # ║  SQL Server · MinIO · Redis · API                                 ║
@@ -109,8 +109,10 @@ foreach ($line in $env_content) {
     if ($parts.Count -eq 2) { $envVars[$parts[0].Trim()] = $parts[1].Trim() }
 }
 
-$minioUser = $envVars["MINIO_ACCESS_KEY"] ?? "minioadmin"
-$minioPass = $envVars["MINIO_SECRET_KEY"] ?? "minioadmin"
+$minioUser = $envVars["MINIO_ACCESS_KEY"]
+$minioPass = $envVars["MINIO_SECRET_KEY"]
+if ([string]::IsNullOrEmpty($minioUser)) { $minioUser = "minioadmin" }
+if ([string]::IsNullOrEmpty($minioPass)) { $minioPass = "minioadmin" }
 
 # mc alias + bucket
 docker exec onlineshop-minio sh -c "mc alias set local http://localhost:9000 $minioUser $minioPass && mc mb --ignore-existing local/products && mc anonymous set public local/products" 2>$null

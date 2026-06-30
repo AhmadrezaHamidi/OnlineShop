@@ -17,11 +17,18 @@ global using Ahmad.OnlineShop.Domain.Products.Exceptions;
 global using Ahmad.OnlineShop.Domain.Repositories;
 global using BackOffice.Domain.Repositories;
 
+// Discount
+global using Ahmad.OnlineShop.Domain.Discount.Args;
+global using Ahmad.OnlineShop.Domain.Discount.Enums;
+global using Ahmad.OnlineShop.Domain.Discount.Exceptions;
+
 global using Ahmad.OnlineShop.Application.Commands;
 global using Ahmad.OnlineShop.Application.Contract.Order.Commands;
+global using Ahmad.OnlineShop.Application.Commands.Discount;
+global using Ahmad.OnlineShop.Application.Commands.Marketing;
 global using BackOffice.Application.Commands;
 
 // Aliases برای جلوگیری از conflict با namespace
-global using OrderAgg  = Ahmad.OnlineShop.Domain.Order.Aggregates.Order;
-global using ProductAgg = Ahmad.OnlineShop.Domain.Products.Product;
+global using OrderAgg    = Ahmad.OnlineShop.Domain.Order.Aggregates.Order;
+global using ProductAgg  = Ahmad.OnlineShop.Domain.Products.Product;
 global using CategoryAgg = Ahmad.OnlineShop.Domain.Products.Category;

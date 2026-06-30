@@ -9,6 +9,7 @@ using Autofac;
 using BackOffice.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Products;
+using Ahmad.OnlineShop.Domain.Discount.Repositories;
 using OldIUserRepository = Ahmad.OnlineShop.Domain.Users.IUserRepository;
 using OldUserRepository  = Ahmad.OnlineShop.Persistence.EF.Repositories.UserRepository;
 using Ahmad.OnlineShop.Persistence.EF.Repositories;
@@ -70,6 +71,8 @@ public class AutofacModule : Autofac.Module
         builder.RegisterType<InventoryRepository>()    .As<IInventoryRepository>()    .InstancePerLifetimeScope();
         builder.RegisterType<ProductImageRepository>() .As<IProductImageRepository>() .InstancePerLifetimeScope();
         builder.RegisterType<OldUserRepository>()      .As<OldIUserRepository>()      .InstancePerLifetimeScope();
+        builder.RegisterType<DiscountRepository>()        .As<IDiscountRepository>()        .InstancePerLifetimeScope();
+        builder.RegisterType<ProductPackageRepository>()  .As<IProductPackageRepository>()  .InstancePerLifetimeScope();
 
         // ── ۳. Identity Repositories ──────────────────────────────────────────
         builder.RegisterType<IdentityUserRepository>()        .As<IUserRepository>()         .InstancePerLifetimeScope();

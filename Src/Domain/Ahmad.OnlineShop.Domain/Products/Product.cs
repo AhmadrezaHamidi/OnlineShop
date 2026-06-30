@@ -10,32 +10,32 @@ public class Product : AggregateRoot<long>
 {
     private const int MaxImages = 10;
 
-    private readonly List<ProductImage> _images    = [];
-    private Inventory?                  _inventory;
+    private readonly List<ProductImage> _images = [];
+    private Inventory? _inventory;
 
-    public long          SellerId    { get; private set; }
-    public long          CategoryId  { get; private set; }
-    public string        Name        { get; private set; } = string.Empty;
-    public string?       Description { get; private set; }
-    public decimal       Price       { get; private set; }
-    public ProductStatus Status      { get; private set; }
+    public long SellerId { get; private set; }
+    public long CategoryId { get; private set; }
+    public string Name { get; private set; } = string.Empty;
+    public string? Description { get; private set; }
+    public decimal Price { get; private set; }
+    public ProductStatus Status { get; private set; }
     public DateTimeOffset CreationTime { get; private set; }
 
-    public Inventory                     Inventory => _inventory!;
+    public Inventory Inventory => _inventory!;
     public IReadOnlyCollection<ProductImage> Images => _images.AsReadOnly();
 
     private Product() { }
 
     private Product(CreateProductArg arg) : base(arg.Id)
     {
-        SellerId     = arg.SellerId;
-        CategoryId   = arg.CategoryId;
-        Name         = arg.Name.Trim();
-        Description  = arg.Description;
-        Price        = arg.Price;
-        Status       = ProductStatus.Active;
+        SellerId = arg.SellerId;
+        CategoryId = arg.CategoryId;
+        Name = arg.Name.Trim();
+        Description = arg.Description;
+        Price = arg.Price;
+        Status = ProductStatus.Active;
         CreationTime = DateTimeOffset.UtcNow;
-        _inventory   = Inventory.Create(arg.InventoryId, arg.Id, 0);
+        _inventory = Inventory.Create(arg.InventoryId, arg.Id, 0);
     }
 
     public static Product Create(CreateProductArg arg)
@@ -66,16 +66,16 @@ public class Product : AggregateRoot<long>
     public void UpdateDetails(string name, string? description, long categoryId)
     {
         GuardName(name);
-        Name        = name.Trim();
+        Name = name.Trim();
         Description = description;
-        CategoryId  = categoryId;
+        CategoryId = categoryId;
     }
 
     public void ChangePrice(decimal newPrice)
     {
         GuardPrice(newPrice);
         var old = Price;
-        Price   = newPrice;
+        Price = newPrice;
         RaiseDomainEvent(new ProductPriceChangedEvent(Id, old, newPrice));
     }
 
@@ -112,7 +112,7 @@ public class Product : AggregateRoot<long>
         if (depleted)
             RaiseDomainEvent(new StockDepletedEvent(Id, _inventory.AvailableQuantity));
         else if (lowStock)
-            RaiseDomainEvent(new StockDepletedEvent(Id, _inventory.AvailableQuantity));
+            RaiseDomainEvent(new StockLowEvent(Id, _inventory.AvailableQuantity));
     }
 
     public void ReleaseStock(int quantity)
@@ -121,7 +121,7 @@ public class Product : AggregateRoot<long>
         RaiseDomainEvent(new StockReleasedEvent(Id, quantity));
     }
 
-    public void ConfirmStock(int quantity)  => _inventory!.Confirm(quantity);
+    public void ConfirmStock(int quantity) => _inventory!.Confirm(quantity);
 
     public void ReplenishStock(int quantity)
     {

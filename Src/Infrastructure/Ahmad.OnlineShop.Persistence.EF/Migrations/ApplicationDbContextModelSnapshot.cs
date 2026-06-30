@@ -293,6 +293,135 @@ namespace Ahmad.OnlineShop.Persistence.EF.Migrations
                     b.ToTable("Installments", (string)null);
                 });
 
+            modelBuilder.Entity("Ahmad.OnlineShop.Domain.Discount.Aggregates.Discount", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("CreationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaxUsage")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MinOrderAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset?>("ModificationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsageCount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Discounts", (string)null);
+                });
+
+            modelBuilder.Entity("Ahmad.OnlineShop.Domain.Discount.Aggregates.ProductPackage", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("CreationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ModificationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductPackages", (string)null);
+                });
+
+            modelBuilder.Entity("Ahmad.OnlineShop.Domain.Discount.Entities.PackageItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ModificationTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("PackageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("PackageItems", (string)null);
+                });
+
             modelBuilder.Entity("Ahmad.OnlineShop.Domain.Order.Aggregates.Order", b =>
                 {
                     b.Property<long>("Id")
@@ -790,6 +919,15 @@ namespace Ahmad.OnlineShop.Persistence.EF.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Ahmad.OnlineShop.Domain.Discount.Entities.PackageItem", b =>
+                {
+                    b.HasOne("Ahmad.OnlineShop.Domain.Discount.Aggregates.ProductPackage", null)
+                        .WithMany("Items")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ahmad.OnlineShop.Domain.Order.Entities.OrderItem", b =>
                 {
                     b.HasOne("Ahmad.OnlineShop.Domain.Order.Aggregates.Order", null)
@@ -872,6 +1010,11 @@ namespace Ahmad.OnlineShop.Persistence.EF.Migrations
             modelBuilder.Entity("Ahmad.OnlineShop.Domain.Bnpl.Aggregates.BnplContract", b =>
                 {
                     b.Navigation("Installments");
+                });
+
+            modelBuilder.Entity("Ahmad.OnlineShop.Domain.Discount.Aggregates.ProductPackage", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Ahmad.OnlineShop.Domain.Order.Aggregates.Order", b =>

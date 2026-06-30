@@ -10,25 +10,25 @@ namespace Ahmad.OnlineShop.Domain.BackOffice.Aggregates;
 public sealed class AdminUser : AggregateRoot<long>
 {
     private readonly List<AuditLog> _auditLogs = [];
-    private readonly List<Report>   _reports   = [];
+    private readonly List<Report> _reports = [];
 
-    public string      FullName  { get; private set; } = string.Empty;
-    public string      Email     { get; private set; } = string.Empty;
-    public AdminRole   Role      { get; private set; }
-    public AdminStatus Status    { get; private set; }
-    public DateTime    CreatedAt { get; private set; }
+    public string FullName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public AdminRole Role { get; private set; }
+    public AdminStatus Status { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyCollection<AuditLog> AuditLogs => _auditLogs.AsReadOnly();
-    public IReadOnlyCollection<Report>   Reports   => _reports.AsReadOnly();
+    public IReadOnlyCollection<Report> Reports => _reports.AsReadOnly();
 
     private AdminUser() { }
 
     private AdminUser(CreateAdminUserArg arg) : base(arg.Id)
     {
-        FullName  = arg.FullName.Trim();
-        Email     = arg.Email.Trim().ToLowerInvariant();
-        Role      = arg.Role;
-        Status    = AdminStatus.Active;
+        FullName = arg.FullName.Trim();
+        Email = arg.Email.Trim().ToLowerInvariant();
+        Role = arg.Role;
+        Status = AdminStatus.Active;
         CreatedAt = DateTime.UtcNow;
     }
 

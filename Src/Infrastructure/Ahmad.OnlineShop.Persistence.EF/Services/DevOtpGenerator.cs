@@ -11,5 +11,5 @@ public static class OtpCodeGenerator
     public static void ConfigureForDevelopment() => _isDevelopment = true;
 
     public static string Generate() =>
-        _isDevelopment ? "00000" : new Random().Next(10000, 99999).ToString();
+        _isDevelopment ? "000000" : new Random().Next(100_000, 999_999).ToString();
 }

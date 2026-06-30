@@ -11,12 +11,12 @@ namespace Ahmad.OnlineShop.Application.BackOffice.Tests;
 public class BackOfficeHandlersTests
 {
     private readonly FakeAdminUserRepository _repo = new();
-    private readonly BackOfficeHandlers      _sut;
-    private readonly CancellationToken       _ct = CancellationToken.None;
+    private readonly BackOfficeHandlers _sut;
+    private readonly CancellationToken _ct = CancellationToken.None;
 
     public BackOfficeHandlersTests()
     {
-        _sut = new BackOfficeHandlers(_repo);
+        _sut = new BackOfficeHandlers(_repo, FakeAppDb.Create());
     }
 
     private static AdminUser MakeAdmin() =>
@@ -144,7 +144,7 @@ public class BackOfficeHandlersTests
     [Fact]
     public async Task CompleteReport_When_ReportExists_Should_MarkCompleted()
     {
-        var admin  = MakeAdmin();
+        var admin = MakeAdmin();
         var report = admin.RequestReport(new CreateReportArg(10, admin.Id, ReportType.Sales));
         _repo.Seed(admin);
 
@@ -159,13 +159,13 @@ public class BackOfficeHandlersTests
     [Fact]
     public async Task FailReport_When_ReportExists_Should_MarkFailed()
     {
-        var admin  = MakeAdmin();
+        var admin = MakeAdmin();
         var report = admin.RequestReport(new CreateReportArg(10, admin.Id, ReportType.Sales));
         _repo.Seed(admin);
 
         await _sut.Handle(new FailReportCommand(1, report.Id, "خطای سرور"), _ct);
 
         Assert.Equal(ReportStatus.Failed, report.Status);
-        Assert.Equal("خطای سرور",        report.FailReason);
+        Assert.Equal("خطای سرور", report.FailReason);
     }
 }

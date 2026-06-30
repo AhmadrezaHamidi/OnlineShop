@@ -36,7 +36,6 @@ public sealed class ProductHandlers(
 
         var productId = productRepository.GetNextId();
         var product = ProductAgg.Create(cmd.Map(productId, productId));
-
         await productRepository.AddAsync(product, token);
         await context.SaveChangesAsync(token);
         return product.Id;
@@ -111,7 +110,7 @@ public sealed class ProductHandlers(
     public async Task<long> Handle(CreateCategoryCommand cmd, CancellationToken token)
     {
         if (await categoryRepository.ExistsByName(cmd.Name, token))
-            throw new EmptyCategoryNameException();
+            throw new CategoryNameAlreadyExistsException();
 
         if (cmd.ParentId.HasValue)
             _ = await categoryRepository.Get(cmd.ParentId.Value, token)

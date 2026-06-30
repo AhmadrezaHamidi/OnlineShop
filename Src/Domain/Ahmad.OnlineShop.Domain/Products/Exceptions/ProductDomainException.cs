@@ -75,6 +75,12 @@ public sealed class CategoryCircularReferenceException : BusinessException
         : base(Resources.Message.CategoryCircularReferenceException) { }
 }
 
+public sealed class CategoryNameAlreadyExistsException : BusinessException
+{
+    public CategoryNameAlreadyExistsException()
+        : base("دسته‌بندی با این نام از قبل وجود دارد.") { }
+}
+
 // Inventory
 public sealed class InsufficientStockException : BusinessException
 {

@@ -58,6 +58,13 @@ public sealed class UserReadRepository(IDbConnection connection) : IUserReadRepo
         return (items, total);
     }
 
+    public async Task<IReadOnlyList<string>> GetAllCustomerPhonesAsync(CancellationToken token = default)
+    {
+        const string sql = "SELECT PhoneNumber FROM [dbo].[IdentityUsers] WHERE PhoneNumber IS NOT NULL";
+        var result = await connection.QueryAsync<string>(sql);
+        return result.ToList().AsReadOnly();
+    }
+
     // ── Row Mapping ───────────────────────────────────────────────────────────
 
     private sealed class UserRow

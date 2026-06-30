@@ -40,8 +40,14 @@ public sealed record StockReleasedEvent(
     int  ReleasedQuantity
 ) : IEvent;
 
-/// <summary>موجودی به پایان رسید یا زیر حد بحرانی رفت</summary>
+/// <summary>موجودی به پایان رسید (صفر شد)</summary>
 public sealed record StockDepletedEvent(
+    long ProductId,
+    int  CurrentQuantity
+) : IEvent;
+
+/// <summary>موجودی زیر حد هشدار رفت (کم است اما صفر نشده)</summary>
+public sealed record StockLowEvent(
     long ProductId,
     int  CurrentQuantity
 ) : IEvent;

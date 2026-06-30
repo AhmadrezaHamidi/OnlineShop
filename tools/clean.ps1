@@ -1,4 +1,4 @@
-# ╔══════════════════════════════════════════════════════════════════╗
+﻿# ╔══════════════════════════════════════════════════════════════════╗
 # ║         Clean — Ahmad OnlineShop                                ║
 # ║  حذف bin/obj در کل solution + publish های قدیمی               ║
 # ╚══════════════════════════════════════════════════════════════════╝
@@ -37,9 +37,10 @@ function Remove-Folder($path, $label) {
         $size = (Get-ChildItem $path -Recurse -ErrorAction SilentlyContinue |
                  Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum
         Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
-        $script:totalSize += $size ?? 0
+        if ($null -eq $size) { $size = 0 }
+        $script:totalSize += $size
         $script:count++
-        Write-Info "حذف شد: $label  ($([math]::Round(($size ?? 0)/1MB, 1)) MB)"
+        Write-Info "حذف شد: $label  ($([math]::Round($size/1MB, 1)) MB)"
     }
 }
 

@@ -8,8 +8,8 @@ namespace Ahmad.OnlineShop.Application.Handlers;
 
 public sealed class BnplHandlers(
     IBnplContractRepository contractRepo,
-    ICreditLimitRepository  creditRepo,
-    ApplicationDbContext    context) :
+    ICreditLimitRepository creditRepo,
+    ApplicationDbContext context) :
     ICommandHandler<CreateBnplContractCommand, long>,
     ICommandHandler<PayInstallmentCommand, long>,
     ICommandHandler<IncreaseCreditLimitCommand, long>,

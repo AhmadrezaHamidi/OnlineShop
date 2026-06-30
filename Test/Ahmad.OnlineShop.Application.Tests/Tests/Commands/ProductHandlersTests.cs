@@ -11,20 +11,20 @@ namespace Ahmad.OnlineShop.Application.Tests.Commands;
 
 public class ProductHandlersTests
 {
-    private readonly FakeProductRepository  _productRepo  = new();
+    private readonly FakeProductRepository _productRepo = new();
     private readonly FakeCategoryRepository _categoryRepo = new();
-    private readonly ProductHandlers        _sut;
-    private readonly CancellationToken      _ct = CancellationToken.None;
+    private readonly ProductHandlers _sut;
+    private readonly CancellationToken _ct = CancellationToken.None;
 
     public ProductHandlersTests()
     {
-        _sut = new ProductHandlers(_productRepo, _categoryRepo);
+        _sut = new ProductHandlers(_productRepo, _categoryRepo, FakeAppDb.Create());
     }
 
     // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private static CategoryAgg MakeCategory() => new(10, "Electronics");
-    private static ProductAgg  MakeProduct()  => ProductAgg.Create(
+    private static ProductAgg MakeProduct() => ProductAgg.Create(
         new CreateProductArg(Id: 1, SellerId: 100, CategoryId: 10, Name: "Laptop", Description: null, Price: 50_000_000m, InventoryId: 1));
 
     private static CreateProductCommand MakeCreateCommand(long sellerId = 100) =>
@@ -68,7 +68,7 @@ public class ProductHandlersTests
 
         Assert.Equal("New Name", product.Name);
         Assert.Equal("New Desc", product.Description);
-        Assert.Equal(20,          product.CategoryId);
+        Assert.Equal(20, product.CategoryId);
     }
 
     /// <summary>Ø®Ø·Ø§: Ù…Ø­ØµÙˆÙ„ Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯ â†’ ProductNotFoundException</summary>
@@ -174,13 +174,13 @@ public class ProductHandlersTests
         Assert.Equal("Electronics", _categoryRepo.Added!.Name);
     }
 
-    /// <summary>Ø®Ø·Ø§: Ù†Ø§Ù… Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ ØªÚ©Ø±Ø§Ø±ÛŒ â†’ EmptyCategoryNameException</summary>
+    /// <summary>خطا: نام دسته‌بندی تکراری → CategoryNameAlreadyExistsException</summary>
     [Fact]
-    public async Task CreateCategory_When_NameExists_Should_Throw_EmptyCategoryNameException()
+    public async Task CreateCategory_When_NameExists_Should_Throw_CategoryNameAlreadyExistsException()
     {
         _categoryRepo.NameExists = true;
 
-        await Assert.ThrowsAsync<EmptyCategoryNameException>(
+        await Assert.ThrowsAsync<CategoryNameAlreadyExistsException>(
             () => _sut.Handle(new CreateCategoryCommand("Electronics", null), _ct));
     }
 }

@@ -2,6 +2,9 @@ using Ahmad.OnlineShop.Domain.BackOffice.Aggregates;
 using Ahmad.OnlineShop.Domain.BackOffice.Entities;
 using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
 using Ahmad.OnlineShop.Domain.Bnpl.Entities;
+using Ahmad.OnlineShop.Domain.Discount.Entities;
+using DiscountAggregate = Ahmad.OnlineShop.Domain.Discount.Aggregates.Discount;
+using ProductPackage    = Ahmad.OnlineShop.Domain.Discount.Aggregates.ProductPackage;
 using Ahmad.OnlineShop.Domain.Products;
 using Ahmad.OnlineShop.Domain.User;
 using OrderAggregate = Ahmad.OnlineShop.Domain.Order.Aggregates.Order;
@@ -50,6 +53,9 @@ public sealed class ApplicationDbContext
     public DbSet<OrderAggregate> Orders => Set<OrderAggregate>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<DiscountAggregate> Discounts => Set<DiscountAggregate>();
+    public DbSet<ProductPackage> ProductPackages => Set<ProductPackage>();
+    public DbSet<PackageItem> PackageItems => Set<PackageItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

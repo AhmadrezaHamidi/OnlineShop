@@ -6,6 +6,7 @@
 /// </summary>
 using Ahmad.OnlineShop.Application.Tests.Fakes;
 using Ahmad.OnlineShop.Application.Handlers;
+using Ahmad.OnlineShop.Persistence.EF;
 
 namespace Ahmad.OnlineShop.Application.Tests.Commands;
 
@@ -18,7 +19,7 @@ public class BnplHandlersTests
 
     public BnplHandlersTests()
     {
-        _sut = new BnplHandlers(_contractRepo, _creditRepo);
+        _sut = new BnplHandlers(_contractRepo, _creditRepo, FakeAppDb.Create());
     }
 
     private static CreditLimit MakeCredit(decimal total = 1_000_000m) =>

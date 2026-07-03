@@ -33,6 +33,7 @@ services:
       FileStorage__DefaultBucket: products
       FileStorage__PublicBaseUrl: "http://localhost:9000"
       RedisOptions__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
+      Seq__ServerUrl:               "http://seq:5341"
       UseFakeServices: "false"
     depends_on:
       sqlserver:
@@ -87,6 +88,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── Seq (Log Server) ─────────────────────────────────────────────────────────
+  seq:
+    image: datalust/seq:latest
+    container_name: onlineshop-seq
+    ports:
+      - "5341:5341"   # ingestion (Serilog sink)
+      - "8081:80"     # UI → http://localhost:8081
+    environment:
+      ACCEPT_EULA: Y
+    volumes:
+      - seq-data:/data
+    networks:
+      - onlineshop-net
+    restart: unless-stopped
+
   # ── Redis (optional — cache) ──────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
@@ -109,6 +125,7 @@ volumes:
   sqlserver-data:
   minio-data:
   redis-data:
+  seq-data:
 
 networks:
   onlineshop-net:

@@ -24,4 +24,9 @@
     <ProjectReference Include="..\..\Rest\Ahmad.OnlineShop.API.Rest\Ahmad.OnlineShop.Rest.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+  </ItemGroup>
+
 </Project>

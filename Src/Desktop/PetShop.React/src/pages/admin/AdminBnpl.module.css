@@ -1,0 +1,8 @@
+.sectionTitle { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: var(--text2); }
+.msg { font-size: 13px; color: #DC2626; margin-bottom: 12px; }
+.creditCard { background: var(--surface1); border-radius: 16px; padding: 20px; border: 1.5px solid var(--border); }
+.creditRow { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
+.creditItem { display: flex; flex-direction: column; gap: 6px; }
+.creditLabel { font-size: 12px; color: var(--text2); font-weight: 500; }
+.creditVal { font-size: 18px; font-weight: 700; color: var(--text); }
+.actions { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; }

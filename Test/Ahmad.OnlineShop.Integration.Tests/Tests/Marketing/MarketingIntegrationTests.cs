@@ -8,11 +8,13 @@ namespace Ahmad.OnlineShop.Integration.Tests.Marketing;
 [Collection("Integration")]
 public sealed class MarketingIntegrationTests : IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient         _client;
+    private readonly OnlineShopWebFactory _factory;
 
     public MarketingIntegrationTests(OnlineShopWebFactory factory)
     {
-        _client = factory.CreateClient();
+        _factory = factory;
+        _client  = factory.CreateClient();
     }
 
     public async Task InitializeAsync()
@@ -34,16 +36,17 @@ public sealed class MarketingIntegrationTests : IAsyncLifetime
         var body = await resp.Content.ReadFromJsonAsync<JsonElement>();
         var data = ApiHelper.GetData(body);
         Assert.NotNull(data);
-        // حداقل ۳ کاربر seed شده باید پیامک دریافت کنند
         Assert.True(data.Value.GetInt32() >= 3);
     }
 
     [Fact]
     public async Task SendBulkSms_Without_Token_Should_Return_401()
     {
-        using var client = new HttpClient { BaseAddress = _client.BaseAddress };
+        // باید از factory.CreateClient() استفاده شود نه new HttpClient()
+        // چون test server از in-memory transport استفاده می‌کند
+        using var unauthClient = _factory.CreateClient();
 
-        var resp = await client.PostAsJsonAsync(
+        var resp = await unauthClient.PostAsJsonAsync(
             $"{ApiHelper.MarketingUrl}/sms/broadcast",
             new { Message = "بدون احراز هویت" });
 

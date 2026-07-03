@@ -43,10 +43,9 @@ public sealed class AuthIntegrationTests(OnlineShopWebFactory factory)
 
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
 
+        // MapPostEndpoint<LoginCommandResponse> → object مستقیم (بدون ApiResponse wrapper)
         var body = await resp.Content.ReadFromJsonAsync<JsonElement>();
-        var data = ApiHelper.GetData(body);
-        Assert.NotNull(data);
-        Assert.True(data.Value.TryGetProperty("accessToken", out var token));
+        Assert.True(body.TryGetProperty("accessToken", out var token));
         Assert.False(string.IsNullOrEmpty(token.GetString()));
     }
 

@@ -4,8 +4,15 @@ using AhmadBase.External.Service;
 using AhmadBase.External.Service.Payment;
 using AhmadBase.External.Service.Sms;
 using AhmadBase.External.Service.Storage;
+using AhmadBase.IOC;
 using SmsContract = AhmadBase.External.Service.ISmsService;
 using Autofac;
+using Ahmad.OnlineShop.Config.Middlewares;
+using Ahmad.OnlineShop.Application.Validators;
+using FluentValidation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using BackOffice.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Products;
@@ -24,7 +31,6 @@ using Ahmad.OnlineShop.Read.Dapper.Identity;
 using Ahmad.OnlineShop.Read.Dapper.BackOffice;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace Ahmad.OnlineShop.Config;
 
@@ -129,7 +135,42 @@ public class AutofacModule : Autofac.Module
 
         builder.RegisterType<ZarinPalService>().As<IPaymentService>().InstancePerLifetimeScope();
 
-        // ── ۸. File Storage (MinIO) ───────────────────────────────────────────
+        // ── ۸. CorrelationId — اول pipeline، قبل از همه middleware ها ─────────
+        builder.RegisterType<CorrelationIdStartupFilter>()
+               .As<IStartupFilter>()
+               .SingleInstance();
+
+        // ── ۱۰. FluentValidation — validators + pipeline behavior ─────────────
+        // ValidationException → 400 middleware
+        builder.RegisterType<ValidationExceptionStartupFilter>()
+               .As<IStartupFilter>()
+               .SingleInstance();
+
+        // ثبت تمام validator های assembly
+        builder.RegisterAssemblyTypes(typeof(ValidationBehavior<,>).Assembly)
+               .AsClosedTypesOf(typeof(IValidator<>))
+               .InstancePerLifetimeScope();
+
+        // pipeline behavior — برای هر ICommand<TResult> اجرا می‌شود
+        builder.RegisterGeneric(typeof(ValidationBehavior<,>))
+               .As(typeof(IPipelineBehavior<,>))
+               .InstancePerLifetimeScope();
+
+        // ── ۹. Swagger — رفع تداخل SchemaId + error response های درست ─────────
+        builder.Register<IConfigureOptions<SwaggerGenOptions>>(_ =>
+            new ConfigureOptions<SwaggerGenOptions>(opts =>
+            {
+                opts.SchemaGeneratorOptions.SchemaIdSelector = t => t.FullName ?? t.Name;
+                opts.OperationFilterDescriptors.Add(new FilterDescriptor
+                {
+                    Type      = typeof(Ahmad.OnlineShop.Config.Extensions.Swagger.ErrorResponseOperationFilter),
+                    Arguments = Array.Empty<object>()
+                });
+            }))
+            .As<IConfigureOptions<SwaggerGenOptions>>()
+            .SingleInstance();
+
+        // ── ۹. File Storage (MinIO) ───────────────────────────────────────────
         builder.Register(c =>
         {
             var opts = c.Resolve<IConfiguration>().GetSection(FileStorageOptions.Section).Get<FileStorageOptions>() ?? new FileStorageOptions();

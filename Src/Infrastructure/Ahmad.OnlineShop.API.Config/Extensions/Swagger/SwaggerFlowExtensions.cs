@@ -61,6 +61,9 @@ public static class SwaggerFlowExtensions
 
     public static SwaggerGenOptions AddFlowDescriptions(this SwaggerGenOptions options)
     {
+        // جلوگیری از تداخل SchemaId وقتی دو کلاس هم‌نام در namespace های مختلف وجود دارند
+        options.CustomSchemaIds(t => t.FullName);
+
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Title       = "Ahmad OnlineShop API",

@@ -15,14 +15,16 @@ COPY ["Src/Application/Ahmad.OnlineShop.Application/Ahmad.OnlineShop.Application
 COPY ["Src/Application/Ahmad.OnlineShop.Application.Contract/Ahmad.OnlineShop.Application.Contract.csproj", "Src/Application/Ahmad.OnlineShop.Application.Contract/"]
 COPY ["Src/Application/Ahmad.OnlineShop.Application.Query/Ahmad.OnlineShop.Application.Query.csproj","Src/Application/Ahmad.OnlineShop.Application.Query/"]
 COPY ["Src/Application/Ahmad.OnlineShop.Application.Query.Contract/Ahmad.OnlineShop.Application.Query.Contract.csproj","Src/Application/Ahmad.OnlineShop.Application.Query.Contract/"]
+COPY ["Src/Application/Ahmad.OnlineShop.Application.Validators/Ahmad.OnlineShop.Application.Validators.csproj", "Src/Application/Ahmad.OnlineShop.Application.Validators/"]
 COPY ["Src/Application/Ahmad.OnlineShop.Event.Handler/Ahmad.OnlineShop.Event.Handler.csproj",        "Src/Application/Ahmad.OnlineShop.Event.Handler/"]
 COPY ["Src/Infrastructure/Ahmad.OnlineShop.Persistence.EF/Ahmad.OnlineShop.Persistence.EF.csproj",   "Src/Infrastructure/Ahmad.OnlineShop.Persistence.EF/"]
 COPY ["Src/Infrastructure/Ahmad.OnlineShop.Read.Dapper/Ahmad.OnlineShop.Read.Dapper.csproj",         "Src/Infrastructure/Ahmad.OnlineShop.Read.Dapper/"]
 COPY ["Src/Infrastructure/Ahmad.OnlineShop.API.Config/Ahmad.OnlineShop.Config.csproj",               "Src/Infrastructure/Ahmad.OnlineShop.API.Config/"]
 COPY ["Src/Rest/Ahmad.OnlineShop.API.Rest/Ahmad.OnlineShop.Rest.csproj",                             "Src/Rest/Ahmad.OnlineShop.API.Rest/"]
 
-# NuGet config برای private source
+# NuGet config + local AhmadBase packages
 COPY ["nuget.config", "."]
+COPY ["local-packages/", "local-packages/"]
 
 # Restore
 RUN dotnet restore "Src/Host/Ahmad.OnlineShop.ServiceHost/Ahmad.OnlineShop.ServiceHost.csproj"

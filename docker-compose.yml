@@ -1,10 +1,3 @@
-version: '3.9'
-
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Ahmad OnlineShop — Full Stack Docker Compose                               ║
-# ║  API · Frontend · SQL Server · MinIO · Redis · Seq · Grafana · Prometheus   ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
-
 services:
 
   # ── API (Backend) ─────────────────────────────────────────────────────────────
@@ -33,7 +26,7 @@ services:
       FileStorage__DefaultBucket: products
       FileStorage__PublicBaseUrl: "http://localhost:9000"
       RedisOptions__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
-      Seq__ServerUrl:             "http://seq:5341"
+      Seq__ServerUrl:             "http://host.docker.internal:5341"
       UseFakeServices:            "false"
     depends_on:
       sqlserver:
@@ -118,69 +111,10 @@ services:
       timeout: 5s
       retries: 3
 
-  # ── Seq (Log Server) ──────────────────────────────────────────────────────────
-  seq:
-    image: datalust/seq:latest
-    container_name: onlineshop-seq
-    ports:
-      - "5341:5341"
-      - "8081:80"
-    environment:
-      ACCEPT_EULA: Y
-    volumes:
-      - seq-data:/data
-    networks:
-      - onlineshop-net
-    restart: unless-stopped
-
-  # ── Prometheus (Metrics Scraper) ──────────────────────────────────────────────
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: onlineshop-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-lifecycle'
-    networks:
-      - onlineshop-net
-    restart: unless-stopped
-    depends_on:
-      - api
-
-  # ── Grafana (Dashboard) ───────────────────────────────────────────────────────
-  grafana:
-    image: grafana/grafana:latest
-    container_name: onlineshop-grafana
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER:     admin
-      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD:-Admin@123}"
-      GF_USERS_ALLOW_SIGN_UP:     "false"
-      GF_SERVER_ROOT_URL:         "http://localhost:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-    depends_on:
-      - prometheus
-      - seq
-    networks:
-      - onlineshop-net
-    restart: unless-stopped
-
 volumes:
   sqlserver-data:
   minio-data:
   redis-data:
-  seq-data:
-  prometheus-data:
-  grafana-data:
 
 networks:
   onlineshop-net:

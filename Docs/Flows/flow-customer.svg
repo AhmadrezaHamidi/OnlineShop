@@ -1,0 +1,90 @@
+<svg viewBox="0 0 820 520" xmlns="http://www.w3.org/2000/svg" font-family="Tahoma,Arial,sans-serif">
+  <title>Customer Flow — OnlineShop</title>
+  <rect width="820" height="520" fill="#f8fafc" rx="12"/>
+  <text x="410" y="38" text-anchor="middle" font-size="17" font-weight="bold" fill="#1e40af">👤 فرایند مشتری (Customer Flow)</text>
+
+  <!-- Step boxes -->
+  <!-- 1 -->
+  <rect x="30" y="70" width="160" height="72" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="110" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">1. ثبت‌نام / ورود</text>
+  <text x="110" y="112" text-anchor="middle" font-size="10" fill="#3b82f6">Register / Login / OTP</text>
+  <text x="110" y="128" text-anchor="middle" font-size="9" fill="#6b7280">→ JWT Token</text>
+
+  <!-- 2 -->
+  <rect x="230" y="70" width="160" height="72" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="310" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">2. مرور محصولات</text>
+  <text x="310" y="112" text-anchor="middle" font-size="10" fill="#3b82f6">GET /Product</text>
+  <text x="310" y="128" text-anchor="middle" font-size="9" fill="#6b7280">GET /Product/{id}, /Categories</text>
+
+  <!-- 3 -->
+  <rect x="430" y="70" width="160" height="72" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="510" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">3. اعمال تخفیف</text>
+  <text x="510" y="112" text-anchor="middle" font-size="10" fill="#3b82f6">GET /Discounts/code/{code}</text>
+  <text x="510" y="128" text-anchor="middle" font-size="9" fill="#6b7280">POST /Discounts/apply</text>
+
+  <!-- 4 -->
+  <rect x="630" y="70" width="160" height="72" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="710" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#1d4ed8">4. ثبت سفارش</text>
+  <text x="710" y="112" text-anchor="middle" font-size="10" fill="#3b82f6">POST /Order</text>
+  <text x="710" y="128" text-anchor="middle" font-size="9" fill="#6b7280">POST /Order/{id}/Items → Place</text>
+
+  <!-- Arrows row 1 -->
+  <line x1="190" y1="106" x2="228" y2="106" stroke="#2563eb" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="390" y1="106" x2="428" y2="106" stroke="#2563eb" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="590" y1="106" x2="628" y2="106" stroke="#2563eb" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Row 2 -->
+  <!-- 5 -->
+  <rect x="30" y="220" width="160" height="72" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="110" y="246" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">5. پرداخت</text>
+  <text x="110" y="262" text-anchor="middle" font-size="10" fill="#16a34a">POST /Order/{id}/Payments</text>
+  <text x="110" y="278" text-anchor="middle" font-size="9" fill="#6b7280">نقدی یا BNPL اقساط</text>
+
+  <!-- 6 -->
+  <rect x="230" y="220" width="160" height="72" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="310" y="246" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">6. پیگیری سفارش</text>
+  <text x="310" y="262" text-anchor="middle" font-size="10" fill="#16a34a">GET /Order/{id}</text>
+  <text x="310" y="278" text-anchor="middle" font-size="9" fill="#6b7280">Placed→Confirmed→Shipped</text>
+
+  <!-- 7 -->
+  <rect x="430" y="220" width="160" height="72" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="510" y="246" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">7. تحویل / لغو</text>
+  <text x="510" y="262" text-anchor="middle" font-size="10" fill="#16a34a">POST /Order/{id}/Deliver</text>
+  <text x="510" y="278" text-anchor="middle" font-size="9" fill="#6b7280">POST /Order/{id}/Cancel</text>
+
+  <!-- 8 -->
+  <rect x="630" y="220" width="160" height="72" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="710" y="246" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">8. پروفایل</text>
+  <text x="710" y="262" text-anchor="middle" font-size="10" fill="#16a34a">GET/PATCH /Account/Profile</text>
+  <text x="710" y="278" text-anchor="middle" font-size="9" fill="#6b7280">PATCH /ChangePassword</text>
+
+  <!-- Arrow from step 4 down to step 5 -->
+  <line x1="710" y1="142" x2="710" y2="190" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="710" y1="190" x2="110" y2="190" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="110" y1="190" x2="110" y2="218" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <!-- Arrows row 2 -->
+  <line x1="190" y1="256" x2="228" y2="256" stroke="#16a34a" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="390" y1="256" x2="428" y2="256" stroke="#16a34a" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="590" y1="256" x2="628" y2="256" stroke="#16a34a" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <!-- BNPL detail box -->
+  <rect x="30" y="360" width="760" height="110" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="410" y="385" text-anchor="middle" font-size="12" font-weight="bold" fill="#854d0e">💳 جریان BNPL (خرید اقساطی)</text>
+  <text x="60" y="410" font-size="10" fill="#713f12">POST /bnpl/contracts  →  GET /bnpl/contracts/{id}/installments  →  POST …/installments/{id}/pay  →  PATCH …/default یا cancel</text>
+  <text x="60" y="430" font-size="10" fill="#713f12">GET /bnpl/users/{userId}/credit  (بررسی سقف اعتبار قبل از ثبت قرارداد)</text>
+  <text x="60" y="450" font-size="10" fill="#713f12">GET /bnpl/users/{userId}/contracts  (لیست قراردادهای کاربر)</text>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+</svg>

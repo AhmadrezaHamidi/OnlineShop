@@ -34,6 +34,22 @@ Src/
 
 ---
 
+## فرایندها به تفکیک نقش (Role Flows)
+
+### 👤 مشتری (Customer)
+![Customer Flow](Docs/Flows/flow-customer.svg)
+
+### 🏪 فروشنده (Seller)
+![Seller Flow](Docs/Flows/flow-seller.svg)
+
+### 🔑 ادمین (Admin)
+![Admin Flow](Docs/Flows/flow-admin.svg)
+
+### ⚙️ سیستمی / State Machine
+![System Flow](Docs/Flows/flow-system.svg)
+
+---
+
 ## UI/UX — صفحات فرانت
 
 ### احراز هویت

@@ -1,0 +1,29 @@
+.smsBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--p3);
+  color: var(--p4);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text2); }
+.charCount { font-size: 11px; color: var(--text3); text-align: left; }
+.success {
+  display: flex; align-items: center; gap: 8px;
+  background: #DCFCE7; color: #14532D;
+  border-radius: 12px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 14px;
+}
+.errorMsg {
+  display: flex; align-items: center; gap: 8px;
+  background: #FEE2E2; color: #991B1B;
+  border-radius: 12px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 14px;
+}

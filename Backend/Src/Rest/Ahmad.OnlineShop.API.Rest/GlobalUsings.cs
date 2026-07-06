@@ -1,0 +1,9 @@
+global using AhmadBase.Application;
+global using AhmadBase.Application.Query;
+global using AhmadBase.Web;
+global using AhmadBase.Web.Models;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Routing;
+global using Ahmad.OnlineShop.Application.Commands;
+global using Ahmad.OnlineShop.Application.Query.Queries;

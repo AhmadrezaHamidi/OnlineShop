@@ -1,0 +1,58 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #1E0E6E, #5C35D4);
+}
+
+.card {
+  width: 360px;
+  background: #fff;
+  border-radius: 28px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.logoIcon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+.logo h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--p4);
+}
+.logo p {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text2); }
+
+.hint {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+  text-align: center;
+  background: var(--p3);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.error {
+  font-size: 12px;
+  color: #DC2626;
+  font-weight: 500;
+  text-align: center;
+}

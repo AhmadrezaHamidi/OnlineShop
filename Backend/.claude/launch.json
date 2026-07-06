@@ -1,0 +1,34 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clinic-frontend",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "C:\\Users\\ASUS\\Desktop\\Projects\\Denticitery\\Front\\dist", "-p", "5500", "--no-clipboard", "--single"],
+      "port": 5500
+    },
+    {
+      "name": "onlineshop-desktop",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "فرانت", "-p", "5510", "--no-clipboard"],
+      "port": 5510
+    }
+  ,
+    {
+      "name": "petshop-react",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "Src\\Desktop\\PetShop.React",
+      "port": 3002,
+      "autoPort": false
+    },
+    {
+      "name": "denticitery-react",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "C:\\Users\\ASUS\\Desktop\\Projects\\Denticitery\\Front",
+      "port": 5500,
+      "autoPort": false
+    }
+  ]
+}

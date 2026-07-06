@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Ahmad OnlineShop — System Flows</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8f9fa; color: #212529; padding: 20px; }
+  h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 30px; font-size: 28px; }
+  h2 { color: #16213e; margin: 30px 0 15px; font-size: 20px; border-right: 4px solid #e94560; padding-right: 10px; }
+  h3 { color: #0f3460; margin: 20px 0 10px; font-size: 16px; }
+  .flow-box { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px;
+              box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e9ecef; }
+  .steps { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
+  .step { display: flex; align-items: center; gap: 12px; padding: 10px 15px;
+          background: #f8f9fa; border-radius: 8px; border-right: 3px solid #e94560; }
+  .step-num { background: #e94560; color: white; border-radius: 50%; width: 28px; height: 28px;
+              display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
+  .step-text { flex: 1; font-size: 14px; }
+  .step-code { font-family: monospace; background: #e9ecef; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #495057; }
+  .arrow { text-align: center; color: #adb5bd; font-size: 20px; margin: 2px 0; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; margin: 2px; }
+  .tag-get    { background: #d4edda; color: #155724; }
+  .tag-post   { background: #cce5ff; color: #004085; }
+  .tag-patch  { background: #fff3cd; color: #856404; }
+  .tag-delete { background: #f8d7da; color: #721c24; }
+  .tag-role   { background: #e2d9f3; color: #4b0082; }
+  .note { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 13px; }
+  .error-box { background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 10px; margin: 10px 0; font-size: 13px; }
+  .success-box { background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 10px; margin: 10px 0; font-size: 13px; }
+  .jwt-box { background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 8px; padding: 15px; margin: 10px 0; }
+  .jwt-box code { display: block; font-family: monospace; font-size: 12px; background: #1a1a2e; color: #e94560; padding: 12px; border-radius: 6px; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  th { background: #1a1a2e; color: white; padding: 10px; text-align: right; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e9ecef; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  @media print { body { padding: 10px; } .flow-box { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>📋 Ahmad OnlineShop — System Flows</h1>
+<p style="color:#6c757d; margin-bottom:30px;">مستندات فرآیندهای سیستم — نسخه ۱.۰ — تاریخ: ۱۴۰۵</p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۱. فرآیند ورود با OTP و دریافت Token</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <h3>۱.۱ — درخواست کد OTP</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">۱</div><div class="step-text">کاربر شماره موبایل وارد می‌کند <span class="step-code">POST /Auth/RequestOtp</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۲</div><div class="step-text">سیستم کد ۶ رقمی تولید و در DB ذخیره می‌کند (اعتبار: ۵ دقیقه)</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۳</div><div class="step-text">کد از طریق <strong>SMS.ir</strong> ارسال می‌شود</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۴</div><div class="step-text">پاسخ: <span class="step-code">true</span> (موفق) یا <span class="step-code">false</span> (شکست SMS)</div></div>
+  </div>
+
+  <h3>۱.۲ — تأیید OTP و دریافت JWT</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">۱</div><div class="step-text">کاربر کد دریافتی را ارسال می‌کند <span class="step-code">POST /Auth/VerifyOtp</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۲</div><div class="step-text">سیستم اعتبار OTP را بررسی می‌کند (منقضی نشده / استفاده نشده / کد درست)</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۳</div><div class="step-text">اگر کاربر جدید است → <strong>ثبت خودکار</strong> با UserType=Customer</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۴</div><div class="step-text">JWT AccessToken + RefreshToken صادر می‌شود</div></div>
+  </div>
+
+  <div class="jwt-box">
+    <strong>ساختار JWT Token (Payload):</strong>
+    <code>{
+  "sub": "12345",           // UserId
+  "phone": "09121234567",   // شماره موبایل
+  "type": "Customer",       // نوع کاربر: Customer | Seller
+  "roles": ["Seller"],      // نقش‌های اختصاص‌یافته
+  "iat": 1234567890,
+  "exp": 1234571490         // ۱ ساعت اعتبار
+}</code>
+  </div>
+
+  <table>
+    <tr><th>حالت</th><th>خروجی</th></tr>
+    <tr><td>OTP درست و معتبر</td><td>✅ JWT + RefreshToken</td></tr>
+    <tr><td>OTP اشتباه</td><td>❌ InvalidOtpException</td></tr>
+    <tr><td>OTP منقضی (۵ دقیقه)</td><td>❌ InvalidOtpException</td></tr>
+    <tr><td>OTP قبلاً استفاده شده</td><td>❌ InvalidOtpException (Replay Attack)</td></tr>
+    <tr><td>OTP درخواست نشده</td><td>❌ OtpNotRequestedException</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۲. فرآیند سفارش‌دهی و پرداخت</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <h3>۲.۱ — پرداخت آنلاین (زرین‌پال)</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">۱</div><div class="step-text"><span class="tag tag-post">POST</span> <span class="step-code">/api/v1/orders</span> — ثبت سفارش با PaymentMethod=ZarinPal</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۲</div><div class="step-text"><span class="tag tag-post">POST</span> <span class="step-code">/api/v1/orders/{id}/payments</span> — ثبت رکورد پرداخت</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۳</div><div class="step-text">ZarinPal Request → دریافت Authority و RedirectUrl</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۴</div><div class="step-text">کاربر به درگاه زرین‌پال redirect می‌شود <span class="step-code">https://zarinpal.com/pg/StartPay/{authority}</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۵</div><div class="step-text">بعد از پرداخت، کاربر به CallbackUrl بازمی‌گردد با <span class="step-code">?Status=OK&Authority=xxx</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۶</div><div class="step-text">ZarinPal Verify → دریافت TransactionCode</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۷</div><div class="step-text"><span class="tag tag-patch">PATCH</span> <span class="step-code">/api/v1/orders/{id}/payments/{pid}/complete</span> — تأیید سفارش</div></div>
+  </div>
+
+  <div class="success-box">✅ نتیجه: OrderStatus → Confirmed | PaymentStatus → Completed</div>
+  <div class="error-box">❌ اگر Status=NOK: <span class="step-code">/api/v1/orders/{id}/payments/{pid}/fail</span> — سفارش Pending می‌ماند</div>
+
+  <h3>۲.۲ — پرداخت درب منزل (Cash on Delivery)</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">۱</div><div class="step-text"><span class="tag tag-post">POST</span> ثبت سفارش با PaymentMethod=CashOnDelivery</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۲</div><div class="step-text">سفارش در وضعیت Pending ثبت می‌شود — نیاز به پرداخت آنلاین ندارد</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۳</div><div class="step-text">هنگام تحویل، پرداخت نقدی دریافت می‌شود</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۴</div><div class="step-text">ادمین پرداخت را به صورت دستی تأیید می‌کند → OrderStatus → Confirmed</div></div>
+  </div>
+
+  <h3>۲.۳ — چرخه وضعیت سفارش</h3>
+  <div style="text-align:center; margin:15px 0; font-size:14px;">
+    <strong>Pending</strong> → <strong>Confirmed</strong> → <strong>Processing</strong> → <strong>Shipped</strong> → <strong>Delivered</strong>
+    <br><br>
+    هر مرحله می‌تواند → <strong style="color:#dc3545">Cancelled</strong> (قبل از Delivered)
+    <br>
+    Delivered می‌تواند → <strong style="color:#856404">Refunded</strong>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۳. فرآیند مدیریت محصول (فروشنده)</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <h3>۳.۱ — ثبت محصول</h3>
+  <table>
+    <tr><th>API</th><th>عملیات</th><th>نقش</th></tr>
+    <tr><td><span class="tag tag-post">POST</span> /api/products</td><td>ثبت محصول جدید</td><td><span class="tag-role tag">Seller</span></td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span> /api/products/{id}/price</td><td>تغییر قیمت</td><td><span class="tag-role tag">Seller</span></td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span> /api/products/{id}/activate</td><td>فعال‌سازی</td><td><span class="tag-role tag">Seller</span></td></tr>
+    <tr><td><span class="tag tag-post">POST</span> /api/products/{id}/images</td><td>افزودن تصویر</td><td><span class="tag-role tag">Seller</span></td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span> /api/products/{id}/inventory/replenish</td><td>تأمین موجودی</td><td><span class="tag-role tag">Seller</span></td></tr>
+  </table>
+
+  <div class="note">
+    ⚠️ <strong>Seller Ownership:</strong> فروشنده فقط به محصولات خودش دسترسی دارد.
+    درخواست روی محصول دیگران → <code>ProductNotOwnedBySellerException</code>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۴. فرآیند BackOffice (ادمین)</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <h3>۴.۱ — دسترسی‌های ادمین</h3>
+  <table>
+    <tr><th>API</th><th>عملیات</th><th>توضیح</th></tr>
+    <tr><td><span class="tag tag-get">GET</span> /BackOffice/Admins</td><td>لیست مدیران</td><td>با فیلتر Status و Role</td></tr>
+    <tr><td><span class="tag tag-get">GET</span> /BackOffice/Admins/{id}/AuditLogs</td><td>لاگ فعالیت‌ها</td><td>تاریخچه اقدامات هر ادمین</td></tr>
+    <tr><td><span class="tag tag-get">GET</span> /BackOffice/Reports</td><td>گزارش‌ها</td><td>درخواست و مشاهده گزارشات</td></tr>
+    <tr><td><span class="tag tag-get">GET</span> /BackOffice/Orders (Admin)</td><td>همه سفارشات</td><td>با فیلتر Status، Method، تاریخ</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span> /BackOffice/Admins/{id}/Role</td><td>تغییر نقش ادمین</td><td>نقش‌ها: SuperAdmin, ProductManager, ...</td></tr>
+  </table>
+
+  <h3>۴.۲ — نقش‌های BackOffice</h3>
+  <table>
+    <tr><th>نقش</th><th>دسترسی</th></tr>
+    <tr><td>SuperAdmin</td><td>همه چیز + مدیریت ادمین‌ها</td></tr>
+    <tr><td>ProductManager</td><td>مدیریت محصولات و دسته‌بندی‌ها</td></tr>
+    <tr><td>OrderManager</td><td>مدیریت سفارشات و تحویل</td></tr>
+    <tr><td>FinanceManager</td><td>گزارشات مالی و پرداخت‌ها</td></tr>
+    <tr><td>SupportAgent</td><td>مشاهده سفارشات و پشتیبانی</td></tr>
+  </table>
+
+  <div class="note">
+    ℹ️ ادمین‌ها به صورت دستی در دیتابیس ثبت می‌شوند — صفحه ثبت‌نام عمومی ندارند
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۵. فرآیند BNPL (اقساط)</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <div class="steps">
+    <div class="step"><div class="step-num">۱</div><div class="step-text">بررسی سقف اعتبار کاربر <span class="step-code">GET /bnpl/users/{id}/credit</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۲</div><div class="step-text">ایجاد قرارداد BNPL <span class="step-code">POST /bnpl/contracts</span> — تعداد اقساط و مبلغ</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۳</div><div class="step-text">مبلغ کل از سقف اعتبار Block می‌شود</div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۴</div><div class="step-text">هر ماه یک قسط پرداخت می‌شود <span class="step-code">POST /bnpl/contracts/{id}/installments/{iid}/pay</span></div></div>
+    <div class="arrow">↓</div>
+    <div class="step"><div class="step-num">۵</div><div class="step-text">پس از پرداخت تمام اقساط → قرارداد Completed</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>۶. خلاصه Endpoints</h2>
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="flow-box">
+  <table>
+    <tr><th>دسته</th><th>Base URL</th><th>Auth</th></tr>
+    <tr><td>Auth (OTP)</td><td>/api/v{v}/Identity/Auth/</td><td>بدون auth</td></tr>
+    <tr><td>Users</td><td>/api/v{v}/Identity/Users/</td><td>JWT Required</td></tr>
+    <tr><td>Products</td><td>/api/products/</td><td>Seller Role</td></tr>
+    <tr><td>Orders</td><td>/api/v{v}/Orders/</td><td>JWT Required</td></tr>
+    <tr><td>BNPL</td><td>/api/v1/bnpl/</td><td>JWT Required</td></tr>
+    <tr><td>BackOffice</td><td>/api/v{v}/BackOffice/</td><td>Admin Role</td></tr>
+  </table>
+</div>
+
+<hr style="margin:30px 0; border-color:#dee2e6">
+<p style="color:#6c757d; font-size:12px; text-align:center;">
+  Ahmad OnlineShop Documentation — Generated automatically
+  <br>برای به‌روزرسانی این فایل از <code>tools/changelog.ps1</code> استفاده کنید
+</p>
+
+</body>
+</html>

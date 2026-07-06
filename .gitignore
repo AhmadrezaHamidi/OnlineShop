@@ -1,0 +1,18 @@
+# Env
+.env
+
+# Backend
+Backend/bin/
+Backend/obj/
+Backend/.vs/
+
+# Frontend
+Frontend/node_modules/
+Frontend/dist/
+
+# Monitoring data
+monitoring/grafana/data/
+
+# OS
+.DS_Store
+Thumbs.db

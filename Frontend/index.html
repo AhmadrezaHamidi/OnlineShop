@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetShop — پنل مدیریت</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+
+<!-- ── Legacy Electron content below (kept for reference) ── -->
+<div id="login-overlay" style="display:none">
+  <div class="login-box">
+    <h2>ورود به پنل مدیریت</h2>
+    <p>فروشگاه احمد</p>
+
+    <!-- Step 1: phone -->
+    <div id="step-phone">
+      <div class="form-group">
+        <label for="phone-input">شماره موبایل</label>
+        <input id="phone-input" class="form-control" type="tel"
+               placeholder="09XXXXXXXXX" maxlength="11" autocomplete="off" />
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="btn-send-otp">ارسال کد تأیید</button>
+      <p class="error-msg" id="phone-error"></p>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="step-otp" style="display:none">
+      <p style="margin-bottom:16px; color:var(--text2); font-size:.85rem;">
+        کد ۶ رقمی ارسال‌شده به <span id="otp-phone-label" style="color:var(--text)"></span> را وارد کنید
+      </p>
+      <div class="form-group">
+        <input id="otp-input" class="form-control otp-input"
+               type="text" maxlength="6" placeholder="------" autocomplete="off" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:10px" id="btn-verify-otp">ورود</button>
+      <button class="btn" style="width:100%;background:var(--bg3)" id="btn-back-phone">← بازگشت</button>
+      <p class="error-msg" id="otp-error"></p>
+    </div>
+
+    <!-- API URL config -->
+    <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border)">
+      <label style="font-size:.78rem; color:var(--text2)">آدرس API</label>
+      <input id="api-url-input" class="form-control" type="text" style="margin-top:6px" />
+    </div>
+  </div>
+</div>
+
+<!-- ── App Shell ──────────────────────────────────────────────────────── -->
+<div id="app" style="display:none">
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <span>🛍</span> فروشگاه احمد
+    </div>
+
+    <div class="nav-item active" data-page="dashboard">
+      <span class="icon">📊</span> داشبورد
+    </div>
+    <div class="nav-item" data-page="orders">
+      <span class="icon">📦</span> سفارش‌ها
+    </div>
+    <div class="nav-item" data-page="products">
+      <span class="icon">🏷</span> محصولات
+    </div>
+    <div class="nav-item" data-page="users">
+      <span class="icon">👤</span> کاربران
+    </div>
+    <div class="nav-item" data-page="bnpl">
+      <span class="icon">💳</span> اقساط BNPL
+    </div>
+    <div class="nav-item" data-page="admins">
+      <span class="icon">🛡</span> مدیران
+    </div>
+    <div class="nav-item" data-page="settings">
+      <span class="icon">⚙</span> تنظیمات
+    </div>
+
+    <div class="sidebar-footer">
+      v1.0.0 · Ahmad OnlineShop
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div id="main">
+    <!-- Topbar -->
+    <div id="topbar">
+      <span class="topbar-title" id="page-title">داشبورد</span>
+      <div class="topbar-right">
+        <span id="api-status" class="offline">● آفلاین</span>
+        <button class="btn btn-primary btn-sm" id="btn-refresh">↺ بارگذاری مجدد</button>
+        <button class="btn btn-sm" style="background:var(--bg3)" id="btn-logout">خروج</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="content">
+
+      <!-- Dashboard -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">📊 داشبورد</div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card blue">
+            <span class="label">سفارش‌های امروز</span>
+            <span class="value" id="stat-orders-today">—</span>
+            <span class="sub">در انتظار تأیید</span>
+          </div>
+          <div class="stat-card green">
+            <span class="label">درآمد امروز (تومان)</span>
+            <span class="value" id="stat-revenue">—</span>
+            <span class="sub">پرداخت موفق</span>
+          </div>
+          <div class="stat-card yellow">
+            <span class="label">محصولات فعال</span>
+            <span class="value" id="stat-products">—</span>
+            <span class="sub">موجود در فروشگاه</span>
+          </div>
+          <div class="stat-card red">
+            <span class="label">اقساط سررسید-گذشته</span>
+            <span class="value" id="stat-overdue">—</span>
+            <span class="sub">نیاز به پیگیری</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:600;margin-bottom:16px">آخرین سفارش‌ها</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>کاربر</th>
+                  <th>مبلغ (تومان)</th>
+                  <th>وضعیت</th>
+                  <th>تاریخ</th>
+                </tr>
+              </thead>
+              <tbody id="recent-orders-body">
+                <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div class="page" id="page-orders">
+        <div class="page-title">📦 سفارش‌ها</div>
+        <div class="card">
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <select id="order-status-filter" class="form-control" style="width:180px;direction:rtl">
+              <option value="">همه وضعیت‌ها</option>
+              <option value="0">Pending</option>
+              <option value="1">Placed</option>
+              <option value="2">Confirmed</option>
+              <option value="3">Shipped</option>
+              <option value="4">Delivered</option>
+              <option value="5">Cancelled</option>
+            </select>
+            <button class="btn btn-primary btn-sm" id="btn-filter-orders">فیلتر</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>کاربر</th>
+                  <th>مبلغ (تومان)</th>
+                  <th>روش پرداخت</th>
+                  <th>وضعیت</th>
+                  <th>تاریخ ثبت</th>
+                </tr>
+              </thead>
+              <tbody id="orders-body">
+                <tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="orders-pagination" style="margin-top:14px;text-align:center;display:flex;justify-content:center;gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div class="page" id="page-products">
+        <div class="page-title">🏷 محصولات</div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>نام محصول</th>
+                  <th>قیمت (تومان)</th>
+                  <th>موجودی</th>
+                  <th>وضعیت</th>
+                </tr>
+              </thead>
+              <tbody id="products-body">
+                <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="products-pagination" style="margin-top:14px;text-align:center;display:flex;justify-content:center;gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="page" id="page-users">
+        <div class="page-title">👤 کاربران</div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>نام کامل</th>
+                  <th>شماره موبایل</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="users-body">
+                <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="users-pagination" style="margin-top:14px;text-align:center;display:flex;justify-content:center;gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- BNPL -->
+      <div class="page" id="page-bnpl">
+        <div class="page-title">💳 اقساط BNPL</div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه قرارداد</th>
+                  <th>شناسه سفارش</th>
+                  <th>کل مبلغ</th>
+                  <th>تعداد اقساط</th>
+                  <th>وضعیت</th>
+                </tr>
+              </thead>
+              <tbody id="bnpl-body">
+                <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admins -->
+      <div class="page" id="page-admins">
+        <div class="page-title">🛡 مدیران سیستم</div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>نام کامل</th>
+                  <th>ایمیل</th>
+                  <th>نقش</th>
+                  <th>وضعیت</th>
+                </tr>
+              </thead>
+              <tbody id="admins-body">
+                <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="page" id="page-settings">
+        <div class="page-title">⚙ تنظیمات</div>
+        <div class="card">
+          <div class="form-group">
+            <label>آدرس API</label>
+            <input id="settings-api-url" class="form-control" type="text" />
+          </div>
+          <button class="btn btn-primary" id="btn-save-settings">ذخیره تنظیمات</button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

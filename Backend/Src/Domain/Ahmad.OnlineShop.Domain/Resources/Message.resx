@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ── Identity ── -->
+  <data name="UserNotFoundException" xml:space="preserve">
+    <value>کاربر مورد نظر یافت نشد.</value>
+  </data>
+  <data name="UserExistException" xml:space="preserve">
+    <value>این شماره موبایل قبلاً در سیستم ثبت‌نام شده است.</value>
+  </data>
+  <data name="ExistingUserException" xml:space="preserve">
+    <value>کاربری با این مشخصات از قبل در سیستم وجود دارد.</value>
+  </data>
+  <data name="IncorrectPasswordException" xml:space="preserve">
+    <value>نام کاربری یا رمز عبور اشتباه است.</value>
+  </data>
+  <data name="RoleNotFoundException" xml:space="preserve">
+    <value>نقش مورد نظر در سیستم یافت نشد.</value>
+  </data>
+  <data name="InvalidRefreshTokenException" xml:space="preserve">
+    <value>توکن نامعتبر یا منقضی شده است. لطفاً مجدداً وارد شوید.</value>
+  </data>
+  <data name="InvalidOtpException" xml:space="preserve">
+    <value>کد تأیید وارد شده نامعتبر یا منقضی شده است.</value>
+  </data>
+  <data name="OtpNotRequestedException" xml:space="preserve">
+    <value>ابتدا کد تأیید را دریافت کنید و سپس تأیید نمایید.</value>
+  </data>
+  <data name="EmptyNameException" xml:space="preserve">
+    <value>نام و نام خانوادگی نمی‌توانند خالی باشند.</value>
+  </data>
+  <data name="EmptyPhoneNumberException" xml:space="preserve">
+    <value>شماره موبایل نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="InvalidPhoneNumberException" xml:space="preserve">
+    <value>فرمت شماره موبایل نامعتبر است. لطفاً شماره‌ای با ۱۱ رقم وارد کنید.</value>
+  </data>
+  <data name="InvalidNationalCodeException" xml:space="preserve">
+    <value>کد ملی وارد شده نامعتبر است. کد ملی باید ۱۰ رقم باشد.</value>
+  </data>
+  <data name="PasswordMismatchException" xml:space="preserve">
+    <value>رمز عبور جدید و تکرار آن یکسان نیستند.</value>
+  </data>
+
+  <!-- ── Products ── -->
+  <data name="ProductNotFoundException" xml:space="preserve">
+    <value>محصول مورد نظر یافت نشد.</value>
+  </data>
+  <data name="EmptyProductNameException" xml:space="preserve">
+    <value>نام محصول نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="InvalidPriceException" xml:space="preserve">
+    <value>قیمت محصول باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="ProductAlreadyActiveException" xml:space="preserve">
+    <value>محصول در حال حاضر فعال است.</value>
+  </data>
+  <data name="ProductAlreadyArchivedException" xml:space="preserve">
+    <value>محصول در حال حاضر بایگانی شده است.</value>
+  </data>
+  <data name="ProductAlreadyInactiveException" xml:space="preserve">
+    <value>محصول در حال حاضر غیرفعال است.</value>
+  </data>
+  <data name="ProductNotOwnedBySellerException" xml:space="preserve">
+    <value>شما مجاز به مدیریت این محصول نیستید.</value>
+  </data>
+  <data name="InvalidSellerIdException" xml:space="preserve">
+    <value>شناسه فروشنده نامعتبر است.</value>
+  </data>
+
+  <!-- ── Category ── -->
+  <data name="CategoryNotFoundException" xml:space="preserve">
+    <value>دسته‌بندی مورد نظر یافت نشد.</value>
+  </data>
+  <data name="EmptyCategoryNameException" xml:space="preserve">
+    <value>نام دسته‌بندی نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="CategoryCircularReferenceException" xml:space="preserve">
+    <value>دسته‌بندی نمی‌تواند به خودش یا زیرمجموعه‌هایش اشاره کند.</value>
+  </data>
+
+  <!-- ── Inventory ── -->
+  <data name="InsufficientStockException" xml:space="preserve">
+    <value>موجودی کافی برای انجام این عملیات وجود ندارد.</value>
+  </data>
+  <data name="InvalidQuantityException" xml:space="preserve">
+    <value>مقدار وارد شده باید بزرگ‌تر یا مساوی صفر باشد.</value>
+  </data>
+  <data name="InvalidReserveQuantityException" xml:space="preserve">
+    <value>مقدار رزرو باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="InvalidReserveException" xml:space="preserve">
+    <value>عملیات رزرو در وضعیت فعلی معتبر نیست.</value>
+  </data>
+  <data name="NothingToReleaseException" xml:space="preserve">
+    <value>موجودی رزرو شده‌ای برای آزادسازی وجود ندارد.</value>
+  </data>
+
+  <!-- ── Images ── -->
+  <data name="ImageNotFoundException" xml:space="preserve">
+    <value>تصویر مورد نظر یافت نشد.</value>
+  </data>
+  <data name="ImageInvalidUrlException" xml:space="preserve">
+    <value>آدرس تصویر نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="InvalidImageUrlException" xml:space="preserve">
+    <value>آدرس تصویر وارد شده نامعتبر است.</value>
+  </data>
+  <data name="ImageInvalidBucketKeyException" xml:space="preserve">
+    <value>کلید باکت تصویر نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="ImageInvalidSortOrderException" xml:space="preserve">
+    <value>ترتیب نمایش تصویر نمی‌تواند منفی باشد.</value>
+  </data>
+  <data name="MaxImagesExceededException" xml:space="preserve">
+    <value>تعداد تصاویر از حداکثر مجاز (۱۰ تصویر) بیشتر نمی‌تواند باشد.</value>
+  </data>
+  <data name="PrimaryImageExistsException" xml:space="preserve">
+    <value>یک تصویر اصلی برای این محصول از قبل تعریف شده است.</value>
+  </data>
+
+  <!-- ── BackOffice ── -->
+  <data name="AdminNotFoundException" xml:space="preserve">
+    <value>مدیر مورد نظر یافت نشد.</value>
+  </data>
+  <data name="AdminEmailAlreadyExistsException" xml:space="preserve">
+    <value>مدیری با این آدرس ایمیل قبلاً ثبت شده است.</value>
+  </data>
+  <data name="AdminInvalidEmailException" xml:space="preserve">
+    <value>آدرس ایمیل وارد شده نامعتبر است.</value>
+  </data>
+  <data name="AdminInvalidNameException" xml:space="preserve">
+    <value>نام کامل مدیر الزامی است.</value>
+  </data>
+  <data name="AdminAlreadyActiveException" xml:space="preserve">
+    <value>حساب مدیر در حال حاضر فعال است.</value>
+  </data>
+  <data name="AdminAlreadyInactiveException" xml:space="preserve">
+    <value>حساب مدیر در حال حاضر غیرفعال است.</value>
+  </data>
+  <data name="ReportNotFoundException" xml:space="preserve">
+    <value>گزارش مورد نظر یافت نشد.</value>
+  </data>
+  <data name="ReportAlreadyCompletedException" xml:space="preserve">
+    <value>این گزارش قبلاً تکمیل شده است و قابل ویرایش نیست.</value>
+  </data>
+  <data name="AuditInvalidActionException" xml:space="preserve">
+    <value>نوع عملیات برای ثبت در گزارش حسابرسی الزامی است.</value>
+  </data>
+  <data name="AuditInvalidEntityException" xml:space="preserve">
+    <value>نوع موجودیت برای ثبت در گزارش حسابرسی الزامی است.</value>
+  </data>
+
+  <!-- ── BNPL ── -->
+  <data name="CreditLimitNotFoundException" xml:space="preserve">
+    <value>سقف اعتبار این کاربر تعریف نشده است.</value>
+  </data>
+  <data name="InsufficientCreditException" xml:space="preserve">
+    <value>اعتبار موجود شما برای این تراکنش کافی نیست.</value>
+  </data>
+  <data name="InvalidCreditLimitAmountException" xml:space="preserve">
+    <value>مقدار اعتبار باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="NegativeCreditException" xml:space="preserve">
+    <value>مقدار آزادسازی اعتبار از اعتبار مصرف‌شده بیشتر است.</value>
+  </data>
+  <data name="BnplContractNotFoundException" xml:space="preserve">
+    <value>قرارداد اقساطی مورد نظر یافت نشد.</value>
+  </data>
+  <data name="BnplContractAlreadyCancelledException" xml:space="preserve">
+    <value>این قرارداد اقساطی قبلاً لغو شده است.</value>
+  </data>
+  <data name="BnplContractAlreadyCompletedException" xml:space="preserve">
+    <value>این قرارداد اقساطی قبلاً تکمیل شده است.</value>
+  </data>
+  <data name="BnplContractNotActiveException" xml:space="preserve">
+    <value>این عملیات فقط روی قراردادهای فعال قابل اجرا است.</value>
+  </data>
+  <data name="InvalidInstallmentCountException" xml:space="preserve">
+    <value>تعداد اقساط باید بین ۱ تا ۴۸ باشد.</value>
+  </data>
+  <data name="InvalidTotalAmountException" xml:space="preserve">
+    <value>مبلغ کل قرارداد باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="InstallmentNotFoundException" xml:space="preserve">
+    <value>قسط مورد نظر یافت نشد.</value>
+  </data>
+  <data name="InstallmentAlreadyPaidException" xml:space="preserve">
+    <value>این قسط قبلاً پرداخت شده است.</value>
+  </data>
+  <data name="InstallmentInvalidAmountException" xml:space="preserve">
+    <value>مبلغ قسط باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+
+  <!-- ── Order ── -->
+  <data name="OrderNotFoundException" xml:space="preserve">
+    <value>سفارش مورد نظر یافت نشد.</value>
+  </data>
+  <data name="OrderNoItemsException" xml:space="preserve">
+    <value>سفارش باید حداقل یک آیتم داشته باشد.</value>
+  </data>
+  <data name="OrderAlreadyCancelledException" xml:space="preserve">
+    <value>این سفارش قبلاً لغو شده است.</value>
+  </data>
+  <data name="OrderAlreadyDeliveredException" xml:space="preserve">
+    <value>این سفارش قبلاً تحویل داده شده و قابل تغییر نیست.</value>
+  </data>
+  <data name="OrderInvalidStatusTransitionException" xml:space="preserve">
+    <value>تغییر وضعیت سفارش در حالت فعلی مجاز نیست.</value>
+  </data>
+  <data name="OrderItemNotFoundException" xml:space="preserve">
+    <value>آیتم مورد نظر در سفارش یافت نشد.</value>
+  </data>
+  <data name="OrderItemInvalidQuantityException" xml:space="preserve">
+    <value>تعداد آیتم باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="OrderItemInvalidUnitPriceException" xml:space="preserve">
+    <value>قیمت واحد باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="PaymentNotFoundException" xml:space="preserve">
+    <value>پرداخت مورد نظر یافت نشد.</value>
+  </data>
+  <data name="PaymentAmountMismatchException" xml:space="preserve">
+    <value>مبلغ پرداخت با مجموع سفارش مطابقت ندارد.</value>
+  </data>
+  <data name="PaymentInvalidAmountException" xml:space="preserve">
+    <value>مبلغ پرداخت باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="OrderCannotConfirmWithoutPaymentException" xml:space="preserve">
+    <value>تأیید سفارش بدون پرداخت موفق امکان‌پذیر نیست.</value>
+  </data>
+</root>

@@ -1,0 +1,53 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.usersecrets
+
+# Build results
+**/bin/
+**/obj/
+**/out/
+**/Publish/
+
+# Visual Studio
+.vs/
+.vscode/
+*.sln.cache
+*.csproj.user
+
+# Logs
+*.log
+logs/
+
+# User-specific files
+*.rsuser
+*.db
+
+# NuGet
+packages/
+*.nupkg
+
+# Environment variables
+.env
+appsettings.*.json
+secrets.json
+
+# macOS / Windows junk
+.DS_Store
+Thumbs.db
+
+# Git
+.gitignore
+!.gitignore
+
+# Temporary files
+*.tmp
+*.temp
+
+# Rider / JetBrains
+.idea/
+
+# Test results
+TestResults/

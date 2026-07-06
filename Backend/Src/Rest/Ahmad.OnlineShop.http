@@ -1,0 +1,188 @@
+### ═══════════════════════════════════════════════════════════
+### Ahmad OnlineShop API — HTTP Test File
+### Base URL: http://localhost:5141
+### در Dev: OTP همیشه 00000 است
+### ═══════════════════════════════════════════════════════════
+
+@baseUrl = http://localhost:5141
+@apiVersion = 1
+@api = {{baseUrl}}/api/v{{apiVersion}}
+
+### ──────────────────────────────────────────────────────────
+### بعد از VerifyOtp این متغیر رو از response پر کن:
+### ──────────────────────────────────────────────────────────
+@token = YOUR_JWT_TOKEN_HERE
+@userId = 1
+@refreshToken = YOUR_REFRESH_TOKEN_HERE
+
+
+### ═══════════════════════════════════════════════════════════
+###  STEP 1 ─ ارسال OTP (بدون JWT)
+### ═══════════════════════════════════════════════════════════
+
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09121234567"
+}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+###  STEP 2 ─ تأیید OTP → دریافت JWT  (در Dev کد: 00000)
+### ═══════════════════════════════════════════════════════════
+
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09121234567",
+  "code": "00000"
+}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+###  STEP 3 ─ Refresh Token
+### ═══════════════════════════════════════════════════════════
+
+POST {{api}}/Identity/Auth/RefreshToken
+Content-Type: application/json
+
+{
+  "accessToken":  "{{token}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+### ═══════════════════════════════════════════════════════════
+###  STEP 4 ─ Logout
+### ═══════════════════════════════════════════════════════════
+
+POST {{api}}/Identity/Auth/Logout
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+###  USERS ─ مدیریت کاربران (نیاز به JWT دارد)
+### ═══════════════════════════════════════════════════════════
+
+### لیست کاربران
+GET {{api}}/Identity/Users?page=1&pageSize=10
+Authorization: Bearer {{token}}
+
+###
+
+### دریافت کاربر با ID
+GET {{api}}/Identity/Users/{{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+### لیست نقش‌ها
+GET {{api}}/Identity/Roles
+Authorization: Bearer {{token}}
+
+###
+
+### ویرایش پروفایل
+PUT {{api}}/Identity/Users/{{userId}}/Profile
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "fullName": "احمد حمیدی فرد"
+}
+
+###
+
+### اختصاص نقش Seller (roleId=2)
+POST {{api}}/Identity/Users/{{userId}}/Roles/2
+Authorization: Bearer {{token}}
+
+###
+
+### حذف نقش Seller
+DELETE {{api}}/Identity/Users/{{userId}}/Roles/2
+Authorization: Bearer {{token}}
+
+###
+
+### فعال‌سازی کاربر
+POST {{api}}/Identity/Users/{{userId}}/Activate
+Authorization: Bearer {{token}}
+
+###
+
+### غیرفعال‌سازی کاربر
+POST {{api}}/Identity/Users/{{userId}}/Deactivate
+Authorization: Bearer {{token}}
+
+###
+
+### تعلیق کاربر
+POST {{api}}/Identity/Users/{{userId}}/Suspend
+Authorization: Bearer {{token}}
+
+###
+
+
+### ═══════════════════════════════════════════════════════════
+###  کاربران تست از Seed (همه OTP = 00000)
+### ═══════════════════════════════════════════════════════════
+###
+###  Admin    → 09000000001  (roleId=1)
+###  Seller   → 09000000002  (roleId=2)
+###  Customer → 09000000003  (roleId=3)
+###
+
+### ورود به عنوان Admin
+POST {{api}}/Identity/Auth/RequestOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000001"
+}
+
+###
+
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000001",
+  "code": "00000"
+}
+
+###
+
+### ورود به عنوان Seller
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000002",
+  "code": "00000"
+}
+
+###
+
+### ورود به عنوان Customer
+POST {{api}}/Identity/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "09000000003",
+  "code": "00000"
+}
+
+###

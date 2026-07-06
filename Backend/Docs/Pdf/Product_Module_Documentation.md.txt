@@ -1,0 +1,80 @@
+# مستندات ماژول Product
+
+## ۱. طراحی Aggregate Product
+
+**Aggregate Root:** `Product`
+
+### ساختار Aggregate:
+
+- **Product** (AggregateRoot<long>)
+  - CategoryId
+  - Name
+  - Description
+  - Price
+  - Status (Active / Inactive / Archived)
+  - CreatedAt, UpdatedAt
+  - Inventory (Entity 1:1)
+    - Quantity
+    - ReservedQuantity
+    - AvailableQuantity
+  - Images (Collection - Max 10)
+    - ProductImage (Entity<Guid>)
+      - Url
+      - BucketKey
+      - Type (Primary / Gallery)
+      - SortOrder
+      - UploadedAt
+
+**قوانین مهم:**
+- حداکثر ۱۰ تصویر
+- فقط یک تصویر Primary
+- تمام عملیات از طریق Aggregate Root
+
+## ۲. Endpoints
+
+### Product Operations
+- **GET** `/Product` → GetProducts
+- **GET** `/Product/{id}` → GetProduct
+- **POST** `/Product` → Post
+- **PUT** `/Product/{id}` → Put
+- **PATCH** `/Product/{id}/Price` → PatchChangePrice
+- **PATCH** `/Product/{id}/Activate` → PatchActivateProduct
+- **PATCH** `/Product/{id}/Deactivate` → PatchDeactivateProduct
+- **PATCH** `/Product/{id}/Archive` → PatchArchiveProduct
+
+### Inventory Operations
+- **GET** `/Product/{id}/Inventory` → GetInventory
+- **PATCH** `/Product/{id}/Inventory/Replenish` → PatchReplenishStock
+- **PATCH** `/Product/{id}/Inventory/Reserve` → PatchReserveStock
+- **PATCH** `/Product/{id}/Inventory/Release` → PatchReleaseStock
+- **PATCH** `/Product/{id}/Inventory/Confirm` → PatchConfirmStock
+
+### Image Operations
+- **POST** `/Product/{id}/Images` → PostImage
+- **DELETE** `/Product/{id}/Images/{imageId}` → DeleteImage
+- **PATCH** `/Product/{id}/Images/{imageId}/Primary` → PatchSetPrimaryImage
+- **PATCH** `/Product/{id}/Images/{imageId}/Reorder` → PatchReorderImage
+
+## ۳. Domain Events
+
+| Event | توضیح فارسی | کاربرد |
+|------|-------------|--------|
+| ProductPriceChangedEvent | تغییر قیمت محصول | بروزرسانی کش و اطلاع‌رسانی |
+| ProductStatusChangedEvent | تغییر وضعیت محصول | همگام‌سازی visibility |
+| ProductImageAddedEvent | اضافه شدن تصویر | پردازش تصویر |
+| ProductImageRemovedEvent | حذف تصویر | پاک‌سازی storage |
+| StockReservedEvent | رزرو موجودی | هنگام سفارش |
+| StockReleasedEvent | آزادسازی رزرو | لغو سفارش |
+| StockReplenishedEvent | افزایش موجودی | تامین کالا |
+| StockDepletedEvent | موجودی کم یا تمام | هشدار انبار |
+
+## ۴. Commands & Queries
+
+**Commands:**
+- CreateProductCommand, UpdateProductCommand, ChangeProductPriceCommand, Activate/Deactivate/ArchiveProductCommand
+- ReplenishStockCommand, ReserveStockCommand, ReleaseStockCommand, ConfirmStockCommand
+- AddProductImageCommand, RemoveProductImageCommand, SetPrimaryImageCommand, ReorderImageCommand
+
+**Queries:**
+- GetProductsQuery, GetProductQuery, GetInventoryQuery
+

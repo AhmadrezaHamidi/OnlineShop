@@ -1,0 +1,62 @@
+<svg viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg" font-family="Tahoma,Arial,sans-serif">
+  <title>Seller Flow — OnlineShop</title>
+  <rect width="820" height="420" fill="#f8fafc" rx="12"/>
+  <text x="410" y="38" text-anchor="middle" font-size="17" font-weight="bold" fill="#15803d">🏪 فرایند فروشنده (Seller Flow)</text>
+
+  <rect x="30" y="70" width="160" height="80" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="110" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">1. ایجاد محصول</text>
+  <text x="110" y="112" text-anchor="middle" font-size="10" fill="#16a34a">POST /Product</text>
+  <text x="110" y="128" text-anchor="middle" font-size="9" fill="#6b7280">PUT /Product/{id}</text>
+  <text x="110" y="142" text-anchor="middle" font-size="9" fill="#6b7280">PATCH /Product/{id}/Price</text>
+
+  <rect x="230" y="70" width="160" height="80" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="310" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">2. تصاویر محصول</text>
+  <text x="310" y="112" text-anchor="middle" font-size="10" fill="#16a34a">POST /Product/{id}/Images</text>
+  <text x="310" y="128" text-anchor="middle" font-size="9" fill="#6b7280">PATCH .../Primary</text>
+  <text x="310" y="142" text-anchor="middle" font-size="9" fill="#6b7280">PATCH .../Reorder</text>
+
+  <rect x="430" y="70" width="160" height="80" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="510" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">3. موجودی انبار</text>
+  <text x="510" y="112" text-anchor="middle" font-size="10" fill="#16a34a">PATCH .../Replenish</text>
+  <text x="510" y="128" text-anchor="middle" font-size="9" fill="#6b7280">PATCH .../Reserve</text>
+  <text x="510" y="142" text-anchor="middle" font-size="9" fill="#6b7280">PATCH .../Confirm / Release</text>
+
+  <rect x="630" y="70" width="160" height="80" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="710" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">4. پکیج‌سازی</text>
+  <text x="710" y="112" text-anchor="middle" font-size="10" fill="#16a34a">POST /Packages</text>
+  <text x="710" y="128" text-anchor="middle" font-size="9" fill="#6b7280">POST /Packages/{id}/items</text>
+  <text x="710" y="142" text-anchor="middle" font-size="9" fill="#6b7280">PUT .../activate</text>
+
+  <line x1="190" y1="110" x2="228" y2="110" stroke="#16a34a" stroke-width="2" marker-end="url(#a1)"/>
+  <line x1="390" y1="110" x2="428" y2="110" stroke="#16a34a" stroke-width="2" marker-end="url(#a1)"/>
+  <line x1="590" y1="110" x2="628" y2="110" stroke="#16a34a" stroke-width="2" marker-end="url(#a1)"/>
+
+  <!-- Row 2 -->
+  <rect x="130" y="230" width="200" height="80" rx="10" fill="#bbf7d0" stroke="#15803d" stroke-width="1.5"/>
+  <text x="230" y="256" text-anchor="middle" font-size="12" font-weight="bold" fill="#14532d">5. فعال/غیرفعال محصول</text>
+  <text x="230" y="272" text-anchor="middle" font-size="10" fill="#15803d">PATCH /Product/{id}/Activate</text>
+  <text x="230" y="288" text-anchor="middle" font-size="9" fill="#6b7280">PATCH /Deactivate / Archive</text>
+
+  <rect x="380" y="230" width="200" height="80" rx="10" fill="#bbf7d0" stroke="#15803d" stroke-width="1.5"/>
+  <text x="480" y="256" text-anchor="middle" font-size="12" font-weight="bold" fill="#14532d">6. پردازش سفارش‌ها</text>
+  <text x="480" y="272" text-anchor="middle" font-size="10" fill="#15803d">POST /Order/{id}/Confirm</text>
+  <text x="480" y="288" text-anchor="middle" font-size="9" fill="#6b7280">POST .../Ship → .../Deliver</text>
+
+  <line x1="110" y1="150" x2="110" y2="195" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="110" y1="195" x2="230" y2="195" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="230" y1="195" x2="230" y2="228" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+
+  <line x1="710" y1="150" x2="710" y2="195" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="710" y1="195" x2="480" y2="195" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="480" y1="195" x2="480" y2="228" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+
+  <!-- Category note -->
+  <rect x="30" y="350" width="760" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="410" y="372" text-anchor="middle" font-size="11" fill="#15803d">📁 دسته‌بندی: POST /Product/Categories  |  PUT /Product/Categories/{id}  |  GET /Product/Categories</text>
+  <text x="410" y="390" text-anchor="middle" font-size="10" fill="#6b7280">(فروشنده یا ادمین می‌تونه دسته‌بندی بسازه)</text>
+
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/></marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/></marker>
+  </defs>
+</svg>

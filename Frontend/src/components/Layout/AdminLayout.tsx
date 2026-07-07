@@ -26,9 +26,9 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
-          <span>🐾</span>
+          <span>🛍️</span>
           <div>
-            <div className={styles.logoTitle}>PetShop</div>
+            <div className={styles.logoTitle}>OnlineShop</div>
             <div className={styles.logoSub}>پنل مدیریت</div>
           </div>
         </div>

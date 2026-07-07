@@ -44,7 +44,7 @@ services:
     ports:
       - "5510:80"
     volumes:
-      - ./Frontend:/usr/share/nginx/html:ro
+      - ./Frontend/dist:/usr/share/nginx/html:ro
     networks:
       - onlineshop-net
     restart: unless-stopped

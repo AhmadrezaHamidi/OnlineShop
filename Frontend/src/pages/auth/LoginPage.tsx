@@ -42,8 +42,8 @@ export default function LoginPage() {
       <div className={styles.card}>
         {/* Logo */}
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>🐾</span>
-          <h1>PetShop</h1>
+          <span className={styles.logoIcon}>🛍️</span>
+          <h1>OnlineShop</h1>
           <p>ورود به سیستم</p>
         </div>
 

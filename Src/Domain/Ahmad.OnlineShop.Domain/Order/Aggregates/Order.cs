@@ -93,11 +93,18 @@ public sealed class Order : AggregateRoot<long>
         return payment;
     }
 
-    public void MarkPaymentCompleted(long paymentId)
+    public void SetPaymentAuthority(long paymentId, string authority)
     {
         var payment = _payments.FirstOrDefault(p => p.Id == paymentId);
         GuardPaymentExists(payment);
-        payment!.MarkCompleted();
+        payment!.SetZarinPalAuthority(authority);
+    }
+
+    public void MarkPaymentCompleted(long paymentId, string? transactionCode = null)
+    {
+        var payment = _payments.FirstOrDefault(p => p.Id == paymentId);
+        GuardPaymentExists(payment);
+        payment!.MarkCompleted(transactionCode);
         Confirm();
     }
 

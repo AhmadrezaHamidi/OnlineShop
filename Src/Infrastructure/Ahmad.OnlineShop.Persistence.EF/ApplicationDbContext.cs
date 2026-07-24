@@ -98,7 +98,7 @@ public sealed class IdentityAppDbContext : DbContext, IUnitOfWork
         : base(options) { }
 
     public DbSet<IdentityAppUser> IdentityUsers => Set<IdentityAppUser>();
-    public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
+    public DbSet<Identity.Domain.Entities.OtpRequest> OtpRequests => Set<Identity.Domain.Entities.OtpRequest>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Identity.Domain.Entities.Role> Roles => Set<Identity.Domain.Entities.Role>();
 
@@ -136,7 +136,7 @@ public sealed class IdentityAppDbContext : DbContext, IUnitOfWork
                 .Metadata.SetValueComparer(roleIdsComparer);
         });
 
-        builder.Entity<OtpRequest>(e =>
+        builder.Entity<Identity.Domain.Entities.OtpRequest>(e =>
         {
             e.ToTable("OtpRequests");
             e.HasKey(o => o.Id);

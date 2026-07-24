@@ -190,7 +190,7 @@ public sealed class OrderHandlers(
                 return await FallbackToCashOnDelivery(order, paymentId, result.Error, token);
             }
 
-            order.RecordPayment(new RecordPaymentArg(paymentId, order.TotalAmount, PaymentMethod.ZarinPal, "ZarinPal"));
+            order.RecordPayment(new RecordPaymentArg(paymentId, order.TotalAmount, "ZarinPal", PaymentMethod.ZarinPal));
             order.SetPaymentAuthority(paymentId, result.Authority!);
 
             await repository.UpdateAsync(order, token);
@@ -235,7 +235,7 @@ public sealed class OrderHandlers(
     private async Task<InitiatePaymentResult> FallbackToCashOnDelivery(
         OrderAgg.Aggregates.Order order, long paymentId, string? reason, CancellationToken token)
     {
-        order.RecordPayment(new RecordPaymentArg(paymentId, order.TotalAmount, PaymentMethod.CashOnDelivery, "COD-Fallback"));
+        order.RecordPayment(new RecordPaymentArg(paymentId, order.TotalAmount, "COD-Fallback", PaymentMethod.CashOnDelivery));
         order.MarkPaymentCompleted(paymentId);
 
         await repository.UpdateAsync(order, token);

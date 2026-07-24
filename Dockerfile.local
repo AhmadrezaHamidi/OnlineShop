@@ -1,0 +1,14 @@
+FROM onlineshop-api:latest AS base
+
+WORKDIR /app
+
+COPY publish_temp/ .
+
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_URLS=http://+:8080 \
+    DOTNET_RUNNING_IN_CONTAINER=true \
+    TZ=Asia/Tehran
+
+USER appuser
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "Ahmad.OnlineShop.ServiceHost.dll"]

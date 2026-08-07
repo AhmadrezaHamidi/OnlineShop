@@ -1,6 +1,8 @@
 using Ahmad.OnlineShop.Application.Contract.Order.Commands;
 using Ahmad.OnlineShop.Application.Contract.Payment;
 using Ahmad.OnlineShop.Application.Order.Mapper;
+using Ahmad.OnlineShop.Domain.Discount.Exceptions;
+using Ahmad.OnlineShop.Domain.Discount.Repositories;
 using Ahmad.OnlineShop.Domain.Order.Args;
 using Ahmad.OnlineShop.Domain.Order.Enums;
 using Ahmad.OnlineShop.Domain.Order.Exceptions;
@@ -13,14 +15,18 @@ using OrderAgg = Ahmad.OnlineShop.Domain.Order;
 namespace Ahmad.OnlineShop.Application.Handlers;
 
 public sealed class OrderHandlers(
-    IOrderRepository      repository,
-    ApplicationDbContext  context,
-    IZarinPalService      zarinpalService,
+    IOrderRepository        repository,
+    IDiscountRepository     discountRepository,
+    IProductPackageRepository packageRepository,
+    ApplicationDbContext    context,
+    IZarinPalService        zarinpalService,
     ILogger<OrderHandlers>? logger = null) :
     ICommandHandler<CreateOrderCommand, long>,
     ICommandHandler<PlaceOrderCommand, long>,
     ICommandHandler<AddOrderItemCommand, long>,
     ICommandHandler<RemoveOrderItemCommand, long>,
+    ICommandHandler<ApplyDiscountToOrderCommand, decimal>,
+    ICommandHandler<ApplyPackageToOrderCommand, decimal>,
     ICommandHandler<ConfirmOrderCommand, long>,
     ICommandHandler<ShipOrderCommand, long>,
     ICommandHandler<DeliverOrderCommand, long>,
@@ -52,6 +58,60 @@ public sealed class OrderHandlers(
         await repository.UpdateAsync(order, token);
         await context.SaveChangesAsync(token);
         return order.Id;
+    }
+
+    #endregion
+
+    #region Discount / Package Commands
+
+    public async Task<decimal> Handle(ApplyDiscountToOrderCommand command, CancellationToken token)
+    {
+        var order = await repository.GetByIdAsync(command.OrderId, token)
+            ?? throw new OrderNotFoundException();
+
+        var discount = await discountRepository.GetByCodeAsync(
+            command.DiscountCode.Trim().ToUpperInvariant(), token)
+            ?? throw new DiscountNotFoundException();
+
+        // Discount.Apply uses Strategy + Specification internally
+        var discountAmount = discount.Apply(order.SubTotal > 0 ? order.SubTotal : order.TotalAmount);
+
+        order.ApplyDiscount(command.DiscountCode, discountAmount);
+
+        await discountRepository.UpdateAsync(discount, token);
+        await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
+
+        logger?.LogInformation("تخفیف {Code} به سفارش {OrderId} اعمال شد. مبلغ تخفیف: {Amount}",
+            command.DiscountCode, command.OrderId, discountAmount);
+
+        return discountAmount;
+    }
+
+    public async Task<decimal> Handle(ApplyPackageToOrderCommand command, CancellationToken token)
+    {
+        var order = await repository.GetByIdAsync(command.OrderId, token)
+            ?? throw new OrderNotFoundException();
+
+        var package = await packageRepository.GetByIdAsync(command.PackageId, token)
+            ?? throw new ProductPackageNotFoundException();
+
+        if (!package.IsValid)
+            throw new PackageNotActiveException();
+
+        var originalTotal = order.SubTotal > 0 ? order.SubTotal : order.TotalAmount;
+        var discountedTotal   = package.CalculateDiscountedTotal(originalTotal);
+        var packageDiscountAmount = originalTotal - discountedTotal;
+
+        order.ApplyPackage(command.PackageId, packageDiscountAmount);
+
+        await repository.UpdateAsync(order, token);
+        await context.SaveChangesAsync(token);
+
+        logger?.LogInformation("پکیج {PackageId} به سفارش {OrderId} اعمال شد. تخفیف: {Amount}",
+            command.PackageId, command.OrderId, packageDiscountAmount);
+
+        return packageDiscountAmount;
     }
 
     #endregion

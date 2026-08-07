@@ -11,12 +11,17 @@ public sealed class Order : AggregateRoot<long>
     private readonly List<OrderItem> _items    = [];
     private readonly List<Payment>   _payments = [];
 
-    public long          UserId        { get; private set; }
-    public OrderStatus   Status        { get; private set; }
-    public decimal       TotalAmount   { get; private set; }
-    public PaymentMethod PaymentMethod { get; private set; }
-    public DateTime      PlacedAt      { get; private set; }
-    public DateTime      CreatedAt     { get; private set; }
+    public long          UserId              { get; private set; }
+    public OrderStatus   Status              { get; private set; }
+    public decimal       SubTotal            { get; private set; }  // جمع قبل از تخفیف
+    public decimal       DiscountAmount      { get; private set; }  // مبلغ تخفیف کد
+    public decimal       PackageDiscount     { get; private set; }  // تخفیف پکیج
+    public decimal       TotalAmount         { get; private set; }  // مبلغ نهایی
+    public string?       DiscountCode        { get; private set; }  // کد تخفیف اعمال‌شده
+    public long?         AppliedPackageId    { get; private set; }  // پکیج اعمال‌شده
+    public PaymentMethod PaymentMethod       { get; private set; }
+    public DateTime      PlacedAt            { get; private set; }
+    public DateTime      CreatedAt           { get; private set; }
 
     public IReadOnlyCollection<OrderItem> Items    => _items.AsReadOnly();
     public IReadOnlyCollection<Payment>   Payments => _payments.AsReadOnly();
@@ -25,12 +30,15 @@ public sealed class Order : AggregateRoot<long>
 
     private Order(CreateOrderArg arg) : base(arg.Id)
     {
-        UserId        = arg.UserId;
-        Status        = OrderStatus.Pending;
-        PaymentMethod = arg.PaymentMethod;
-        TotalAmount   = 0;
-        CreatedAt     = DateTime.UtcNow;
-        PlacedAt      = DateTime.UtcNow;
+        UserId           = arg.UserId;
+        Status           = OrderStatus.Pending;
+        PaymentMethod    = arg.PaymentMethod;
+        SubTotal         = 0;
+        DiscountAmount   = 0;
+        PackageDiscount  = 0;
+        TotalAmount      = 0;
+        CreatedAt        = DateTime.UtcNow;
+        PlacedAt         = DateTime.UtcNow;
     }
 
     public static Order Create(CreateOrderArg arg)
@@ -211,6 +219,35 @@ public sealed class Order : AggregateRoot<long>
             throw new OrderAlreadyDeliveredException();
     }
 
+    // ── Discount / Package ────────────────────────────────
+
+    /// <summary>کد تخفیف روی این سفارش اعمال می‌شود.</summary>
+    public void ApplyDiscount(string code, decimal discountAmount)
+    {
+        GuardStatusIsPending();
+        if (discountAmount < 0 || discountAmount > SubTotal)
+            throw new InvalidOperationException("مبلغ تخفیف نامعتبر است");
+
+        DiscountCode   = code.Trim().ToUpperInvariant();
+        DiscountAmount = discountAmount;
+        RecalculateTotal();
+    }
+
+    /// <summary>پکیج تخفیفی روی این سفارش اعمال می‌شود.</summary>
+    public void ApplyPackage(long packageId, decimal packageDiscountAmount)
+    {
+        GuardStatusIsPending();
+        if (packageDiscountAmount < 0 || packageDiscountAmount > SubTotal)
+            throw new InvalidOperationException("مبلغ تخفیف پکیج نامعتبر است");
+
+        AppliedPackageId = packageId;
+        PackageDiscount  = packageDiscountAmount;
+        RecalculateTotal();
+    }
+
     private void RecalculateTotal()
-        => TotalAmount = _items.Sum(i => i.TotalPrice);
+    {
+        SubTotal    = _items.Sum(i => i.TotalPrice);
+        TotalAmount = Math.Max(0, SubTotal - DiscountAmount - PackageDiscount);
+    }
 }

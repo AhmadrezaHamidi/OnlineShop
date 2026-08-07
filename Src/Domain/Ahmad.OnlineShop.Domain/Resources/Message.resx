@@ -279,4 +279,65 @@
   <data name="OrderCannotConfirmWithoutPaymentException" xml:space="preserve">
     <value>تأیید سفارش بدون پرداخت موفق امکان‌پذیر نیست.</value>
   </data>
+
+  <!-- ── Discount ── -->
+  <data name="DiscountNotFoundException" xml:space="preserve">
+    <value>کد تخفیف مورد نظر یافت نشد.</value>
+  </data>
+  <data name="InvalidDiscountCodeException" xml:space="preserve">
+    <value>کد تخفیف نامعتبر است.</value>
+  </data>
+  <data name="InvalidDiscountValueException" xml:space="preserve">
+    <value>مقدار تخفیف باید بزرگ‌تر از صفر باشد.</value>
+  </data>
+  <data name="DiscountCodeAlreadyExistsException" xml:space="preserve">
+    <value>این کد تخفیف قبلاً ثبت شده است.</value>
+  </data>
+  <data name="DiscountExpiredException" xml:space="preserve">
+    <value>مدت اعتبار این کد تخفیف به پایان رسیده است.</value>
+  </data>
+  <data name="DiscountMaxUsageReachedException" xml:space="preserve">
+    <value>این کد تخفیف به حداکثر تعداد استفاده رسیده است.</value>
+  </data>
+  <data name="DiscountMinOrderAmountNotMetException" xml:space="preserve">
+    <value>مبلغ سفارش از حداقل مبلغ لازم برای این تخفیف کمتر است.</value>
+  </data>
+  <data name="DiscountNotActiveException" xml:space="preserve">
+    <value>این کد تخفیف فعال نیست.</value>
+  </data>
+  <data name="DiscountAlreadyActiveException" xml:space="preserve">
+    <value>این تخفیف در حال حاضر فعال است.</value>
+  </data>
+
+  <!-- ── Package ── -->
+  <data name="ProductPackageNotFoundException" xml:space="preserve">
+    <value>پکیج محصول مورد نظر یافت نشد.</value>
+  </data>
+  <data name="InvalidPackageTitleException" xml:space="preserve">
+    <value>عنوان پکیج نمی‌تواند خالی باشد.</value>
+  </data>
+  <data name="InvalidPackageDiscountException" xml:space="preserve">
+    <value>درصد تخفیف پکیج باید بین ۱ تا ۱۰۰ باشد.</value>
+  </data>
+  <data name="InvalidPackageDateRangeException" xml:space="preserve">
+    <value>تاریخ شروع باید قبل از تاریخ پایان باشد.</value>
+  </data>
+  <data name="PackageItemAlreadyExistsException" xml:space="preserve">
+    <value>این محصول از قبل در پکیج موجود است.</value>
+  </data>
+  <data name="PackageItemNotFoundException" xml:space="preserve">
+    <value>آیتم مورد نظر در این پکیج یافت نشد.</value>
+  </data>
+  <data name="PackageNotActiveException" xml:space="preserve">
+    <value>این پکیج فعال نیست.</value>
+  </data>
+  <data name="PackageAlreadyActiveException" xml:space="preserve">
+    <value>این پکیج در حال حاضر فعال است.</value>
+  </data>
+  <data name="PackageExpiredException" xml:space="preserve">
+    <value>مدت اعتبار این پکیج به پایان رسیده است.</value>
+  </data>
+  <data name="CategoryNameAlreadyExistsException" xml:space="preserve">
+    <value>دسته‌بندی با این نام از قبل وجود دارد.</value>
+  </data>
 </root>

@@ -1,9 +1,4 @@
 ﻿using AhmadBase.Doamin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ahmad.OnlineShop.Domain.Products.Exceptions;
 
@@ -78,7 +73,7 @@ public sealed class CategoryCircularReferenceException : BusinessException
 public sealed class CategoryNameAlreadyExistsException : BusinessException
 {
     public CategoryNameAlreadyExistsException()
-        : base("دسته‌بندی با این نام از قبل وجود دارد.") { }
+        : base(Resources.Message.CategoryNameAlreadyExistsException) { }
 }
 
 // Inventory

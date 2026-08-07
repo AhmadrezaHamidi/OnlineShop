@@ -500,5 +500,63 @@ namespace Ahmad.OnlineShop.Domain.Resources {
         internal static string InvalidSellerIdException {
             get { return ResourceManager.GetString("InvalidSellerIdException", resourceCulture); }
         }
+
+        internal static string DiscountNotFoundException {
+            get { return ResourceManager.GetString("DiscountNotFoundException", resourceCulture); }
+        }
+        internal static string InvalidDiscountCodeException {
+            get { return ResourceManager.GetString("InvalidDiscountCodeException", resourceCulture); }
+        }
+        internal static string InvalidDiscountValueException {
+            get { return ResourceManager.GetString("InvalidDiscountValueException", resourceCulture); }
+        }
+        internal static string DiscountCodeAlreadyExistsException {
+            get { return ResourceManager.GetString("DiscountCodeAlreadyExistsException", resourceCulture); }
+        }
+        internal static string DiscountExpiredException {
+            get { return ResourceManager.GetString("DiscountExpiredException", resourceCulture); }
+        }
+        internal static string DiscountMaxUsageReachedException {
+            get { return ResourceManager.GetString("DiscountMaxUsageReachedException", resourceCulture); }
+        }
+        internal static string DiscountMinOrderAmountNotMetException {
+            get { return ResourceManager.GetString("DiscountMinOrderAmountNotMetException", resourceCulture); }
+        }
+        internal static string DiscountNotActiveException {
+            get { return ResourceManager.GetString("DiscountNotActiveException", resourceCulture); }
+        }
+        internal static string DiscountAlreadyActiveException {
+            get { return ResourceManager.GetString("DiscountAlreadyActiveException", resourceCulture); }
+        }
+        internal static string ProductPackageNotFoundException {
+            get { return ResourceManager.GetString("ProductPackageNotFoundException", resourceCulture); }
+        }
+        internal static string InvalidPackageTitleException {
+            get { return ResourceManager.GetString("InvalidPackageTitleException", resourceCulture); }
+        }
+        internal static string InvalidPackageDiscountException {
+            get { return ResourceManager.GetString("InvalidPackageDiscountException", resourceCulture); }
+        }
+        internal static string InvalidPackageDateRangeException {
+            get { return ResourceManager.GetString("InvalidPackageDateRangeException", resourceCulture); }
+        }
+        internal static string PackageItemAlreadyExistsException {
+            get { return ResourceManager.GetString("PackageItemAlreadyExistsException", resourceCulture); }
+        }
+        internal static string PackageItemNotFoundException {
+            get { return ResourceManager.GetString("PackageItemNotFoundException", resourceCulture); }
+        }
+        internal static string PackageNotActiveException {
+            get { return ResourceManager.GetString("PackageNotActiveException", resourceCulture); }
+        }
+        internal static string PackageAlreadyActiveException {
+            get { return ResourceManager.GetString("PackageAlreadyActiveException", resourceCulture); }
+        }
+        internal static string PackageExpiredException {
+            get { return ResourceManager.GetString("PackageExpiredException", resourceCulture); }
+        }
+        internal static string CategoryNameAlreadyExistsException {
+            get { return ResourceManager.GetString("CategoryNameAlreadyExistsException", resourceCulture); }
+        }
     }
 }

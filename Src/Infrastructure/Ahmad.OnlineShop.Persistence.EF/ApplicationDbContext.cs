@@ -3,6 +3,8 @@ using Ahmad.OnlineShop.Domain.BackOffice.Entities;
 using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;
 using Ahmad.OnlineShop.Domain.Bnpl.Entities;
 using Ahmad.OnlineShop.Domain.Discount.Entities;
+using InvoiceAgg  = Ahmad.OnlineShop.Domain.Invoice.Aggregates.Invoice;
+using InvoiceItem = Ahmad.OnlineShop.Domain.Invoice.Entities.InvoiceItem;
 using DiscountAggregate = Ahmad.OnlineShop.Domain.Discount.Aggregates.Discount;
 using ProductPackage    = Ahmad.OnlineShop.Domain.Discount.Aggregates.ProductPackage;
 using Ahmad.OnlineShop.Domain.Products;
@@ -56,6 +58,8 @@ public sealed class ApplicationDbContext
     public DbSet<DiscountAggregate> Discounts => Set<DiscountAggregate>();
     public DbSet<ProductPackage> ProductPackages => Set<ProductPackage>();
     public DbSet<PackageItem> PackageItems => Set<PackageItem>();
+    public DbSet<InvoiceAgg>  Invoices     => Set<InvoiceAgg>();
+    public DbSet<InvoiceItem> InvoiceItems => Set<InvoiceItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -98,7 +102,7 @@ public sealed class IdentityAppDbContext : DbContext, IUnitOfWork
         : base(options) { }
 
     public DbSet<IdentityAppUser> IdentityUsers => Set<IdentityAppUser>();
-    public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
+    public DbSet<Identity.Domain.Entities.OtpRequest> OtpRequests => Set<Identity.Domain.Entities.OtpRequest>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Identity.Domain.Entities.Role> Roles => Set<Identity.Domain.Entities.Role>();
 
@@ -136,7 +140,7 @@ public sealed class IdentityAppDbContext : DbContext, IUnitOfWork
                 .Metadata.SetValueComparer(roleIdsComparer);
         });
 
-        builder.Entity<OtpRequest>(e =>
+        builder.Entity<Identity.Domain.Entities.OtpRequest>(e =>
         {
             e.ToTable("OtpRequests");
             e.HasKey(o => o.Id);

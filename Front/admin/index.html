@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ورود ادمین</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+.wrap { width:100%; max-width:400px; }
+.logo { text-align:center; margin-bottom:32px; }
+.logo-ic { width:64px;height:64px;background:var(--teal-d);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px; }
+.logo h1 { font-size:22px;font-weight:500; }
+.logo p  { font-size:13px;color:var(--g5);margin-top:4px; }
+.step { display:none; }
+.step.active { display:block; }
+.otp-input { letter-spacing:8px;font-size:22px;text-align:center; }
+.hint { font-size:12px;color:var(--g5);text-align:center;margin-top:10px; }
+.back-link { color:var(--teal);cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-ic"><i class="ti ti-tooth" style="font-size:32px;color:#fff"></i></div>
+    <h1>پنل مدیریت</h1>
+    <p>کلینیک دندانپزشکی</p>
+  </div>
+
+  <div class="card">
+    <div class="step active" id="step1">
+      <div class="form-group">
+        <label>شماره موبایل ادمین</label>
+        <input type="tel" class="input" id="phone" placeholder="09xxxxxxxxx" maxlength="11" dir="ltr">
+      </div>
+      <button class="btn btn-primary btn-full" id="sendBtn" onclick="sendOtp()">دریافت کد تأیید</button>
+    </div>
+
+    <div class="step" id="step2">
+      <div style="text-align:center;margin-bottom:16px">
+        <i class="ti ti-shield-lock" style="font-size:36px;color:var(--teal)"></i>
+        <p style="margin-top:8px;font-size:13px;color:var(--g5)">کد ارسال شد به <strong id="phoneShow"></strong></p>
+      </div>
+      <div class="form-group">
+        <input type="text" class="input otp-input" id="otp" placeholder="------" maxlength="6" dir="ltr">
+      </div>
+      <button class="btn btn-primary btn-full" id="verifyBtn" onclick="verify()">ورود به پنل</button>
+      <p class="hint"><span class="back-link" onclick="goBack()">← تغییر شماره</span></p>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, setToken, setUser, getUser } from '../shared/api.js';
+import { toast, setLoading } from '../shared/ui.js';
+
+window.toast = toast;
+let phone = '';
+
+const u = getUser();
+if (u?.role === 'Admin') window.location.href = 'dashboard.html';
+
+window.goBack = () => {
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('step2').classList.remove('active');
+};
+
+window.sendOtp = async () => {
+  phone = document.getElementById('phone').value.trim();
+  if (!phone || phone.length < 11) { toast('شماره را وارد کنید', 'error'); return; }
+  const btn = document.getElementById('sendBtn');
+  setLoading(btn, true);
+  try {
+    await api('POST', '/api/Auth/login', { phoneNumber: phone });
+    document.getElementById('phoneShow').textContent = phone;
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    toast('کد ارسال شد', 'success');
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+  finally { setLoading(btn, false); }
+};
+
+window.verify = async () => {
+  const code = document.getElementById('otp').value.trim();
+  if (code.length < 4) { toast('کد را وارد کنید', 'error'); return; }
+  const btn = document.getElementById('verifyBtn');
+  setLoading(btn, true);
+  try {
+    const data = await api('POST', '/api/Auth/verify-phone', { phoneNumber: phone, verificationCode: code });
+    if (data.user.role !== 'Admin') { toast('دسترسی ندارید', 'error'); return; }
+    setToken(data.token);
+    setUser({ ...data.user });
+    window.location.href = 'dashboard.html';
+  } catch(e) { toast(e?.message ?? 'کد نادرست', 'error'); }
+  finally { setLoading(btn, false); }
+};
+</script>
+</body>
+</html>

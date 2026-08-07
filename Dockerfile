@@ -23,9 +23,12 @@ COPY ["Src/Rest/Ahmad.OnlineShop.API.Rest/Ahmad.OnlineShop.Rest.csproj",        
 
 # NuGet config برای private source
 COPY ["nuget.config", "."]
+COPY ["Nuget/", "Nuget/"]
+COPY ["NugetSource/", "NugetSource/"]
 
 # Restore
-RUN dotnet restore "Src/Host/Ahmad.OnlineShop.ServiceHost/Ahmad.OnlineShop.ServiceHost.csproj"
+RUN dotnet restore "Src/Host/Ahmad.OnlineShop.ServiceHost/Ahmad.OnlineShop.ServiceHost.csproj" \
+    --ignore-failed-sources
 
 # کپی بقیه کدها
 COPY . .

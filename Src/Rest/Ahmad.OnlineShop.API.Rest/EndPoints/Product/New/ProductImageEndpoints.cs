@@ -1,10 +1,22 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Ahmad.OnlineShop.Domain.Products.Enums;
 using Ahmad.OnlineShop.Rest.EndPoints.Product;
+using AhmadBase.External.Service.Storage;
+using AhmadBase.Web.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 
 namespace Ahmad.OnlineShop.Rest.Endpoints;
 
 public class ProductImageEndpoints : IEndpoint
 {
+    private static readonly HashSet<string> _allowedTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg", "image/png", "image/webp", "image/gif"
+    };
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup(ProductConstants.Routes.BaseRoute)
@@ -17,6 +29,12 @@ public class ProductImageEndpoints : IEndpoint
             ProductConstants.Names.GetImages,
             ProductConstants.Docs.GetImages.Summary,
             ProductConstants.Docs.GetImages.Description);
+
+        // آپلود فایل به MinIO
+        group.MapPost("{id:long}/images/upload", UploadImage)
+            .WithName("Product.UploadImage")
+            .WithSummary("آپلود عکس محصول به MinIO — multipart/form-data")
+            .DisableAntiforgery();
 
         group.MapPostEndpoint(
             ProductConstants.Routes.AddImage,
@@ -56,6 +74,44 @@ public class ProductImageEndpoints : IEndpoint
         => await queryBus.DispatchAsync<List<GetProductImageResponse>>(
             new GetProductImagesQuery(id), ct);
 
+    /// <summary>
+    /// آپلود عکس مستقیماً به MinIO — فایل رو می‌گیره، کلید یکتا می‌سازه،
+    /// آپلود می‌کنه و URL رو در DB ذخیره می‌کنه.
+    /// </summary>
+    private static async Task<IResult> UploadImage(
+        long id,
+        IFormFile file,
+        ImageType type,
+        ICommandBus bus,
+        IFileStorageService storage,
+        IOptions<FileStorageOptions> storageOpts,
+        CancellationToken ct)
+    {
+        if (!_allowedTypes.Contains(file.ContentType))
+            return Results.BadRequest(ApiResponse<string>.Fail(
+                $"فرمت {file.ContentType} پشتیبانی نمی‌شود. فرمت‌های مجاز: JPEG, PNG, WebP, GIF"));
+
+        if (file.Length > 5 * 1024 * 1024)
+            return Results.BadRequest(ApiResponse<string>.Fail("حداکثر حجم مجاز ۵ مگابایت است"));
+
+        var ext       = Path.GetExtension(file.FileName).TrimStart('.');
+        var objectKey = $"products/{id}/{Guid.NewGuid():N}.{ext}";
+        var bucket    = storageOpts.Value.DefaultBucket;
+
+        await using var stream = file.OpenReadStream();
+        var uploadResult = await storage.UploadAsync(
+            new FileUploadRequest(bucket, objectKey, stream, file.ContentType, file.Length), ct);
+
+        if (!uploadResult.Success)
+            return Results.Problem($"آپلود به MinIO ناموفق بود: {uploadResult.Error}");
+
+        var cmd = new AddProductImageCommand(id, uploadResult.PublicUrl!, objectKey, type);
+        var productId = await bus.Dispatch<long>(cmd, ct);
+
+        return Results.Ok(ApiResponse<UploadImageResponse>.Ok(
+            new UploadImageResponse(productId, uploadResult.PublicUrl!, objectKey)));
+    }
+
     private static async Task<long> AddImage(
         long id,
         [FromBody] AddProductImageCommand command,
@@ -84,4 +140,6 @@ public class ProductImageEndpoints : IEndpoint
         ICommandBus bus,
         CancellationToken ct)
         => await bus.Dispatch<Guid>(command with { ProductId = id, ImageId = imageId }, ct);
+
+    public sealed record UploadImageResponse(long ProductId, string Url, string BucketKey);
 }

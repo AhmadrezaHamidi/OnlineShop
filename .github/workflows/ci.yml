@@ -1,0 +1,71 @@
+name: CI — Build & Test
+
+on:
+  push:
+    branches: [ "**" ]
+    paths-ignore:
+      - "**.md"
+      - "Docs/**"
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  SOLUTION:       "Ahmad.OnlineShop.sln"
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET 8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Cache NuGet packages ────────────────────────────────────────────────
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # ── Setup .NET ──────────────────────────────────────────────────────────
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # ── NuGet local feed (Nuget/ folder) ───────────────────────────────────
+      - name: Add local NuGet feed
+        run: |
+          if [ -d "Nuget" ]; then
+            dotnet nuget add source "$GITHUB_WORKSPACE/Nuget" --name LocalFeed || true
+          fi
+
+      # ── Restore ─────────────────────────────────────────────────────────────
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      # ── Build ───────────────────────────────────────────────────────────────
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore -c Release
+
+      # ── Test ────────────────────────────────────────────────────────────────
+      - name: Test
+        run: |
+          dotnet test ${{ env.SOLUTION }} \
+            --no-build -c Release \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+        continue-on-error: false
+
+      # ── Publish test results ────────────────────────────────────────────────
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name:    ".NET Test Results"
+          path:    "**/test-results.trx"
+          reporter: dotnet-trx

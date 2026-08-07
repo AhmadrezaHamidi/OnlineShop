@@ -1,4 +1,5 @@
-using Identity.Domain.Entities;
+﻿using Identity.Domain.Entities;
+using OtpRequest = Identity.Domain.Entities.OtpRequest;
 
 namespace Identity.Domain.Repositories;
 

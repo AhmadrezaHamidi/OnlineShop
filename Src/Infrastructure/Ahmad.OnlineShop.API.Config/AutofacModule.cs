@@ -17,11 +17,14 @@ using BackOffice.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Repositories;
 using Ahmad.OnlineShop.Domain.Products;
 using Ahmad.OnlineShop.Domain.Discount.Repositories;
+using Ahmad.OnlineShop.Domain.Invoice.Repositories;
 using OldIUserRepository = Ahmad.OnlineShop.Domain.Users.IUserRepository;
 using OldUserRepository  = Ahmad.OnlineShop.Persistence.EF.Repositories.UserRepository;
 using Ahmad.OnlineShop.Persistence.EF.Repositories;
 using Ahmad.OnlineShop.Persistence.EF;
+using Ahmad.OnlineShop.Application.Contract.Payment;
 using Ahmad.OnlineShop.Persistence.EF.Services;
+using Ahmad.OnlineShop.Persistence.EF.Services.Payment;
 using Microsoft.EntityFrameworkCore;
 using Identity.Application.Services;
 using Identity.Domain.Repositories;
@@ -79,6 +82,7 @@ public class AutofacModule : Autofac.Module
         builder.RegisterType<OldUserRepository>()      .As<OldIUserRepository>()      .InstancePerLifetimeScope();
         builder.RegisterType<DiscountRepository>()        .As<IDiscountRepository>()        .InstancePerLifetimeScope();
         builder.RegisterType<ProductPackageRepository>()  .As<IProductPackageRepository>()  .InstancePerLifetimeScope();
+        builder.RegisterType<InvoiceRepository>()         .As<IInvoiceRepository>()         .InstancePerLifetimeScope();
 
         // ── ۳. Identity Repositories ──────────────────────────────────────────
         builder.RegisterType<IdentityUserRepository>()        .As<IUserRepository>()         .InstancePerLifetimeScope();
@@ -134,6 +138,9 @@ public class AutofacModule : Autofac.Module
         }).As<IOptions<PaymentGatewayOptions>>().SingleInstance();
 
         builder.RegisterType<ZarinPalService>().As<IPaymentService>().InstancePerLifetimeScope();
+
+        // IZarinPalService — پیاده‌سازی پروژه با Circuit Breaker (Polly)
+        builder.RegisterType<ZarinPalPaymentService>().As<IZarinPalService>().InstancePerLifetimeScope();
 
         // ── ۸. CorrelationId — اول pipeline، قبل از همه middleware ها ─────────
         builder.RegisterType<CorrelationIdStartupFilter>()

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تنظیمات</title>
+<link rel="stylesheet" href="../../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+:root{--sidebar:220px}
+body{display:flex;min-height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.logo{padding:20px 16px;border-bottom:0.5px solid rgba(255,255,255,.1)}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-ic{width:34px;height:34px;background:var(--teal-m);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-t{font-size:15px;font-weight:500;color:#fff}
+.nav-sec{padding:14px 10px 4px}
+.nav-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;padding:0 6px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;margin-bottom:2px;text-decoration:none}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.13);color:#fff}
+.nav-item i{font-size:17px}
+.sb-user{margin-top:auto;padding:14px;border-top:0.5px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--teal-m);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:500}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid var(--g1);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.section{background:#fff;border-radius:12px;border:0.5px solid var(--g1);padding:20px}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--g0)}
+.sec-title i{font-size:18px;color:var(--teal)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--g0)}
+.toggle-row:last-of-type{border:none}
+.toggle-lbl{font-size:13px;color:var(--g7)}
+.toggle-sub{font-size:11px;color:var(--g5);margin-top:2px}
+.switch{position:relative;width:40px;height:22px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--g2);border-radius:12px;transition:.2s}
+.slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--teal)}
+.switch input:checked+.slider:before{transform:translateX(18px)}
+.save-btn{margin-top:14px;width:100%}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-row">
+      <div class="logo-ic"><i class="ti ti-tooth" style="font-size:18px;color:#fff"></i></div>
+      <div>
+        <div class="logo-t">کلینیک دندان</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">پنل مدیریت</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">اصلی</div>
+    <a class="nav-item" href="../dashboard.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+    <a class="nav-item" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+    <a class="nav-item" href="patients.html"><i class="ti ti-users"></i>بیماران</a>
+    <a class="nav-item" href="doctors.html"><i class="ti ti-stethoscope"></i>دکترها</a>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">ابزارها</div>
+    <a class="nav-item" href="sms.html"><i class="ti ti-message-dots"></i>کمپین SMS</a>
+    <a class="nav-item active" href="settings.html"><i class="ti ti-settings"></i>تنظیمات</a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">ا</div>
+    <div style="flex:1"><div style="font-size:12px;color:#fff;font-weight:500" id="sbName">ادمین</div></div>
+    <i class="ti ti-logout" style="color:rgba(255,255,255,.4);cursor:pointer" onclick="doLogout()"></i>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div style="font-size:15px;font-weight:500;color:var(--g7)">تنظیمات</div>
+  </div>
+
+  <div class="content">
+    <div class="settings-grid">
+
+      <!-- اطلاعات کلینیک -->
+      <div class="section">
+        <div class="sec-title"><i class="ti ti-building-hospital"></i>اطلاعات کلینیک</div>
+        <div class="form-group">
+          <label>نام کلینیک</label>
+          <input type="text" class="input" id="clinicName" placeholder="کلینیک دندانپزشکی ...">
+        </div>
+        <div class="form-group">
+          <label>آدرس</label>
+          <input type="text" class="input" id="clinicAddr" placeholder="آدرس کلینیک">
+        </div>
+        <div class="form-group">
+          <label>شماره تماس</label>
+          <input type="tel" class="input" id="clinicPhone" dir="ltr" placeholder="021xxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>ساعات کاری</label>
+          <input type="text" class="input" id="clinicHours" placeholder="شنبه تا چهارشنبه ۸–۲۰">
+        </div>
+        <button class="btn btn-primary save-btn" onclick="saveSection('clinic')">ذخیره</button>
+      </div>
+
+      <!-- تنظیمات پیامک -->
+      <div class="section">
+        <div class="sec-title"><i class="ti ti-message"></i>سرویس SMS</div>
+        <div class="form-group">
+          <label>API Key سرویس پیامک</label>
+          <input type="text" class="input" id="smsKey" dir="ltr" placeholder="xxxxxxxxxxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>شماره فرستنده</label>
+          <input type="tel" class="input" id="smsSender" dir="ltr" placeholder="3000XXXXX">
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">ارسال SMS فعال باشد</div></div>
+          <label class="switch"><input type="checkbox" id="smsEnabled"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-lbl">یادآوری خودکار نوبت</div>
+            <div class="toggle-sub">۲۴ ساعت قبل از نوبت</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="smsReminder"><span class="slider"></span></label>
+        </div>
+        <button class="btn btn-primary save-btn" onclick="saveSection('sms')">ذخیره</button>
+      </div>
+
+      <!-- تنظیمات بله -->
+      <div class="section">
+        <div class="sec-title"><i class="ti ti-brand-telegram"></i>پیام‌رسان بله</div>
+        <div class="form-group">
+          <label>توکن ربات بله</label>
+          <input type="text" class="input" id="baleToken" dir="ltr" placeholder="TOKEN:xxxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>Chat ID کانال کلینیک</label>
+          <input type="text" class="input" id="baleChatId" dir="ltr" placeholder="-100xxxxxxxxxx">
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">اطلاع‌رسانی از طریق بله</div></div>
+          <label class="switch"><input type="checkbox" id="baleEnabled"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-lbl">ارسال نسخه به بله بیمار</div>
+            <div class="toggle-sub">هنگام ثبت نسخه توسط دکتر</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="balePrescription"><span class="slider"></span></label>
+        </div>
+        <button class="btn btn-primary save-btn" onclick="saveSection('bale')">ذخیره</button>
+      </div>
+
+      <!-- تنظیمات نوبت‌دهی -->
+      <div class="section">
+        <div class="sec-title"><i class="ti ti-calendar-cog"></i>نوبت‌دهی</div>
+        <div class="form-group">
+          <label>مدت زمان هر نوبت (دقیقه)</label>
+          <input type="number" class="input" id="slotDuration" value="30" min="10" max="120">
+        </div>
+        <div class="form-group">
+          <label>حداکثر نوبت همزمان</label>
+          <input type="number" class="input" id="maxSlots" value="1" min="1" max="5">
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-lbl">تأیید خودکار نوبت‌ها</div>
+            <div class="toggle-sub">بدون نیاز به تأیید ادمین</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="autoConfirm"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-lbl">نوبت‌دهی آنلاین فعال</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="onlineBooking" checked><span class="slider"></span></label>
+        </div>
+        <button class="btn btn-primary save-btn" onclick="saveSection('booking')">ذخیره</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, getUser } from '../../shared/api.js';
+import { requireAuth } from '../../shared/auth.js';
+import { toast, setLoading } from '../../shared/ui.js';
+
+if (!requireAuth(['Admin'])) throw new Error('auth');
+
+const user = getUser();
+document.getElementById('sbName').textContent = `${user.firstName} ${user.lastName}`;
+document.getElementById('sbAv').textContent   = user.firstName?.[0] ?? 'ا';
+
+async function loadSettings() {
+  try {
+    const s = await api('GET', '/api/admin/settings');
+    if (!s) return;
+
+    document.getElementById('clinicName').value  = s.clinicName  ?? '';
+    document.getElementById('clinicAddr').value  = s.clinicAddr  ?? '';
+    document.getElementById('clinicPhone').value = s.clinicPhone ?? '';
+    document.getElementById('clinicHours').value = s.clinicHours ?? '';
+
+    document.getElementById('smsKey').value      = s.smsApiKey   ?? '';
+    document.getElementById('smsSender').value   = s.smsSender   ?? '';
+    document.getElementById('smsEnabled').checked    = !!s.smsEnabled;
+    document.getElementById('smsReminder').checked   = !!s.smsReminder;
+
+    document.getElementById('baleToken').value   = s.baleToken   ?? '';
+    document.getElementById('baleChatId').value  = s.baleChatId  ?? '';
+    document.getElementById('baleEnabled').checked       = !!s.baleEnabled;
+    document.getElementById('balePrescription').checked  = !!s.balePrescription;
+
+    document.getElementById('slotDuration').value = s.slotDuration ?? 30;
+    document.getElementById('maxSlots').value     = s.maxSlots     ?? 1;
+    document.getElementById('autoConfirm').checked    = !!s.autoConfirm;
+    document.getElementById('onlineBooking').checked  = s.onlineBooking !== false;
+  } catch(e) {}
+}
+
+window.saveSection = async (section) => {
+  let body = {};
+  if (section === 'clinic') {
+    body = {
+      clinicName:  document.getElementById('clinicName').value,
+      clinicAddr:  document.getElementById('clinicAddr').value,
+      clinicPhone: document.getElementById('clinicPhone').value,
+      clinicHours: document.getElementById('clinicHours').value,
+    };
+  } else if (section === 'sms') {
+    body = {
+      smsApiKey:   document.getElementById('smsKey').value,
+      smsSender:   document.getElementById('smsSender').value,
+      smsEnabled:  document.getElementById('smsEnabled').checked,
+      smsReminder: document.getElementById('smsReminder').checked,
+    };
+  } else if (section === 'bale') {
+    body = {
+      baleToken:        document.getElementById('baleToken').value,
+      baleChatId:       document.getElementById('baleChatId').value,
+      baleEnabled:      document.getElementById('baleEnabled').checked,
+      balePrescription: document.getElementById('balePrescription').checked,
+    };
+  } else if (section === 'booking') {
+    body = {
+      slotDuration:  parseInt(document.getElementById('slotDuration').value),
+      maxSlots:      parseInt(document.getElementById('maxSlots').value),
+      autoConfirm:   document.getElementById('autoConfirm').checked,
+      onlineBooking: document.getElementById('onlineBooking').checked,
+    };
+  }
+
+  try {
+    await api('PUT', '/api/admin/settings', body);
+    toast('تنظیمات ذخیره شد', 'success');
+  } catch(e) {
+    toast(e?.message ?? 'خطا در ذخیره', 'error');
+  }
+};
+
+window.doLogout = () => { if(confirm('خروج؟')){ localStorage.clear(); window.location.href='../index.html'; } };
+
+loadSettings();
+</script>
+</body>
+</html>

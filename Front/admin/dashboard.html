@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>داشبورد ادمین</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+:root{--sidebar:220px}
+body{display:flex;min-height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.logo{padding:20px 16px;border-bottom:0.5px solid rgba(255,255,255,.1)}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-ic{width:34px;height:34px;background:var(--teal-m);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-t{font-size:15px;font-weight:500;color:#fff}
+.logo-s{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.nav-sec{padding:14px 10px 4px}
+.nav-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;padding:0 6px;margin-bottom:6px;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;margin-bottom:2px;text-decoration:none;transition:background .15s}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.13);color:#fff}
+.nav-item i{font-size:17px}
+.nav-badge{margin-right:auto;background:var(--amber-m);color:#fff;font-size:9px;border-radius:10px;padding:1px 6px;font-weight:500}
+.sb-user{margin-top:auto;padding:14px;border-top:0.5px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--teal-m);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:500;flex-shrink:0}
+.sb-name{font-size:12px;color:#fff;font-weight:500}
+.sb-role{font-size:10px;color:rgba(255,255,255,.45)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid var(--g1);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.tb-title{font-size:15px;font-weight:500;color:var(--g7);flex:1}
+.search{display:flex;align-items:center;gap:8px;background:var(--g0);border:0.5px solid var(--g1);border-radius:8px;padding:6px 12px;width:220px}
+.search input{background:none;border:none;outline:none;font-size:12px;color:var(--g7);width:100%;font-family:inherit}
+.search i{color:var(--g2);font-size:15px}
+.tb-icon{width:34px;height:34px;border-radius:8px;border:0.5px solid var(--g1);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--g5);font-size:17px;position:relative}
+.notif-dot::after{content:'';position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--amber-m);border-radius:50%;border:1.5px solid #fff}
+.tb-av{width:34px;height:34px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--teal);font-weight:500;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:12px;border:0.5px solid var(--g1);padding:14px 16px}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sc-lbl{font-size:11px;color:var(--g5)}
+.sc-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.ic-teal{background:var(--teal-l);color:var(--teal)}
+.ic-amber{background:var(--amber-l);color:var(--amber)}
+.ic-coral{background:var(--coral-l);color:var(--coral)}
+.ic-purple{background:var(--purple-l);color:var(--purple)}
+.sc-val{font-size:26px;font-weight:500;color:var(--g7)}
+.sc-delta{font-size:11px;margin-top:4px}
+.delta-up{color:var(--teal-m)}.delta-dn{color:var(--coral)}
+.layout2{display:grid;grid-template-columns:1fr 300px;gap:16px}
+.panel{background:#fff;border-radius:12px;border:0.5px solid var(--g1);padding:16px}
+.panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.panel-title{font-size:13px;font-weight:500;color:var(--g7)}
+.panel-link{font-size:11px;color:var(--teal-m);text-decoration:none;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;color:var(--g5);font-weight:500;text-align:right;padding:0 0 10px;border-bottom:0.5px solid var(--g0)}
+td{font-size:12px;color:var(--g7);padding:9px 0;border-bottom:0.5px solid var(--g0);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+td:last-child,th:last-child{text-align:left}
+.av-sm{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.act-row{display:flex;gap:4px}
+.act-btn{border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.act-primary{background:var(--teal);color:#fff}
+.act-outline{background:#fff;border:0.5px solid var(--g1);color:var(--g6)}
+.act-danger{background:var(--coral-l);color:var(--coral);border:none}
+.side-cards{display:flex;flex-direction:column;gap:14px}
+.doc-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--g0)}
+.doc-row:last-child{border-bottom:none}
+.doc-av{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500}
+.doc-info{flex:1}
+.doc-name{font-size:12px;font-weight:500}
+.doc-spec{font-size:10px;color:var(--g5);margin-top:1px}
+.toggle{width:36px;height:20px;background:var(--teal);border-radius:10px;position:relative;cursor:pointer;flex-shrink:0;border:none}
+.toggle::after{content:'';position:absolute;right:3px;top:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:right .15s}
+.toggle.off{background:var(--g1)}
+.toggle.off::after{right:auto;left:3px}
+.bar-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--g0)}
+.bar-row:last-child{border-bottom:none}
+.bar-lbl{font-size:11px;color:var(--g7);min-width:72px}
+.bar-bg{flex:1;height:5px;background:var(--g0);border-radius:3px}
+.bar-fill{height:5px;border-radius:3px}
+.bar-val{font-size:11px;color:var(--g5);min-width:22px;text-align:left}
+.act-feed{display:flex;flex-direction:column;gap:0}
+.af-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:0.5px solid var(--g0)}
+.af-row:last-child{border-bottom:none}
+.af-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.af-title{font-size:12px;color:var(--g7)}
+.af-time{font-size:10px;color:var(--g5);margin-top:2px}
+.quick-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.qk{background:#fff;border:0.5px solid var(--g1);border-radius:10px;padding:12px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.qk:hover{border-color:var(--teal-b)}
+.qk-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.qk-label{font-size:11px;color:var(--g6);font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-row">
+      <div class="logo-ic"><i class="ti ti-tooth" style="font-size:18px;color:#fff"></i></div>
+      <div>
+        <div class="logo-t">کلینیک دندان</div>
+        <div class="logo-s">پنل مدیریت</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">اصلی</div>
+    <a class="nav-item active" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+    <a class="nav-item" href="pages/appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها<span class="nav-badge" id="pendingCount">...</span></a>
+    <a class="nav-item" href="pages/patients.html"><i class="ti ti-users"></i>بیماران</a>
+    <a class="nav-item" href="pages/doctors.html"><i class="ti ti-stethoscope"></i>دکترها</a>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">ابزارها</div>
+    <a class="nav-item" href="pages/sms.html"><i class="ti ti-message-dots"></i>کمپین SMS</a>
+    <a class="nav-item" href="pages/settings.html"><i class="ti ti-settings"></i>تنظیمات</a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">ا</div>
+    <div style="flex:1">
+      <div class="sb-name" id="sbName">ادمین</div>
+      <div class="sb-role">مدیر کلینیک</div>
+    </div>
+    <i class="ti ti-logout" style="color:rgba(255,255,255,.4);cursor:pointer;font-size:16px" onclick="doLogout()" title="خروج"></i>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="todayTitle">داشبورد</div>
+    <div class="search">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="جستجو بیمار، نوبت..." id="globalSearch">
+    </div>
+    <div class="tb-icon notif-dot" title="اعلان‌ها"><i class="ti ti-bell"></i></div>
+    <a class="tb-icon" href="pages/settings.html" title="تنظیمات"><i class="ti ti-settings"></i></a>
+    <div class="tb-av" id="tbAv">ا</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="sc-top"><span class="sc-lbl">نوبت امروز</span><div class="sc-ic ic-teal"><i class="ti ti-calendar"></i></div></div><div class="sc-val" id="sToday">—</div><div class="sc-delta" id="dToday"></div></div>
+      <div class="stat-card"><div class="sc-top"><span class="sc-lbl">بیماران کل</span><div class="sc-ic ic-purple"><i class="ti ti-users"></i></div></div><div class="sc-val" id="sPatients">—</div><div class="sc-delta delta-up"></div></div>
+      <div class="stat-card"><div class="sc-top"><span class="sc-lbl">در انتظار تأیید</span><div class="sc-ic ic-amber"><i class="ti ti-clock"></i></div></div><div class="sc-val" id="sPending">—</div><div class="sc-delta delta-dn" id="dPending"></div></div>
+      <div class="stat-card"><div class="sc-top"><span class="sc-lbl">لغو امروز</span><div class="sc-ic ic-coral"><i class="ti ti-calendar-x"></i></div></div><div class="sc-val" id="sCancelled">—</div><div class="sc-delta delta-dn"></div></div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-row">
+      <a class="qk" href="pages/appointments.html?new=1">
+        <div class="qk-ic ic-teal"><i class="ti ti-calendar-plus"></i></div>
+        <span class="qk-label">نوبت جدید</span>
+      </a>
+      <a class="qk" href="pages/patients.html?new=1">
+        <div class="qk-ic ic-purple"><i class="ti ti-user-plus"></i></div>
+        <span class="qk-label">بیمار جدید</span>
+      </a>
+      <a class="qk" href="pages/sms.html">
+        <div class="qk-ic ic-amber"><i class="ti ti-message-dots"></i></div>
+        <span class="qk-label">کمپین SMS</span>
+      </a>
+      <a class="qk" href="pages/doctors.html?new=1">
+        <div class="qk-ic ic-coral"><i class="ti ti-stethoscope"></i></div>
+        <span class="qk-label">دکتر جدید</span>
+      </a>
+    </div>
+
+    <!-- Table + Side -->
+    <div class="layout2">
+      <div class="panel">
+        <div class="panel-hd">
+          <span class="panel-title">نوبت‌های امروز</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select style="border:0.5px solid var(--g1);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--g7);background:#fff;font-family:inherit" id="filterStatus" onchange="filterTable()">
+              <option value="">همه وضعیت‌ها</option>
+              <option value="Pending">در انتظار</option>
+              <option value="Confirmed">تأیید شده</option>
+              <option value="Cancelled">لغو شده</option>
+              <option value="Completed">انجام شده</option>
+            </select>
+            <a class="panel-link" href="pages/appointments.html">همه نوبت‌ها</a>
+          </div>
+        </div>
+        <div id="apptTable" style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>بیمار</th><th>تخصص</th><th>ساعت</th><th>وضعیت</th><th>عملیات</th>
+            </tr></thead>
+            <tbody id="apptBody">
+              <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--g5)"><i class="ti ti-loader"></i> در حال بارگذاری...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Side panels -->
+      <div class="side-cards">
+        <div class="panel">
+          <div class="panel-hd">
+            <span class="panel-title">دکترها</span>
+            <a class="panel-link" href="pages/doctors.html">مدیریت</a>
+          </div>
+          <div id="docList"><div style="text-align:center;color:var(--g5);font-size:12px">در حال بارگذاری...</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">فعالیت اخیر</span></div>
+          <div class="act-feed" id="actFeed">
+            <div class="af-row"><div class="af-dot" style="background:var(--teal)"></div><div><div class="af-title">در حال بارگذاری...</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, getUser, logout } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, formatDate, formatTime, statusBadge } from '../shared/ui.js';
+
+if (!requireAuth(['Admin'])) throw new Error('auth');
+
+const user = getUser();
+document.getElementById('sbName').textContent = `${user.firstName} ${user.lastName}`;
+document.getElementById('sbAv').textContent   = user.firstName?.[0] ?? 'ا';
+document.getElementById('tbAv').textContent   = user.firstName?.[0] ?? 'ا';
+document.getElementById('todayTitle').textContent = 'داشبورد — ' + new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+let allAppts = [];
+
+async function loadStats() {
+  try {
+    const [appts, patients] = await Promise.all([
+      api('GET', '/api/admin/reservations/today').catch(() => []),
+      api('GET', '/api/admin/patients').catch(() => []),
+    ]);
+
+    allAppts = appts ?? [];
+    const pending   = allAppts.filter(a => a.status === 'Pending').length;
+    const cancelled = allAppts.filter(a => a.status === 'Cancelled').length;
+
+    document.getElementById('sToday').textContent     = allAppts.length;
+    document.getElementById('sPatients').textContent  = patients?.length ?? '—';
+    document.getElementById('sPending').textContent   = pending;
+    document.getElementById('sCancelled').textContent = cancelled;
+    document.getElementById('pendingCount').textContent = pending;
+
+    renderTable(allAppts);
+    renderActivity(allAppts);
+  } catch(e) { console.error(e); }
+}
+
+function renderTable(list) {
+  const body = document.getElementById('apptBody');
+  if (!list.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--g5)">نوبتی یافت نشد</td></tr>'; return; }
+  body.innerHTML = list.map(r => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:7px">
+          <div class="av-sm" style="background:var(--teal-l);color:var(--teal)">${r.patientName?.[0]??'؟'}</div>
+          ${r.patientName}
+        </div>
+      </td>
+      <td style="color:var(--g5)">${r.specialtyName ?? '—'}</td>
+      <td>${formatTime(r.startTime)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>
+        <div class="act-row">
+          ${r.status === 'Pending' ? `
+            <button class="act-btn act-primary" onclick="confirm_(${r.id})">تأیید</button>
+            <button class="act-btn act-danger" onclick="cancel_(${r.id})">لغو</button>
+          ` : `<button class="act-btn act-outline" onclick="viewAppt(${r.id})"><i class="ti ti-eye"></i></button>`}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+window.filterTable = () => {
+  const status = document.getElementById('filterStatus').value;
+  renderTable(status ? allAppts.filter(a => a.status === status) : allAppts);
+};
+
+window.confirm_ = async (id) => {
+  try {
+    await api('PATCH', `/api/admin/reservations/${id}/confirm`);
+    toast('نوبت تأیید شد', 'success');
+    loadStats();
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+};
+
+window.cancel_ = async (id) => {
+  if (!confirm('لغو نوبت؟')) return;
+  try {
+    await api('PATCH', `/api/admin/reservations/${id}/cancel`);
+    toast('نوبت لغو شد', 'success');
+    loadStats();
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+};
+
+window.viewAppt = (id) => { window.location.href = `pages/appointments.html?id=${id}`; };
+
+function renderActivity(list) {
+  const el = document.getElementById('actFeed');
+  const items = list.slice(0, 5);
+  if (!items.length) { el.innerHTML = '<div class="af-row"><div class="af-dot" style="background:var(--g1)"></div><div class="af-title">فعالیتی وجود ندارد</div></div>'; return; }
+  el.innerHTML = items.map(r => {
+    const color = r.status === 'Confirmed' ? 'var(--teal)' : r.status === 'Cancelled' ? 'var(--coral)' : 'var(--amber)';
+    const label = r.status === 'Confirmed' ? 'نوبت تأیید شد' : r.status === 'Cancelled' ? 'نوبت لغو شد' : 'نوبت ثبت شد';
+    return `<div class="af-row">
+      <div class="af-dot" style="background:${color}"></div>
+      <div><div class="af-title">${label} — ${r.patientName}</div><div class="af-time">${r.specialtyName} ${formatTime(r.startTime)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+async function loadDoctors() {
+  try {
+    const docs = await api('GET', '/api/admin/doctors');
+    const el = document.getElementById('docList');
+    if (!docs?.length) { el.innerHTML = '<div style="text-align:center;color:var(--g5);font-size:12px">دکتری ثبت نشده</div>'; return; }
+    el.innerHTML = docs.slice(0, 4).map(d => `
+      <div class="doc-row">
+        <div class="doc-av ic-teal">${d.user.firstName?.[0] ?? 'د'}</div>
+        <div class="doc-info">
+          <div class="doc-name">دکتر ${d.user.firstName} ${d.user.lastName}</div>
+          <div class="doc-spec">${d.specialtyTitle}</div>
+        </div>
+        <button class="toggle ${d.isActive ? '' : 'off'}" onclick="toggleDoc(${d.id},this)" title="${d.isActive ? 'فعال' : 'غیرفعال'}"></button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+window.toggleDoc = async (id, btn) => {
+  try {
+    await api('PATCH', `/api/admin/doctors/${id}/toggle-active`);
+    btn.classList.toggle('off');
+    toast('وضعیت دکتر تغییر کرد', 'success');
+  } catch(e) { toast('خطا', 'error'); }
+};
+
+window.doLogout = () => {
+  if (confirm('خروج؟')) { const { logout } = { logout: () => { localStorage.clear(); window.location.href = 'index.html'; } }; logout(); }
+};
+
+// Logout inline
+document.querySelector('[onclick="doLogout()"]').onclick = () => {
+  if (confirm('از پنل خارج می‌شوید؟')) { localStorage.clear(); window.location.href = 'index.html'; }
+};
+
+loadStats();
+loadDoctors();
+</script>
+</body>
+</html>

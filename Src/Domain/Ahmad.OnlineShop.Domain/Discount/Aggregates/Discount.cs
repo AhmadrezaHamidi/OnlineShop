@@ -2,6 +2,8 @@ using Ahmad.OnlineShop.Domain.Discount.Args;
 using Ahmad.OnlineShop.Domain.Discount.Enums;
 using Ahmad.OnlineShop.Domain.Discount.Events;
 using Ahmad.OnlineShop.Domain.Discount.Exceptions;
+using Ahmad.OnlineShop.Domain.Discount.Specifications;
+using Ahmad.OnlineShop.Domain.Discount.Strategies;
 using AhmadBase.Doamin;
 
 namespace Ahmad.OnlineShop.Domain.Discount.Aggregates;
@@ -47,23 +49,35 @@ public sealed class Discount : AggregateRoot<long>
 
     // ── Apply ─────────────────────────────────────────────────────────────────
 
-    /// <summary>مبلغ تخفیف را محاسبه و UsageCount را افزایش می‌دهد.</summary>
+    /// <summary>
+    /// مبلغ تخفیف را محاسبه و UsageCount را افزایش می‌دهد.
+    /// از Specification برای اعتبارسنجی و Strategy برای محاسبه استفاده می‌شود.
+    /// </summary>
     public decimal Apply(decimal orderAmount)
     {
-        GuardIsActive();
-        GuardNotExpired();
-        GuardUsageLimit();
-        GuardMinOrderAmount(orderAmount);
+        // Specification Pattern — تمام قوانین به صورت composable بررسی می‌شوند
+        var spec = DiscountSpecificationBuilder.BuildFullValidation();
+        if (!spec.IsSatisfiedBy(this, orderAmount))
+            ThrowDiscountException(spec.FailureReason);
 
         UsageCount++;
 
-        var discountAmount = Type == DiscountType.Percentage
-            ? Math.Round(orderAmount * Value / 100, 0)
-            : Math.Min(Value, orderAmount);
+        // Strategy Pattern — الگوریتم محاسبه بر اساس نوع تخفیف انتخاب می‌شود
+        var strategy      = DiscountStrategyFactory.Create(Type);
+        var discountAmount = strategy.Calculate(orderAmount, Value);
 
         RaiseDomainEvent(new DiscountUsedEvent(Id, Code, UsageCount, discountAmount));
         return discountAmount;
     }
+
+    private static void ThrowDiscountException(string reason) => throw reason switch
+    {
+        var r when r.Contains("غیرفعال")   => (Exception)new DiscountNotActiveException(),
+        var r when r.Contains("منقضی")     => new DiscountExpiredException(),
+        var r when r.Contains("سقف")       => new DiscountMaxUsageReachedException(),
+        var r when r.Contains("حداقل")     => new DiscountMinOrderAmountNotMetException(),
+        _                                   => new InvalidOperationException(reason)
+    };
 
     // ── Status ────────────────────────────────────────────────────────────────
 

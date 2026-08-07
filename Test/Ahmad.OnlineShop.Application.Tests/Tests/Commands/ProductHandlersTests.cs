@@ -18,7 +18,8 @@ public class ProductHandlersTests
 
     public ProductHandlersTests()
     {
-        _sut = new ProductHandlers(_productRepo, _categoryRepo, FakeAppDb.Create());
+        _sut = new ProductHandlers(_productRepo, _categoryRepo, FakeAppDb.Create(),
+            storage: null!, storageOpts: null!);
     }
 
     // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

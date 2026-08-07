@@ -2,33 +2,40 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "clinic-frontend",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "C:\\Users\\ASUS\\Desktop\\Projects\\Denticitery\\Front\\dist", "-p", "5500", "--no-clipboard", "--single"],
+      "name": "petshop-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "jobhunterai-api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "..\\JobHunterAI\\src\\JobHunterAI.Api", "--urls", "http://localhost:5299"],
+      "port": 5299
+    },
+    {
+      "name": "kheirkhabar-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "..\\-FRONT", "run", "dev"],
       "port": 5500
     },
     {
-      "name": "onlineshop-desktop",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "فرانت", "-p", "5510", "--no-clipboard"],
-      "port": 5510
+      "name": "kheirkhabar-api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "..\\Ahmad.KheirKhabar\\Src\\Host\\Ahmad.KheirKhabar.ServiceHost", "--urls", "http://localhost:5141"],
+      "port": 5141
     }
-  ,
-    {
-      "name": "petshop-react",
+    ,{
+      "name": "denticitery-front",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "Src\\Desktop\\PetShop.React",
-      "port": 3002,
-      "autoPort": false
-    },
-    {
-      "name": "denticitery-react",
+      "runtimeArgs": ["--prefix", "C:\\Users\\ASUS\\Desktop\\Projects\\Denticitery\\Front", "run", "dev"],
+      "port": 5500
+    }
+    ,{
+      "name": "mafia-frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "C:\\Users\\ASUS\\Desktop\\Projects\\Denticitery\\Front",
-      "port": 5500,
-      "autoPort": false
+      "runtimeArgs": ["--prefix", "C:\\Users\\ASUS\\Desktop\\Projects\\Mafia\\frontend", "run", "dev", "--", "--port", "5180"],
+      "port": 5180
     }
   ]
 }

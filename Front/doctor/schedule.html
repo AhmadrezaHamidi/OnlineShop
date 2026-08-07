@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>برنامه هفتگی</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom:72px; max-width:480px; margin:0 auto; }
+.topbar { background:var(--teal-d); padding:16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; flex:1; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.day-block { background:#fff; border-radius:12px; border:0.5px solid var(--g1); overflow:hidden; }
+.day-header { background:var(--g0); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; }
+.day-header .date { font-size:13px; font-weight:500; color:var(--g7); }
+.day-header .count { font-size:11px; color:var(--g5); }
+.day-header.today { background:var(--teal-l); }
+.day-header.today .date { color:var(--teal-d); }
+.appt-row { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:0.5px solid var(--g0); }
+.appt-row:last-child { border-bottom:none; }
+.appt-time { font-size:12px; font-weight:500; color:var(--g7); min-width:44px; }
+.appt-info { flex:1; }
+.appt-info .t { font-size:13px; color:var(--g7); }
+.appt-info .s { font-size:11px; color:var(--g5); }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>برنامه هفتگی</h2>
+</div>
+
+<div class="content" id="content">
+  <div class="empty-state"><i class="ti ti-loader"></i><p>در حال بارگذاری...</p></div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+  <a class="tab active" href="schedule.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, formatTime, statusBadge, empty } from '../shared/ui.js';
+
+if (!requireAuth(['Doctor'])) throw new Error('auth');
+
+const todayStr = new Date().toISOString().split('T')[0];
+
+async function load() {
+  const el = document.getElementById('content');
+  try {
+    const days = await api('GET', '/api/doctor/schedule');
+    if (!days?.length) { el.innerHTML = empty('نوبتی یافت نشد'); return; }
+
+    el.innerHTML = days.map(day => {
+      const isToday = day.date === todayStr;
+      const label   = new Date(day.date).toLocaleDateString('fa-IR', { weekday:'long', month:'long', day:'numeric' });
+      return `
+      <div class="day-block">
+        <div class="day-header ${isToday ? 'today' : ''}">
+          <span class="date">${label}${isToday ? ' (امروز)' : ''}</span>
+          <span class="count">${day.count} نوبت</span>
+        </div>
+        ${day.items.map(r => `
+          <div class="appt-row">
+            <span class="appt-time">${formatTime(r.startTime)}</span>
+            <div class="appt-info">
+              <div class="t">${r.patientName}</div>
+              <div class="s">${r.specialty}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              ${statusBadge(r.status)}
+              <a href="prescriptions.html?patient=${r.patientId ?? ''}&reservation=${r.id}"
+                 style="font-size:11px;color:var(--teal);text-decoration:none">نسخه</a>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = empty('خطا در بارگذاری');
+    toast('خطا در بارگذاری برنامه', 'error');
+  }
+}
+
+load();
+</script>
+</body>
+</html>

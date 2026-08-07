@@ -136,12 +136,12 @@
     <value>فرمت شماره موبایل نامعتبر است.</value>
   </data>
   <data name="PasswordMismatchException" xml:space="preserve">
-    <value>رمز عبور جدید و تکرار آن مطابقت ندارند</value>
+    <value>رمز عبور جدید و تکرار آن یکسان نیستند.</value>
   </data>
   <data name="UserExistException" xml:space="preserve">
-    <value>فردی با این نامکاربری قبلا ثبات نام کرده است </value>
+    <value>فردی با این نام کاربری قبلاً ثبت‌نام کرده است.</value>
   </data>
   <data name="UserNotFoundException" xml:space="preserve">
-    <value>کاربر یافت نشد .</value>
+    <value>کاربر یافت نشد.</value>
   </data>
 </root>

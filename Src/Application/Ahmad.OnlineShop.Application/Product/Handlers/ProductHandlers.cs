@@ -1,15 +1,21 @@
 using Ahmad.OnlineShop.Application.Product.Mapper;
 using Ahmad.OnlineShop.Domain.Products.Exceptions;
 using Ahmad.OnlineShop.Persistence.EF;
+using AhmadBase.External.Service.Storage;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ProductAgg = Ahmad.OnlineShop.Domain.Products.Product;
 using CategoryAgg = Ahmad.OnlineShop.Domain.Products.Category;
 
 namespace Ahmad.OnlineShop.Application.Handlers;
 
 public sealed class ProductHandlers(
-    IProductRepository  productRepository,
-    ICategoryRepository categoryRepository,
-    ApplicationDbContext context) :
+    IProductRepository      productRepository,
+    ICategoryRepository     categoryRepository,
+    ApplicationDbContext    context,
+    IFileStorageService     storage,
+    IOptions<FileStorageOptions> storageOpts,
+    ILogger<ProductHandlers>? logger = null) :
     ICommandHandler<CreateProductCommand, long>,
     ICommandHandler<UpdateProductCommand, long>,
     ICommandHandler<ChangeProductPriceCommand, long>,
@@ -209,9 +215,28 @@ public sealed class ProductHandlers(
         var product = await productRepository.Get(cmd.ProductId, token)
             ?? throw new ProductNotFoundException();
 
+        var image = product.Images.FirstOrDefault(i => i.Id == cmd.ImageId)
+            ?? throw new ImageNotFoundException();
+
+        var bucketKey = image.BucketKey;
+
         product.RemoveImage(cmd.ImageId);
         await productRepository.UpdateAsync(product, token);
         await context.SaveChangesAsync(token);
+
+        // حذف فایل از MinIO بعد از موفقیت در DB
+        if (!string.IsNullOrWhiteSpace(bucketKey))
+        {
+            try
+            {
+                await storage.DeleteAsync(storageOpts.Value.DefaultBucket, bucketKey, token);
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "حذف فایل {BucketKey} از MinIO ناموفق بود. رکورد DB حذف شد.", bucketKey);
+            }
+        }
+
         return cmd.ImageId;
     }
 

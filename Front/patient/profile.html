@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>پروفایل</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom: 72px; max-width: 480px; margin: 0 auto; }
+.topbar { background: var(--teal); padding: 16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.profile-header { text-align:center; padding:24px 16px; }
+.profile-av { width:72px;height:72px;border-radius:50%;background:var(--teal);display:inline-flex;align-items:center;justify-content:center;font-size:28px;color:#fff;font-weight:500;margin-bottom:12px; }
+.profile-name { font-size:18px; font-weight:500; color:var(--g7); }
+.profile-phone { font-size:13px; color:var(--g5); margin-top:4px; }
+.menu-item { display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:10px;border:0.5px solid var(--g1);text-decoration:none;color:var(--g7); }
+.menu-item i { font-size:20px;color:var(--g5); }
+.menu-item span { flex:1;font-size:14px; }
+.menu-item .arr { color:var(--g2); font-size:16px; }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>پروفایل من</h2>
+</div>
+
+<div class="content">
+  <div class="card profile-header">
+    <div class="profile-av" id="userAv">؟</div>
+    <div class="profile-name" id="userName">در حال بارگذاری...</div>
+    <div class="profile-phone" id="userPhone"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <a class="menu-item" href="history.html">
+      <i class="ti ti-history"></i>
+      <span>سابقه مراجعات</span>
+      <i class="ti ti-chevron-left arr"></i>
+    </a>
+    <a class="menu-item" href="prescriptions.html">
+      <i class="ti ti-file-text"></i>
+      <span>نسخه‌های دارویی</span>
+      <i class="ti ti-chevron-left arr"></i>
+    </a>
+    <a class="menu-item" href="#" onclick="doLogout()">
+      <i class="ti ti-logout" style="color:var(--coral)"></i>
+      <span style="color:var(--coral)">خروج از حساب</span>
+      <i class="ti ti-chevron-left arr"></i>
+    </a>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-home"></i>خانه</a>
+  <a class="tab" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab active" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { getUser, logout } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+
+if (!requireAuth(['User','Admin','Doctor'])) throw new Error('auth');
+
+const user = getUser();
+if (user) {
+  document.getElementById('userName').textContent  = `${user.firstName} ${user.lastName}`;
+  document.getElementById('userPhone').textContent = user.phoneNumber ?? '';
+  document.getElementById('userAv').textContent    = user.firstName?.[0] ?? '؟';
+}
+
+window.doLogout = () => {
+  if (confirm('از حساب خارج می‌شوید؟')) { logout(); window.location.href = 'index.html'; }
+};
+</script>
+</body>
+</html>

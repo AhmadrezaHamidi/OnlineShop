@@ -1,9 +1,11 @@
 global using AhmadBase.Event.Handler;
 global using AhmadBase.Doamin;
+global using AhmadBase.Application;
 global using Microsoft.Extensions.Logging;
 global using Ahmad.OnlineShop.Domain.Order.Events;
 global using Ahmad.OnlineShop.Domain.Products.Events;
 global using Ahmad.OnlineShop.Domain.Bnpl.Events;
 global using Ahmad.OnlineShop.Domain.BackOffice.Events;
 global using Ahmad.OnlineShop.Domain.Repositories;
+global using Ahmad.OnlineShop.Domain.Invoice.Repositories;
 global using Ahmad.OnlineShop.Domain.Bnpl.Aggregates;

@@ -16,9 +16,13 @@ public class OrderHandlersTests
     private readonly OrderHandlers       _sut;
     private readonly CancellationToken   _ct = CancellationToken.None;
 
+    private readonly FakeDiscountRepository      _discountRepo  = new();
+    private readonly FakeProductPackageRepository _packageRepo   = new();
+
     public OrderHandlersTests()
     {
-        _sut = new OrderHandlers(_repo, FakeAppDb.Create());
+        _sut = new OrderHandlers(_repo, _discountRepo, _packageRepo, FakeAppDb.Create(),
+            zarinpalService: null!);
     }
 
     // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

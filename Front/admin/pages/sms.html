@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>کمپین پیامک</title>
+<link rel="stylesheet" href="../../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+:root{--sidebar:220px}
+body{display:flex;min-height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.logo{padding:20px 16px;border-bottom:0.5px solid rgba(255,255,255,.1)}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-ic{width:34px;height:34px;background:var(--teal-m);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-t{font-size:15px;font-weight:500;color:#fff}
+.nav-sec{padding:14px 10px 4px}
+.nav-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;padding:0 6px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;margin-bottom:2px;text-decoration:none}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.13);color:#fff}
+.nav-item i{font-size:17px}
+.sb-user{margin-top:auto;padding:14px;border-top:0.5px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--teal-m);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:500}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid var(--g1);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.panel{background:#fff;border-radius:12px;border:0.5px solid var(--g1);padding:20px}
+.panel-title{font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.panel-title i{font-size:18px;color:var(--teal)}
+.template-chip{background:var(--g0);border:0.5px solid var(--g1);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;margin-bottom:6px;display:block;text-align:right}
+.template-chip:hover{border-color:var(--teal);color:var(--teal)}
+.char-count{font-size:11px;color:var(--g5);text-align:left;margin-top:4px}
+.audience-opt{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--g0);font-size:13px;cursor:pointer}
+.audience-opt:last-child{border:none}
+.audience-opt input[type=radio]{accent-color:var(--teal)}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--g0);font-size:13px}
+.stat-row:last-child{border:none}
+.stat-val{font-weight:500;color:var(--teal)}
+@media(max-width:800px){.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-row">
+      <div class="logo-ic"><i class="ti ti-tooth" style="font-size:18px;color:#fff"></i></div>
+      <div>
+        <div class="logo-t">کلینیک دندان</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">پنل مدیریت</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">اصلی</div>
+    <a class="nav-item" href="../dashboard.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+    <a class="nav-item" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+    <a class="nav-item" href="patients.html"><i class="ti ti-users"></i>بیماران</a>
+    <a class="nav-item" href="doctors.html"><i class="ti ti-stethoscope"></i>دکترها</a>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">ابزارها</div>
+    <a class="nav-item active" href="sms.html"><i class="ti ti-message-dots"></i>کمپین SMS</a>
+    <a class="nav-item" href="settings.html"><i class="ti ti-settings"></i>تنظیمات</a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">ا</div>
+    <div style="flex:1"><div style="font-size:12px;color:#fff;font-weight:500" id="sbName">ادمین</div></div>
+    <i class="ti ti-logout" style="color:rgba(255,255,255,.4);cursor:pointer" onclick="doLogout()"></i>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div style="font-size:15px;font-weight:500;color:var(--g7)">کمپین پیامک</div>
+  </div>
+
+  <div class="content">
+    <div class="two-col">
+
+      <!-- ارسال پیامک -->
+      <div>
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-title"><i class="ti ti-send"></i>ارسال پیامک گروهی</div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-size:12px;font-weight:500;margin-bottom:8px">مخاطبان</div>
+            <label class="audience-opt">
+              <input type="radio" name="audience" value="all" checked> همه بیماران
+            </label>
+            <label class="audience-opt">
+              <input type="radio" name="audience" value="today"> نوبت‌های امروز
+            </label>
+            <label class="audience-opt">
+              <input type="radio" name="audience" value="tomorrow"> نوبت‌های فردا
+            </label>
+            <label class="audience-opt">
+              <input type="radio" name="audience" value="custom"> شماره دلخواه
+            </label>
+          </div>
+
+          <div class="form-group" id="customGroup" style="display:none">
+            <label>شماره‌های موبایل (با کاما جدا کنید)</label>
+            <textarea class="input" id="customPhones" rows="2" placeholder="09121234567, 09351234567" dir="ltr"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>متن پیام</label>
+            <textarea class="input" id="msgText" rows="5" placeholder="متن پیامک..." oninput="countChars()"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 160 کاراکتر</div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-size:12px;font-weight:500;margin-bottom:8px">کانال ارسال</div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px">
+              <input type="checkbox" id="chSms" checked style="accent-color:var(--teal)"> پیامک (SMS)
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px">
+              <input type="checkbox" id="chBale" style="accent-color:var(--teal)"> پیام‌رسان بله
+            </label>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="sendBtn" onclick="sendCampaign()">
+            <i class="ti ti-send"></i> ارسال کمپین
+          </button>
+        </div>
+
+        <!-- قالب‌های پیش‌ساخته -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-file-text"></i>قالب‌های آماده</div>
+          <div style="font-size:11px;color:var(--g5);margin-bottom:10px">برای انتخاب کلیک کنید</div>
+          <button class="template-chip" onclick="useTemplate(this)">
+            سلام {نام عزیز}، نوبت دندانپزشکی شما فردا ساعت {ساعت} است. لطفاً ۱۰ دقیقه زودتر حضور داشته باشید.
+          </button>
+          <button class="template-chip" onclick="useTemplate(this)">
+            کلینیک دندانپزشکی یادآوری می‌کند: وقت کنترل ۶ ماهه شما فرا رسیده است. برای رزرو با ما تماس بگیرید.
+          </button>
+          <button class="template-chip" onclick="useTemplate(this)">
+            {نام عزیز}، نتیجه رادیوگرافی شما آماده است. لطفاً جهت دریافت مراجعه فرمایید.
+          </button>
+          <button class="template-chip" onclick="useTemplate(this)">
+            نوبت دندانپزشکی {نام} لغو شد. برای تنظیم وقت جدید با کلینیک تماس بگیرید.
+          </button>
+        </div>
+      </div>
+
+      <!-- آمار ارسال -->
+      <div>
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-title"><i class="ti ti-chart-bar"></i>آمار این ماه</div>
+          <div class="stat-row"><span>کل پیامک ارسالی</span><span class="stat-val" id="statTotal">—</span></div>
+          <div class="stat-row"><span>تحویل موفق</span><span class="stat-val" id="statDelivered">—</span></div>
+          <div class="stat-row"><span>ارسال از طریق بله</span><span class="stat-val" id="statBale">—</span></div>
+          <div class="stat-row"><span>کمپین‌های اجرا شده</span><span class="stat-val" id="statCampaigns">—</span></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-history"></i>تاریخچه ارسال</div>
+          <div id="history">
+            <div style="color:var(--g5);font-size:12px;text-align:center;padding:20px">در حال بارگذاری...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, getUser } from '../../shared/api.js';
+import { requireAuth } from '../../shared/auth.js';
+import { toast, setLoading, formatDate } from '../../shared/ui.js';
+
+if (!requireAuth(['Admin'])) throw new Error('auth');
+
+const user = getUser();
+document.getElementById('sbName').textContent = `${user.firstName} ${user.lastName}`;
+document.getElementById('sbAv').textContent   = user.firstName?.[0] ?? 'ا';
+
+// نمایش/پنهان کردن فیلد شماره دلخواه
+document.querySelectorAll('input[name=audience]').forEach(r =>
+  r.addEventListener('change', () => {
+    document.getElementById('customGroup').style.display =
+      r.value === 'custom' && r.checked ? 'block' : 'none';
+  })
+);
+
+window.countChars = () => {
+  document.getElementById('charCount').textContent =
+    document.getElementById('msgText').value.length;
+};
+
+window.useTemplate = (el) => {
+  document.getElementById('msgText').value = el.textContent.trim();
+  countChars();
+};
+
+window.sendCampaign = async () => {
+  const text    = document.getElementById('msgText').value.trim();
+  const audience = document.querySelector('input[name=audience]:checked')?.value ?? 'all';
+  const useSms  = document.getElementById('chSms').checked;
+  const useBale = document.getElementById('chBale').checked;
+
+  if (!text) { toast('متن پیام را وارد کنید', 'error'); return; }
+  if (!useSms && !useBale) { toast('حداقل یک کانال انتخاب کنید', 'error'); return; }
+
+  let phones = null;
+  if (audience === 'custom') {
+    const raw = document.getElementById('customPhones').value;
+    phones = raw.split(',').map(p=>p.trim()).filter(Boolean);
+    if (!phones.length) { toast('شماره موبایل وارد کنید', 'error'); return; }
+  }
+
+  const btn = document.getElementById('sendBtn');
+  setLoading(btn, true);
+  try {
+    await api('POST', '/api/admin/sms/send', { text, audience, phones, useSms, useBale });
+    toast('کمپین با موفقیت ارسال شد', 'success');
+    document.getElementById('msgText').value = '';
+    countChars();
+    loadStats();
+  } catch(e) {
+    toast(e?.message ?? 'خطا در ارسال', 'error');
+  } finally { setLoading(btn, false); }
+};
+
+async function loadStats() {
+  try {
+    const stats = await api('GET', '/api/admin/sms/stats').catch(()=>null);
+    if (stats) {
+      document.getElementById('statTotal').textContent      = stats.totalSent ?? 0;
+      document.getElementById('statDelivered').textContent  = stats.delivered ?? 0;
+      document.getElementById('statBale').textContent       = stats.bale ?? 0;
+      document.getElementById('statCampaigns').textContent  = stats.campaigns ?? 0;
+    }
+
+    const hist = await api('GET', '/api/admin/sms/history').catch(()=>[]);
+    const el   = document.getElementById('history');
+    if (!hist?.length) {
+      el.innerHTML = '<div style="color:var(--g5);font-size:12px;text-align:center;padding:20px">هیچ کمپینی ارسال نشده</div>';
+    } else {
+      el.innerHTML = hist.slice(0,10).map(h=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--g0)">
+          <i class="ti ti-send" style="font-size:16px;color:var(--teal);margin-top:2px"></i>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--g7)">${h.message?.slice(0,60)}${h.message?.length>60?'...':''}</div>
+            <div style="font-size:11px;color:var(--g5);margin-top:3px">${formatDate(h.sentAt)} — ${h.recipientCount} نفر</div>
+          </div>
+        </div>`).join('');
+    }
+  } catch(e) {}
+}
+
+window.doLogout = () => { if(confirm('خروج؟')){ localStorage.clear(); window.location.href='../index.html'; } };
+
+loadStats();
+</script>
+</body>
+</html>

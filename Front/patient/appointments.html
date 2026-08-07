@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>نوبت‌گیری</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom: 72px; max-width: 480px; margin: 0 auto; }
+.topbar { background: var(--teal); padding: 16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.spec-list .spec-item { display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:0.5px solid var(--g1);background:#fff;margin-bottom:8px;cursor:pointer;transition:border-color .15s; }
+.spec-item:hover,.spec-item.selected { border-color:var(--teal); }
+.spec-item .si-ic { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
+.spec-item .si-info { flex:1; }
+.spec-item .si-info .t { font-size:13px;font-weight:500; }
+.spec-item .si-info .s { font-size:11px;color:var(--g5); }
+.slots-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }
+.slot { padding:10px;text-align:center;border:0.5px solid var(--g1);border-radius:8px;font-size:13px;cursor:pointer;background:#fff;transition:all .15s; }
+.slot:hover { border-color:var(--teal);color:var(--teal); }
+.slot.selected { background:var(--teal);color:#fff;border-color:var(--teal); }
+.slot.taken { opacity:.4;cursor:not-allowed;background:var(--g0); }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+.step-indicator { display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:4px; }
+.step-dot { width:8px;height:8px;border-radius:50%;background:var(--g1); }
+.step-dot.active { background:var(--teal);width:20px;border-radius:4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>رزرو نوبت</h2>
+</div>
+
+<div class="content">
+  <div class="step-indicator">
+    <div class="step-dot active" id="d1"></div>
+    <div class="step-dot" id="d2"></div>
+    <div class="step-dot" id="d3"></div>
+  </div>
+
+  <!-- گام ۱: انتخاب تخصص -->
+  <div id="step1">
+    <div class="card">
+      <div class="sec-header"><span class="sec-title">تخصص را انتخاب کنید</span></div>
+      <div class="spec-list" id="specList"><div style="text-align:center;padding:20px;color:var(--g5)"><i class="ti ti-loader" style="font-size:24px"></i></div></div>
+    </div>
+  </div>
+
+  <!-- گام ۲: انتخاب تاریخ -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="sec-header">
+        <button class="btn btn-outline btn-sm" onclick="goStep(1)"><i class="ti ti-arrow-right"></i> برگشت</button>
+        <span class="sec-title" id="step2title">انتخاب تاریخ</span>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>تاریخ</label>
+        <input type="date" class="input" id="dateInput">
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-primary btn-full" onclick="loadSlots()">مشاهده ساعت‌های خالی</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- گام ۳: انتخاب ساعت -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <div class="sec-header">
+        <button class="btn btn-outline btn-sm" onclick="goStep(2)"><i class="ti ti-arrow-right"></i> برگشت</button>
+        <span class="sec-title">انتخاب ساعت</span>
+      </div>
+      <div class="slots-grid" id="slotGrid"><div style="text-align:center;padding:20px;color:var(--g5);grid-column:1/-1"><i class="ti ti-loader" style="font-size:24px"></i></div></div>
+      <div style="margin-top:14px">
+        <button class="btn btn-primary btn-full" id="confirmBtn" style="display:none" onclick="confirmBooking()">تأیید نوبت</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-home"></i>خانه</a>
+  <a class="tab active" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, setLoading } from '../shared/ui.js';
+
+if (!requireAuth(['User','Admin','Doctor'])) throw new Error('auth');
+
+const colors = ['var(--teal-l)/var(--teal)', 'var(--amber-l)/var(--amber)', 'var(--purple-l)/var(--purple)', 'var(--coral-l)/var(--coral)'];
+let selectedSpec = null, selectedSlot = null;
+
+window.goStep = (n) => {
+  [1,2,3].forEach(i => {
+    document.getElementById(`step${i}`).style.display = i === n ? 'block' : 'none';
+    document.getElementById(`d${i}`).className = 'step-dot' + (i === n ? ' active' : '');
+  });
+};
+
+// بارگذاری تخصص‌ها
+async function loadSpecs() {
+  try {
+    const specs = await api('GET', '/api/specialties');
+    const el = document.getElementById('specList');
+    if (!specs?.length) { el.innerHTML = '<p style="color:var(--g5);text-align:center">تخصصی یافت نشد</p>'; return; }
+    el.innerHTML = specs.filter(s => s.isActive).map((s, i) => {
+      const [bg, cl] = colors[i % colors.length].split('/');
+      return `<div class="spec-item" onclick="selectSpec(${s.id},'${s.name}',this)">
+        <div class="si-ic" style="background:${bg};color:${cl}"><i class="ti ti-tooth"></i></div>
+        <div class="si-info">
+          <div class="t">${s.name}</div>
+          <div class="s">${s.hasInstallments ? 'امکان اقساط' : 'نقدی'}</div>
+        </div>
+        <i class="ti ti-chevron-left" style="color:var(--g2)"></i>
+      </div>`;
+    }).join('');
+  } catch(e) { toast('خطا در بارگذاری تخصص‌ها', 'error'); }
+}
+
+window.selectSpec = (id, name, el) => {
+  document.querySelectorAll('.spec-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSpec = { id, name };
+  document.getElementById('step2title').textContent = name;
+
+  // تاریخ پیش‌فرض امروز
+  const today = new Date();
+  today.setDate(today.getDate() + 1);
+  document.getElementById('dateInput').value = today.toISOString().split('T')[0];
+  document.getElementById('dateInput').min  = new Date().toISOString().split('T')[0];
+
+  setTimeout(() => goStep(2), 200);
+};
+
+window.loadSlots = async () => {
+  if (!selectedSpec) return;
+  const date = document.getElementById('dateInput').value;
+  if (!date) { toast('تاریخ را انتخاب کنید', 'error'); return; }
+
+  goStep(3);
+  const el = document.getElementById('slotGrid');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g5);grid-column:1/-1"><i class="ti ti-loader" style="font-size:24px"></i></div>';
+
+  try {
+    const slots = await api('GET', `/api/reservations/available-slots?specialtyId=${selectedSpec.id}&date=${date}`);
+    if (!slots?.length) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g5);grid-column:1/-1">ساعت خالی وجود ندارد</div>';
+      return;
+    }
+    el.innerHTML = slots.map(s => `
+      <div class="slot ${s.isAvailable ? '' : 'taken'}"
+           onclick="${s.isAvailable ? `selectSlot('${s.startTime}','${s.endTime}',this)` : ''}">
+        ${s.startTime.substring(0,5)}
+      </div>`).join('');
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--coral)">خطا در بارگذاری</div>'; }
+};
+
+window.selectSlot = (start, end, el) => {
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = { start, end };
+  document.getElementById('confirmBtn').style.display = 'block';
+};
+
+window.confirmBooking = async () => {
+  if (!selectedSpec || !selectedSlot) { toast('لطفاً همه موارد را انتخاب کنید', 'error'); return; }
+  const date = document.getElementById('dateInput').value;
+  const btn  = document.getElementById('confirmBtn');
+  setLoading(btn, true);
+
+  try {
+    await api('POST', '/api/reservations', {
+      specialtyId: selectedSpec.id,
+      reservationDate: date + 'T00:00:00',
+      startTime: selectedSlot.start,
+      endTime:   selectedSlot.end,
+    });
+    toast('نوبت با موفقیت ثبت شد', 'success');
+    setTimeout(() => window.location.href = 'home.html', 1500);
+  } catch(e) { toast(e?.message ?? 'خطا در ثبت نوبت', 'error'); setLoading(btn, false); }
+};
+
+loadSpecs();
+</script>
+</body>
+</html>

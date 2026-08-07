@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>پیام به بیمار</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom:72px; max-width:480px; margin:0 auto; }
+.topbar { background:var(--teal-d); padding:16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; flex:1; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.patient-item { display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--g0);cursor:pointer; }
+.patient-item:last-child { border-bottom:none; }
+.patient-item:hover { background:var(--g0); }
+.pat-av { width:36px;height:36px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--teal);font-weight:500; }
+.chat-area { display:flex; flex-direction:column; gap:8px; min-height:200px; }
+.msg-out { background:var(--teal); color:#fff; border-radius:12px 12px 4px 12px; padding:10px 14px; font-size:13px; line-height:1.6; align-self:flex-start; max-width:85%; }
+.msg-out .meta { font-size:10px; opacity:.7; margin-top:4px; display:flex; gap:6px; }
+.msg-in  { background:#fff; border:0.5px solid var(--g1); border-radius:12px 12px 12px 4px; padding:10px 14px; font-size:13px; line-height:1.6; align-self:flex-end; max-width:85%; }
+.msg-in .meta { font-size:10px; color:var(--g5); margin-top:4px; }
+.channel-row { display:flex; gap:10px; align-items:center; }
+.channel-lbl { display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer; }
+.send-bar { display:flex; gap:8px; align-items:flex-end; }
+.send-bar textarea { flex:1; resize:none; min-height:44px; max-height:120px; }
+.send-btn { width:44px;height:44px;background:var(--teal);border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex-shrink:0; }
+.quick-msg { background:var(--g0);border:0.5px solid var(--g1);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--g6);cursor:pointer;white-space:nowrap; }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <div style="flex:1">
+    <h2 id="topTitle">پیام به بیمار</h2>
+    <div style="font-size:11px;opacity:.7" id="topPhone"></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- انتخاب بیمار -->
+  <div id="selectSection">
+    <div class="card">
+      <div class="sec-header"><span class="sec-title">انتخاب بیمار</span></div>
+      <input type="text" class="input" id="patSearch" placeholder="جستجو..." oninput="filterPatients(this.value)" style="margin-bottom:10px">
+      <div style="background:#fff;border-radius:10px;border:0.5px solid var(--g1)" id="patientList">
+        <div class="empty-state"><i class="ti ti-loader"></i><p>در حال بارگذاری...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- چت -->
+  <div id="chatSection" style="display:none">
+    <div class="card" style="background:var(--teal-l);border-color:var(--teal-b)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="pat-av" id="chatAv">؟</div>
+        <div>
+          <div style="font-size:14px;font-weight:500" id="chatName"></div>
+          <div style="font-size:12px;color:var(--teal)" id="chatPhone"></div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="margin-right:auto" onclick="clearPatient()">تغییر</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-header"><span class="sec-title">پیام‌های قبلی</span></div>
+      <div class="chat-area" id="chatArea">
+        <div class="empty-state"><p>پیامی ارسال نشده</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-header"><span class="sec-title">پیام جدید</span></div>
+
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none">
+        <div class="quick-msg" onclick="setMsg('لطفاً برای کنترل بعد از درمان مراجعه فرمایید')">یادآوری کنترل</div>
+        <div class="quick-msg" onclick="setMsg('نوبت شما تأیید شد')">تأیید نوبت</div>
+        <div class="quick-msg" onclick="setMsg('لطفاً داروهای تجویزشده را طبق دستور مصرف فرمایید')">یادآوری دارو</div>
+      </div>
+
+      <div class="form-group">
+        <label>متن پیام</label>
+        <textarea class="input" id="msgText" placeholder="پیام خود را بنویسید..." rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>ارسال از طریق</label>
+        <div class="channel-row">
+          <label class="channel-lbl">
+            <input type="checkbox" id="viaSms" checked style="accent-color:var(--teal)"> SMS
+          </label>
+          <label class="channel-lbl">
+            <input type="checkbox" id="viaBale" style="accent-color:var(--purple)">
+            <span style="color:var(--purple)">بله</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="sendBtn" onclick="sendMsg()">
+        <i class="ti ti-send"></i> ارسال پیام
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+  <a class="tab" href="schedule.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, setLoading, formatDate, empty } from '../shared/ui.js';
+
+if (!requireAuth(['Doctor'])) throw new Error('auth');
+
+let allPatients = [], selectedPatient = null;
+
+async function loadPatients() {
+  try {
+    const data = await api('GET', '/api/doctor/today');
+    allPatients = data.items ?? [];
+    renderPatients(allPatients);
+  } catch(e) {
+    document.getElementById('patientList').innerHTML = empty('خطا');
+  }
+}
+
+function renderPatients(list) {
+  const el = document.getElementById('patientList');
+  if (!list.length) { el.innerHTML = '<div class="empty-state"><p>بیماری یافت نشد</p></div>'; return; }
+  el.innerHTML = list.map(p => `
+    <div class="patient-item" onclick="selectPatient(${p.patientId},'${p.patientName}','${p.patientPhone}')">
+      <div class="pat-av">${p.patientName?.[0] ?? '؟'}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${p.patientName}</div>
+        <div style="font-size:11px;color:var(--g5)">${p.patientPhone}</div>
+      </div>
+      <i class="ti ti-chevron-left" style="color:var(--g2)"></i>
+    </div>`).join('');
+}
+
+window.filterPatients = (q) => renderPatients(allPatients.filter(p =>
+  p.patientName?.includes(q) || p.patientPhone?.includes(q)));
+
+window.selectPatient = async (id, name, phone) => {
+  selectedPatient = { id, name, phone };
+  document.getElementById('chatName').textContent  = name;
+  document.getElementById('chatPhone').textContent = phone;
+  document.getElementById('chatAv').textContent    = name?.[0] ?? '؟';
+  document.getElementById('topTitle').textContent  = name;
+  document.getElementById('topPhone').textContent  = phone;
+  document.getElementById('selectSection').style.display = 'none';
+  document.getElementById('chatSection').style.display   = 'flex';
+  document.getElementById('chatSection').style.flexDirection = 'column';
+  document.getElementById('chatSection').style.gap = '12px';
+  await loadMessages(id);
+};
+
+window.clearPatient = () => {
+  selectedPatient = null;
+  document.getElementById('selectSection').style.display = 'block';
+  document.getElementById('chatSection').style.display   = 'none';
+  document.getElementById('topTitle').textContent = 'پیام به بیمار';
+  document.getElementById('topPhone').textContent = '';
+};
+
+async function loadMessages(id) {
+  const el = document.getElementById('chatArea');
+  try {
+    const msgs = await api('GET', `/api/doctor/patients/${id}/messages`);
+    if (!msgs?.length) { el.innerHTML = '<div class="empty-state"><p>پیامی ارسال نشده</p></div>'; return; }
+    el.innerHTML = msgs.map(m => `
+      <div class="msg-out">
+        ${m.messageText}
+        <div class="meta">
+          <span>${formatDate(m.sentAt)}</span>
+          ${m.sentViaSms  ? '<span>SMS ✓</span>' : ''}
+          ${m.sentViaBale ? '<span>بله ✓</span>' : ''}
+        </div>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = empty('خطا'); }
+}
+
+window.setMsg = (text) => { document.getElementById('msgText').value = text; };
+
+window.sendMsg = async () => {
+  if (!selectedPatient) return;
+  const text = document.getElementById('msgText').value.trim();
+  if (!text) { toast('متن پیام را وارد کنید', 'error'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  setLoading(btn, true);
+
+  try {
+    await api('POST', `/api/doctor/patients/${selectedPatient.id}/notify`, { message: text });
+    toast('پیام ارسال شد', 'success');
+    document.getElementById('msgText').value = '';
+    await loadMessages(selectedPatient.id);
+  } catch(e) {
+    toast(e?.message ?? 'خطا در ارسال', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+};
+
+loadPatients();
+</script>
+</body>
+</html>

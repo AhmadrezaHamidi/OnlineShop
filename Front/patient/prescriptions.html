@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>نسخه‌های من</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom: 72px; max-width: 480px; margin: 0 auto; }
+.topbar { background: var(--teal); padding: 16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.rx-card { background:#fff; border-radius:12px; border:0.5px solid var(--g1); overflow:hidden; }
+.rx-header { padding:14px; display:flex; align-items:center; gap:10px; border-bottom:0.5px solid var(--g0); }
+.rx-ic { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0; }
+.rx-info .t { font-size:13px; font-weight:500; }
+.rx-info .s { font-size:11px; color:var(--g5); margin-top:2px; }
+.drug-list { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+.drug-item { background:var(--teal-l); border-radius:8px; padding:10px 12px; }
+.drug-item .name { font-size:13px; font-weight:500; color:var(--teal-d); }
+.drug-item .dose { font-size:11px; color:var(--teal); margin-top:3px; }
+.rx-footer { padding:10px 14px; border-top:0.5px solid var(--g0); display:flex; flex-direction:column; gap:4px; }
+.rx-note { font-size:12px; color:var(--g5); }
+.rx-next { font-size:12px; color:var(--teal-m); }
+.msg-card { background:#fff; border-radius:12px; border:0.5px solid var(--g1); padding:14px; }
+.msg-bubble { background:var(--teal-l); border-radius:10px; padding:10px 12px; font-size:13px; color:var(--teal-d); line-height:1.6; margin-top:8px; }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>نسخه‌ها و پیام‌های دکتر</h2>
+</div>
+
+<div class="content" id="content">
+  <div class="empty-state"><i class="ti ti-loader"></i><p>در حال بارگذاری...</p></div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-home"></i>خانه</a>
+  <a class="tab" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab active" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, getUser } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, formatDate, empty } from '../shared/ui.js';
+
+if (!requireAuth(['User','Admin','Doctor'])) throw new Error('auth');
+
+async function load() {
+  const el = document.getElementById('content');
+  try {
+    const [rxList, msgList] = await Promise.all([
+      api('GET', '/api/patient/prescriptions').catch(() => []),
+      api('GET', '/api/patient/messages').catch(() => []),
+    ]);
+
+    let html = '';
+
+    if (msgList?.length) {
+      html += `<div class="sec-header"><span class="sec-title">پیام‌های دکتر</span></div>`;
+      html += msgList.map(m => `
+        <div class="msg-card">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:13px;font-weight:500;color:var(--g7)">
+              <i class="ti ti-message-circle" style="color:var(--teal)"></i> پیام پزشک
+            </div>
+            <span style="font-size:11px;color:var(--g5)">${formatDate(m.sentAt)}</span>
+          </div>
+          <div class="msg-bubble">${m.messageText}</div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            ${m.sentViaSms  ? '<span class="badge badge-teal"><i class="ti ti-message"></i> SMS</span>' : ''}
+            ${m.sentViaBale ? '<span class="badge badge-purple"><i class="ti ti-brand-telegram"></i> بله</span>' : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    if (rxList?.length) {
+      html += `<div class="sec-header" style="margin-top:4px"><span class="sec-title">نسخه‌های دارویی</span></div>`;
+      html += rxList.map(rx => {
+        const drugs = rx.content?.split('\n').filter(Boolean) ?? [];
+        return `
+        <div class="rx-card">
+          <div class="rx-header">
+            <div class="rx-ic" style="background:var(--teal-l);color:var(--teal)"><i class="ti ti-file-text"></i></div>
+            <div class="rx-info">
+              <div class="t">${rx.doctorName ?? 'دکتر'}</div>
+              <div class="s">${formatDate(rx.issuedAt)} ${rx.diagnosis ? '— ' + rx.diagnosis : ''}</div>
+            </div>
+            <span class="badge badge-teal" style="margin-right:auto">جدید</span>
+          </div>
+          <div class="drug-list">
+            ${drugs.map(d => `<div class="drug-item"><div class="name">${d}</div></div>`).join('')}
+            ${!drugs.length ? `<div class="drug-item"><div class="name">${rx.content}</div></div>` : ''}
+          </div>
+          ${rx.notes || rx.nextVisitDate ? `
+          <div class="rx-footer">
+            ${rx.notes ? `<div class="rx-note"><i class="ti ti-notes"></i> ${rx.notes}</div>` : ''}
+            ${rx.nextVisitDate ? `<div class="rx-next"><i class="ti ti-calendar"></i> ویزیت بعدی: ${formatDate(rx.nextVisitDate)}</div>` : ''}
+          </div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    el.innerHTML = html || empty('نسخه یا پیامی وجود ندارد');
+  } catch(e) {
+    el.innerHTML = empty('خطا در بارگذاری');
+    toast('خطا در بارگذاری', 'error');
+  }
+}
+
+load();
+</script>
+</body>
+</html>

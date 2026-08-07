@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>تاریخچه نوبت‌ها</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body{padding-bottom:72px;max-width:480px;margin:0 auto}
+.topbar{background:var(--teal-d);padding:16px;display:flex;align-items:center;gap:12px;color:#fff}
+.topbar h2{font-size:16px;font-weight:500;flex:1}
+.content{padding:14px}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.filter-chip{border:0.5px solid var(--g1);border-radius:20px;padding:6px 14px;font-size:12px;white-space:nowrap;cursor:pointer;background:#fff;color:var(--g6);font-family:inherit}
+.filter-chip.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.month-group{margin-bottom:16px}
+.month-header{font-size:12px;font-weight:500;color:var(--g5);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.month-header::after{content:"";flex:1;height:0.5px;background:var(--g1)}
+.appt-card{background:#fff;border-radius:10px;border:0.5px solid var(--g1);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.appt-date-box{min-width:44px;height:48px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.appt-date-box .day{font-size:20px;font-weight:600;line-height:1}
+.appt-info{flex:1}
+.appt-spec{font-size:14px;font-weight:500;color:var(--g7)}
+.appt-doc{font-size:12px;color:var(--g5);margin-top:2px}
+.appt-time{font-size:11px;color:var(--g5);margin-top:4px;display:flex;align-items:center;gap:4px}
+.appt-actions{display:flex;gap:6px;margin-top:8px}
+.act-link{font-size:11px;color:var(--teal);cursor:pointer;display:flex;align-items:center;gap:3px;text-decoration:none}
+/* Detail drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;display:none}
+.overlay.show{display:block}
+.sheet{position:fixed;bottom:0;right:0;left:0;max-width:480px;margin:0 auto;background:#fff;border-radius:16px 16px 0 0;z-index:101;transform:translateY(100%);transition:transform .3s;padding:20px;max-height:80vh;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--g1);border-radius:4px;margin:0 auto 16px}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--g0);font-size:13px}
+.detail-row:last-child{border:none}
+.detail-lbl{color:var(--g5)}
+.detail-val{font-weight:500;color:var(--g7)}
+.tabbar{position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55}
+.tab.active{opacity:1;color:var(--teal)}
+.tab i{font-size:20px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>تاریخچه نوبت‌ها</h2>
+  <span id="countBadge" style="font-size:11px;opacity:.7"></span>
+</div>
+
+<div class="content">
+  <div class="filter-row">
+    <button class="filter-chip active" data-status="" onclick="setFilter('')">همه</button>
+    <button class="filter-chip" data-status="Confirmed" onclick="setFilter('Confirmed')">تأیید شده</button>
+    <button class="filter-chip" data-status="Completed" onclick="setFilter('Completed')">انجام شده</button>
+    <button class="filter-chip" data-status="Cancelled" onclick="setFilter('Cancelled')">لغو شده</button>
+    <button class="filter-chip" data-status="Pending" onclick="setFilter('Pending')">در انتظار</button>
+  </div>
+
+  <div id="list">
+    <div style="text-align:center;padding:40px;color:var(--g5)">
+      <i class="ti ti-loader" style="font-size:28px"></i><br><br>در حال بارگذاری...
+    </div>
+  </div>
+</div>
+
+<!-- Bottom sheet جزئیات -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div style="font-size:16px;font-weight:500;margin-bottom:16px" id="sheetTitle">جزئیات نوبت</div>
+  <div class="detail-row"><span class="detail-lbl">تخصص</span><span class="detail-val" id="shSpec"></span></div>
+  <div class="detail-row"><span class="detail-lbl">دکتر</span><span class="detail-val" id="shDoc"></span></div>
+  <div class="detail-row"><span class="detail-lbl">تاریخ</span><span class="detail-val" id="shDate"></span></div>
+  <div class="detail-row"><span class="detail-lbl">ساعت</span><span class="detail-val" id="shTime"></span></div>
+  <div class="detail-row"><span class="detail-lbl">وضعیت</span><span class="detail-val" id="shStatus"></span></div>
+  <div class="detail-row" id="shNoteRow" style="display:none">
+    <span class="detail-lbl">یادداشت</span><span class="detail-val" id="shNote" style="text-align:left;max-width:60%"></span>
+  </div>
+
+  <div id="rxSection" style="display:none;margin-top:16px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--g7)">نسخه پزشک</div>
+    <div id="rxContent" style="background:var(--teal-l);border-radius:8px;padding:12px;font-size:12px;color:var(--teal-d)"></div>
+  </div>
+
+  <button class="btn btn-outline btn-full" style="margin-top:14px" onclick="closeSheet()">بستن</button>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-home"></i>خانه</a>
+  <a class="tab active" href="appointments.html"><i class="ti ti-calendar"></i>نوبت</a>
+  <a class="tab" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, formatDate, formatTime, statusBadge } from '../shared/ui.js';
+
+if (!requireAuth(['User'])) throw new Error('auth');
+
+let all = [], activeFilter = '';
+
+const STATUS_COLOR = {
+  Confirmed: 'var(--teal)',
+  Completed: 'var(--purple)',
+  Cancelled: 'var(--coral)',
+  Pending:   'var(--amber)',
+};
+
+async function load() {
+  try {
+    all = await api('GET', '/api/reservations/my') ?? [];
+    document.getElementById('countBadge').textContent = `${all.length} نوبت`;
+    render();
+  } catch(e) {
+    document.getElementById('list').innerHTML =
+      '<div style="text-align:center;padding:40px;color:var(--coral)">خطا در بارگذاری</div>';
+  }
+}
+
+window.setFilter = (status) => {
+  activeFilter = status;
+  document.querySelectorAll('.filter-chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.status === status));
+  render();
+};
+
+function groupByMonth(items) {
+  const map = {};
+  items.forEach(a => {
+    const d   = new Date(a.reservationDate);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const lbl = d.toLocaleDateString('fa-IR', {year:'numeric', month:'long'});
+    if (!map[key]) map[key] = {lbl, items:[]};
+    map[key].items.push(a);
+  });
+  return Object.values(map);
+}
+
+function render() {
+  const filtered = activeFilter ? all.filter(a => a.status === activeFilter) : all;
+  const list     = document.getElementById('list');
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--g5)"><i class="ti ti-calendar-off" style="font-size:36px"></i><br><br>نوبتی یافت نشد</div>';
+    return;
+  }
+
+  const groups = groupByMonth(filtered);
+  list.innerHTML = groups.map(g => `
+    <div class="month-group">
+      <div class="month-header">${g.lbl}</div>
+      ${g.items.map(a => {
+        const d   = new Date(a.reservationDate);
+        const day = d.toLocaleDateString('fa-IR', {day:'numeric'});
+        const col = STATUS_COLOR[a.status] ?? 'var(--g4)';
+        return `
+          <div class="appt-card" onclick="openDetail(${a.id})">
+            <div class="appt-date-box" style="background:${col}">
+              <div class="day">${day}</div>
+              <div>${d.toLocaleDateString('fa-IR',{weekday:'short'})}</div>
+            </div>
+            <div class="appt-info">
+              <div class="appt-spec">${a.specialtyTitle ?? 'دندانپزشکی'}</div>
+              <div class="appt-doc">${a.doctorName ? 'دکتر '+a.doctorName : 'در انتظار تخصیص دکتر'}</div>
+              <div class="appt-time"><i class="ti ti-clock" style="font-size:12px"></i>${a.startTime ?? '—'}</div>
+              <div class="appt-actions">
+                ${statusBadge(a.status)}
+                ${a.hasPrescription ? '<a class="act-link" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>' : ''}
+              </div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+window.openDetail = async (id) => {
+  const a = all.find(x => x.id === id);
+  if (!a) return;
+
+  const d = new Date(a.reservationDate);
+  document.getElementById('sheetTitle').textContent = a.specialtyTitle ?? 'جزئیات نوبت';
+  document.getElementById('shSpec').textContent     = a.specialtyTitle ?? '—';
+  document.getElementById('shDoc').textContent      = a.doctorName ? 'دکتر '+a.doctorName : '—';
+  document.getElementById('shDate').textContent     = d.toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('shTime').textContent     = a.startTime ?? '—';
+  document.getElementById('shStatus').innerHTML     = statusBadge(a.status);
+
+  const noteRow = document.getElementById('shNoteRow');
+  if (a.notes) { noteRow.style.display='flex'; document.getElementById('shNote').textContent=a.notes; }
+  else { noteRow.style.display='none'; }
+
+  const rxSec = document.getElementById('rxSection');
+  if (a.hasPrescription) {
+    rxSec.style.display = 'block';
+    try {
+      const rxList = await api('GET', '/api/patient/prescriptions');
+      const rx     = rxList?.find(r => r.reservationId === id);
+      document.getElementById('rxContent').textContent = rx?.content ?? 'نسخه‌ای ثبت نشده';
+    } catch(e) { document.getElementById('rxContent').textContent = '—'; }
+  } else { rxSec.style.display = 'none'; }
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('sheet').classList.add('open');
+};
+
+window.closeSheet = () => {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('sheet').classList.remove('open');
+};
+
+load();
+</script>
+</body>
+</html>

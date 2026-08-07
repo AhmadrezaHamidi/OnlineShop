@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت نوبت‌ها</title>
+<link rel="stylesheet" href="../../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+:root{--sidebar:220px}
+body{display:flex;min-height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.logo{padding:20px 16px;border-bottom:0.5px solid rgba(255,255,255,.1)}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-ic{width:34px;height:34px;background:var(--teal-m);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-t{font-size:15px;font-weight:500;color:#fff}
+.nav-sec{padding:14px 10px 4px}
+.nav-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;padding:0 6px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;margin-bottom:2px;text-decoration:none}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.13);color:#fff}
+.nav-item i{font-size:17px}
+.sb-user{margin-top:auto;padding:14px;border-top:0.5px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--teal-m);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:500}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid var(--g1);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar .search{display:flex;align-items:center;gap:8px;background:var(--g0);border:0.5px solid var(--g1);border-radius:8px;padding:7px 12px;min-width:200px}
+.toolbar .search input{background:none;border:none;outline:none;font-size:12px;color:var(--g7);width:160px;font-family:inherit}
+select.filter{border:0.5px solid var(--g1);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--g7);background:#fff;font-family:inherit}
+input[type=date].filter{border:0.5px solid var(--g1);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--g7);background:#fff;font-family:inherit}
+.panel{background:#fff;border-radius:12px;border:0.5px solid var(--g1);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;color:var(--g5);font-weight:500;text-align:right;padding:12px 14px;border-bottom:0.5px solid var(--g0);white-space:nowrap}
+td{font-size:12px;color:var(--g7);padding:11px 14px;border-bottom:0.5px solid var(--g0);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g0)}
+.av-sm{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500}
+.act-row{display:flex;gap:4px}
+.act-btn{border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.act-primary{background:var(--teal);color:#fff}
+.act-outline{background:#fff;border:0.5px solid var(--g1);color:var(--g6)}
+.act-danger{background:var(--coral-l);color:var(--coral)}
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px}
+.page-btn{width:32px;height:32px;border:0.5px solid var(--g1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;background:#fff;color:var(--g7)}
+.page-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:15px;font-weight:500}
+.close-btn{width:32px;height:32px;border:none;background:var(--g0);border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--g5)}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-row">
+      <div class="logo-ic"><i class="ti ti-tooth" style="font-size:18px;color:#fff"></i></div>
+      <div>
+        <div class="logo-t">کلینیک دندان</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">پنل مدیریت</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">اصلی</div>
+    <a class="nav-item" href="../dashboard.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+    <a class="nav-item active" href="appointments.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+    <a class="nav-item" href="patients.html"><i class="ti ti-users"></i>بیماران</a>
+    <a class="nav-item" href="doctors.html"><i class="ti ti-stethoscope"></i>دکترها</a>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">ابزارها</div>
+    <a class="nav-item" href="sms.html"><i class="ti ti-message-dots"></i>کمپین SMS</a>
+    <a class="nav-item" href="settings.html"><i class="ti ti-settings"></i>تنظیمات</a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">ا</div>
+    <div style="flex:1"><div style="font-size:12px;color:#fff;font-weight:500" id="sbName">ادمین</div></div>
+    <i class="ti ti-logout" style="color:rgba(255,255,255,.4);cursor:pointer" onclick="doLogout()"></i>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div style="font-size:15px;font-weight:500;color:var(--g7);flex:1">مدیریت نوبت‌ها</div>
+    <button class="btn btn-primary btn-sm" onclick="openNewModal()">
+      <i class="ti ti-plus"></i> نوبت جدید
+    </button>
+  </div>
+
+  <div class="content">
+    <div class="toolbar">
+      <div class="search">
+        <i class="ti ti-search" style="color:var(--g2);font-size:15px"></i>
+        <input type="text" placeholder="جستجو نام بیمار..." id="searchInput" oninput="applyFilters()">
+      </div>
+      <select class="filter" id="statusFilter" onchange="applyFilters()">
+        <option value="">همه وضعیت‌ها</option>
+        <option value="Pending">در انتظار</option>
+        <option value="Confirmed">تأیید شده</option>
+        <option value="Cancelled">لغو شده</option>
+        <option value="Completed">انجام شده</option>
+      </select>
+      <input type="date" class="filter" id="dateFilter" onchange="applyFilters()">
+      <button class="btn btn-outline btn-sm" onclick="clearFilters()">
+        <i class="ti ti-filter-off"></i> پاک
+      </button>
+    </div>
+
+    <div class="panel">
+      <table>
+        <thead><tr>
+          <th>#</th><th>بیمار</th><th>تخصص</th><th>تاریخ</th><th>ساعت</th><th>وضعیت</th><th>عملیات</th>
+        </tr></thead>
+        <tbody id="apptBody">
+          <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)"><i class="ti ti-loader"></i> در حال بارگذاری...</td></tr>
+        </tbody>
+      </table>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ثبت نوبت -->
+<div class="overlay" id="newModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">ثبت نوبت جدید</span>
+      <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="form-group">
+      <label>شماره موبایل بیمار</label>
+      <div style="display:flex;gap:8px">
+        <input type="tel" class="input" id="newPhone" placeholder="09xxxxxxxxx" dir="ltr" style="flex:1">
+        <button class="btn btn-outline btn-sm" onclick="lookupPatient()"><i class="ti ti-search"></i></button>
+      </div>
+    </div>
+    <div id="patientInfo" style="display:none;background:var(--teal-l);border-radius:8px;padding:10px;margin-bottom:14px;font-size:13px;color:var(--teal-d)"></div>
+    <div class="form-group">
+      <label>تخصص</label>
+      <select class="input" id="newSpec"><option value="">انتخاب تخصص...</option></select>
+    </div>
+    <div class="form-group">
+      <label>تاریخ</label>
+      <input type="date" class="input" id="newDate">
+    </div>
+    <div class="form-group">
+      <label>ساعت شروع</label>
+      <input type="time" class="input" id="newStart" dir="ltr">
+    </div>
+    <div class="form-group">
+      <label>ساعت پایان</label>
+      <input type="time" class="input" id="newEnd" dir="ltr">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal()">انصراف</button>
+      <button class="btn btn-primary" style="flex:1" id="saveBtn" onclick="saveAppt()">
+        <i class="ti ti-check"></i> ثبت نوبت
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api, getUser, logout } from '../../shared/api.js';
+import { requireAuth } from '../../shared/auth.js';
+import { toast, setLoading, formatDate, formatTime, statusBadge } from '../../shared/ui.js';
+
+if (!requireAuth(['Admin'])) throw new Error('auth');
+
+const user = getUser();
+document.getElementById('sbName').textContent = `${user.firstName} ${user.lastName}`;
+document.getElementById('sbAv').textContent   = user.firstName?.[0] ?? 'ا';
+
+let allAppts = [], filtered = [], page = 1;
+const PAGE_SIZE = 15;
+
+async function load() {
+  try {
+    allAppts = await api('GET', '/api/admin/reservations') ?? [];
+    applyFilters();
+  } catch(e) {
+    document.getElementById('apptBody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--coral)">خطا در بارگذاری</td></tr>';
+  }
+}
+
+window.applyFilters = () => {
+  const q      = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const date   = document.getElementById('dateFilter').value;
+  filtered = allAppts.filter(a =>
+    (!q      || a.patientName?.toLowerCase().includes(q)) &&
+    (!status || a.status === status) &&
+    (!date   || a.reservationDate?.startsWith(date))
+  );
+  page = 1;
+  renderTable();
+};
+
+window.clearFilters = () => {
+  document.getElementById('searchInput').value  = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('dateFilter').value   = '';
+  applyFilters();
+};
+
+function renderTable() {
+  const start  = (page-1) * PAGE_SIZE;
+  const sliced = filtered.slice(start, start + PAGE_SIZE);
+  const body   = document.getElementById('apptBody');
+
+  if (!sliced.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">نوبتی یافت نشد</td></tr>';
+  } else {
+    body.innerHTML = sliced.map((r, i) => `
+      <tr>
+        <td style="color:var(--g5)">${start + i + 1}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="av-sm" style="background:var(--teal-l);color:var(--teal)">${r.patientName?.[0]??'؟'}</div>
+            <span>${r.patientName ?? '—'}</span>
+          </div>
+        </td>
+        <td>${r.specialtyName ?? '—'}</td>
+        <td>${formatDate(r.reservationDate)}</td>
+        <td>${formatTime(r.startTime)}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td>
+          <div class="act-row">
+            ${r.status==='Pending' ? `
+              <button class="act-btn act-primary" onclick="confirmAppt(${r.id})"><i class="ti ti-check"></i> تأیید</button>
+              <button class="act-btn act-danger"  onclick="cancelAppt(${r.id})">لغو</button>
+            ` : `<span style="font-size:11px;color:var(--g5)">—</span>`}
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // pagination
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pag   = document.getElementById('pagination');
+  if (total <= 1) { pag.innerHTML=''; return; }
+  pag.innerHTML = Array.from({length:total},(_,i)=>
+    `<div class="page-btn ${i+1===page?'active':''}" onclick="goPage(${i+1})">${i+1}</div>`
+  ).join('');
+}
+
+window.goPage = (n) => { page = n; renderTable(); };
+
+window.confirmAppt = async (id) => {
+  try {
+    await api('PATCH', `/api/admin/reservations/${id}/confirm`);
+    toast('نوبت تأیید شد', 'success');
+    load();
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+};
+
+window.cancelAppt = async (id) => {
+  if (!confirm('لغو نوبت؟')) return;
+  try {
+    await api('PATCH', `/api/admin/reservations/${id}/cancel`);
+    toast('لغو شد', 'success');
+    load();
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+};
+
+window.openNewModal = async () => {
+  document.getElementById('newModal').classList.add('show');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('newDate').value = today;
+  document.getElementById('newDate').min   = today;
+  try {
+    const specs = await api('GET', '/api/specialties');
+    const sel   = document.getElementById('newSpec');
+    sel.innerHTML = '<option value="">انتخاب تخصص...</option>' +
+      specs.filter(s=>s.isActive).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  } catch(e) {}
+};
+
+window.closeModal = () => { document.getElementById('newModal').classList.remove('show'); };
+
+let foundPatientId = null;
+window.lookupPatient = async () => {
+  const phone = document.getElementById('newPhone').value.trim();
+  if (!phone) return;
+  try {
+    const patients = await api('GET', `/api/admin/patients?phone=${phone}`);
+    const p = patients?.[0];
+    if (p) {
+      foundPatientId = p.id;
+      document.getElementById('patientInfo').style.display = 'block';
+      document.getElementById('patientInfo').textContent   = `${p.firstName} ${p.lastName} — ${p.phoneNumber}`;
+    } else {
+      toast('بیمار یافت نشد', 'error');
+    }
+  } catch(e) { toast('خطا در جستجو', 'error'); }
+};
+
+window.saveAppt = async () => {
+  if (!foundPatientId) { toast('ابتدا بیمار را جستجو کنید', 'error'); return; }
+  const specId = document.getElementById('newSpec').value;
+  const date   = document.getElementById('newDate').value;
+  const start  = document.getElementById('newStart').value;
+  const end    = document.getElementById('newEnd').value;
+  if (!specId || !date || !start || !end) { toast('همه فیلدها را پر کنید', 'error'); return; }
+
+  const btn = document.getElementById('saveBtn');
+  setLoading(btn, true);
+  try {
+    await api('POST', '/api/admin/reservations', {
+      userId: foundPatientId,
+      specialtyId: parseInt(specId),
+      reservationDate: date + 'T00:00:00',
+      startTime: start + ':00',
+      endTime:   end   + ':00',
+    });
+    toast('نوبت ثبت شد', 'success');
+    closeModal();
+    load();
+  } catch(e) { toast(e?.message ?? 'خطا', 'error'); }
+  finally { setLoading(btn, false); }
+};
+
+window.doLogout = () => { if(confirm('خروج؟')){ localStorage.clear(); window.location.href='../index.html'; } };
+
+// بررسی query param
+const params = new URLSearchParams(location.search);
+if (params.get('new') === '1') openNewModal();
+
+load();
+</script>
+</body>
+</html>

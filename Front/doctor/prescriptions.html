@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ثبت نسخه</title>
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+<style>
+body { padding-bottom:72px; max-width:480px; margin:0 auto; }
+.topbar { background:var(--teal-d); padding:16px; display:flex; align-items:center; gap:12px; color:#fff; }
+.topbar h2 { font-size:16px; font-weight:500; }
+.content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.patient-select { background:#fff; border-radius:12px; border:0.5px solid var(--g1); }
+.patient-item { display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--g0);cursor:pointer; }
+.patient-item:last-child { border-bottom:none; }
+.patient-item:hover { background:var(--g0); }
+.patient-item.selected { background:var(--teal-l); }
+.pat-av { width:36px;height:36px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--teal);font-weight:500; }
+.pat-info .t { font-size:13px;font-weight:500; }
+.pat-info .s { font-size:11px;color:var(--g5); }
+.drug-row { display:flex;gap:8px;align-items:flex-start;margin-bottom:8px; }
+.drug-row .drug-fields { flex:1;display:flex;flex-direction:column;gap:6px; }
+.drug-row .del-btn { color:var(--coral);font-size:20px;padding-top:10px;cursor:pointer;flex-shrink:0; }
+.add-drug { border:0.5px dashed var(--teal);background:none;border-radius:8px;color:var(--teal);padding:8px;width:100%;font-family:inherit;font-size:13px;cursor:pointer; }
+.tabbar { position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:0.5px solid var(--g1);display:flex;max-width:480px;margin:0 auto;padding:8px 0 12px; }
+.tab { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--g5);text-decoration:none;opacity:.55; }
+.tab.active { opacity:1;color:var(--teal); }
+.tab i { font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" style="color:#fff;text-decoration:none"><i class="ti ti-arrow-right" style="font-size:20px"></i></a>
+  <h2>ثبت نسخه</h2>
+</div>
+
+<div class="content">
+  <!-- انتخاب بیمار -->
+  <div class="card" id="patientSection">
+    <div class="sec-header"><span class="sec-title">انتخاب بیمار</span></div>
+    <input type="text" class="input" id="patSearch" placeholder="جستجو نام یا شماره..." oninput="filterPatients(this.value)" style="margin-bottom:10px">
+    <div class="patient-select" id="patientList">
+      <div class="empty-state"><i class="ti ti-loader"></i><p>در حال بارگذاری...</p></div>
+    </div>
+  </div>
+
+  <!-- فرم نسخه -->
+  <div id="rxForm" style="display:none">
+    <div class="card" style="background:var(--teal-l);border-color:var(--teal-b)" id="selectedPatCard">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="pat-av" id="selPatAv">؟</div>
+        <div>
+          <div style="font-size:14px;font-weight:500" id="selPatName"></div>
+          <div style="font-size:12px;color:var(--teal)" id="selPatPhone"></div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="margin-right:auto" onclick="clearPatient()">تغییر</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>تشخیص</label>
+        <input type="text" class="input" id="diagnosis" placeholder="مثال: عفونت باکتریایی دندان ۳۶">
+      </div>
+
+      <div class="sec-header"><span class="sec-title">داروها</span></div>
+      <div id="drugRows"></div>
+      <button class="add-drug" onclick="addDrug()"><i class="ti ti-plus"></i> افزودن دارو</button>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label>یادداشت</label>
+        <textarea class="input" id="notes" placeholder="توصیه‌های پس از درمان..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>تاریخ ویزیت بعدی</label>
+        <input type="date" class="input" id="nextVisit">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <a href="message.html" class="btn btn-outline" style="text-align:center">
+        <i class="ti ti-message-circle"></i> پیام بده
+      </a>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitRx()">
+        <i class="ti ti-check"></i> ثبت نسخه
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a class="tab" href="home.html"><i class="ti ti-layout-dashboard"></i>داشبورد</a>
+  <a class="tab" href="schedule.html"><i class="ti ti-calendar"></i>نوبت‌ها</a>
+  <a class="tab active" href="prescriptions.html"><i class="ti ti-file-text"></i>نسخه</a>
+  <a class="tab" href="profile.html"><i class="ti ti-user"></i>پروفایل</a>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { api } from '../shared/api.js';
+import { requireAuth } from '../shared/auth.js';
+import { toast, setLoading, empty } from '../shared/ui.js';
+
+if (!requireAuth(['Doctor'])) throw new Error('auth');
+
+let allPatients = [], selectedPatient = null, drugCount = 0;
+
+// بارگذاری بیماران از نوبت‌های امروز
+async function loadPatients() {
+  try {
+    const data = await api('GET', '/api/doctor/today');
+    allPatients = data.items ?? [];
+    renderPatients(allPatients);
+  } catch(e) {
+    document.getElementById('patientList').innerHTML = empty('خطا در بارگذاری');
+  }
+}
+
+function renderPatients(list) {
+  const el = document.getElementById('patientList');
+  if (!list.length) { el.innerHTML = '<div class="empty-state"><p>بیماری یافت نشد</p></div>'; return; }
+  el.innerHTML = list.map(p => `
+    <div class="patient-item" onclick="selectPatient(${p.patientId},'${p.patientName}','${p.patientPhone}')">
+      <div class="pat-av">${p.patientName?.[0] ?? '؟'}</div>
+      <div class="pat-info">
+        <div class="t">${p.patientName}</div>
+        <div class="s">${p.patientPhone} — ${p.specialty}</div>
+      </div>
+      <i class="ti ti-chevron-left" style="color:var(--g2)"></i>
+    </div>`).join('');
+}
+
+window.filterPatients = (q) => {
+  const filtered = allPatients.filter(p =>
+    p.patientName?.includes(q) || p.patientPhone?.includes(q));
+  renderPatients(filtered);
+};
+
+window.selectPatient = (id, name, phone) => {
+  selectedPatient = { id, name, phone };
+  document.getElementById('selPatName').textContent  = name;
+  document.getElementById('selPatPhone').textContent = phone;
+  document.getElementById('selPatAv').textContent    = name?.[0] ?? '؟';
+  document.getElementById('rxForm').style.display    = 'flex';
+  document.getElementById('rxForm').style.flexDirection = 'column';
+  document.getElementById('rxForm').style.gap        = '12px';
+  document.getElementById('patientSection').style.display = 'none';
+  if (!drugCount) addDrug();
+};
+
+window.clearPatient = () => {
+  selectedPatient = null;
+  document.getElementById('patientSection').style.display = 'block';
+  document.getElementById('rxForm').style.display = 'none';
+};
+
+window.addDrug = () => {
+  drugCount++;
+  const id  = `drug${drugCount}`;
+  const row = document.createElement('div');
+  row.className = 'drug-row';
+  row.id = id;
+  row.innerHTML = `
+    <div class="drug-fields">
+      <input type="text" class="input" placeholder="نام دارو و دوز (مثال: آموکسی‌سیلین ۵۰۰mg)">
+      <input type="text" class="input" placeholder="دستور مصرف (مثال: سه بار در روز — ۷ روز)">
+    </div>
+    <i class="ti ti-trash del-btn" onclick="document.getElementById('${id}').remove()"></i>`;
+  document.getElementById('drugRows').appendChild(row);
+};
+
+window.submitRx = async () => {
+  if (!selectedPatient) { toast('بیمار را انتخاب کنید', 'error'); return; }
+  const rows  = document.querySelectorAll('.drug-row');
+  const drugs = Array.from(rows).map(r => {
+    const inputs = r.querySelectorAll('input');
+    return `${inputs[0].value} — ${inputs[1].value}`;
+  }).filter(d => d.trim() !== ' — ');
+
+  if (!drugs.length) { toast('حداقل یک دارو وارد کنید', 'error'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  setLoading(btn, true);
+
+  try {
+    await api('POST', `/api/doctor/patients/${selectedPatient.id}/prescriptions`, {
+      content:       drugs.join('\n'),
+      diagnosis:     document.getElementById('diagnosis').value,
+      notes:         document.getElementById('notes').value,
+      nextVisitDate: document.getElementById('nextVisit').value || null,
+    });
+    toast('نسخه با موفقیت ثبت شد', 'success');
+    setTimeout(() => window.location.href = 'home.html', 1500);
+  } catch(e) {
+    toast(e?.message ?? 'خطا در ثبت نسخه', 'error');
+    setLoading(btn, false);
+  }
+};
+
+// بررسی query param برای pre-select بیمار
+const params = new URLSearchParams(location.search);
+const preId  = params.get('patient');
+
+loadPatients().then(() => {
+  if (preId) {
+    const p = allPatients.find(x => String(x.patientId) === preId);
+    if (p) selectPatient(p.patientId, p.patientName, p.patientPhone);
+  }
+});
+</script>
+</body>
+</html>
